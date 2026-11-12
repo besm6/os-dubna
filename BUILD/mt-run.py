@@ -1,0 +1,153 @@
+#!/usr/bin/env python3
+"""Boot OS Dubna and run a job from 7/M through Multitype.
+
+Usage: mt-run.py [zone]     (zone of 7/M, octal, default 110 = hello.dub)
+
+Starts besm6 with boot-run.ini. The simulator connects tty25 (operator
+console) and tty26 (Multitype) to sockets opened here; both are driven
+with send/expect. Transcripts: mt-run-tty25.txt, mt-run-tty26.txt.
+"""
+import os, re, select, socket, subprocess, sys, time
+
+ZONE = sys.argv[1] if len(sys.argv) > 1 else "110"
+
+# GOST output turns Latin lookalikes into Cyrillic: compare both as Latin.
+# Timeouts are multiplied by SLOW (for traced runs).
+SLOW = float(os.environ.get("SLOW", "1"))
+
+LOOK = str.maketrans("АВЕКМНОРСТХУ", "ABEKMHOPCTXY")
+
+def norm(s):
+    return s.translate(LOOK)
+
+class Fail(Exception):
+    pass
+
+class Line:
+    def __init__(self, name, listener):
+        self.name = name
+        self.listener = listener
+        self.sock = None
+        self.text = ""          # unread output
+        self.log = open("mt-run-%s.txt" % name, "w")
+
+    def connect(self, timeout=10):
+        """SIMH probes a Connect= address at attach time and hangs up;
+        the real connection comes at the first poll, with a banner."""
+        end = time.time() + timeout * SLOW
+        while not self.text:
+            if time.time() > end:
+                raise Fail("%s: no connection" % self.name)
+            if self.sock is None:
+                self.sock, _ = self.listener.accept()
+            self.read(0.5)
+
+    def read(self, timeout):
+        r, _, _ = select.select([self.sock], [], [], timeout)
+        if not r:
+            return
+        d = self.sock.recv(4096)
+        if not d:
+            self.sock.close()
+            self.sock = None
+            if self.text:
+                raise Fail("%s: connection closed" % self.name)
+            return
+        s = d.decode("utf-8", "replace").replace("\r", "")
+        self.text += s
+        self.log.write(s); self.log.flush()
+        sys.stdout.write(s); sys.stdout.flush()
+
+    def expect(self, pattern, timeout=10):
+        """Wait for a regex (lookalikes ignored); consume output up to it."""
+        rx = re.compile(norm(pattern))
+        end = time.time() + timeout * SLOW
+        while True:
+            m = rx.search(norm(self.text))
+            if m:
+                self.text = self.text[m.end():]
+                return m
+            left = end - time.time()
+            if left <= 0:
+                raise Fail("%s: timeout waiting for %r" % (self.name, pattern))
+            self.read(min(left, 0.5))
+
+    def send(self, text):
+        # One character at a time: the Consul input register holds one.
+        for c in text:
+            self.sock.sendall(c.encode())
+            time.sleep(0.02)
+
+def prn_bytes():
+    return sum(os.path.getsize(f) for f in ("output.txt", "output1.txt")
+               if os.path.exists(f))
+
+def listen():
+    s = socket.socket()
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    s.bind(("127.0.0.1", 0))
+    s.listen(1)
+    s.settimeout(30)
+    return s
+
+def main():
+    l25, l26 = listen(), listen()
+    env = dict(os.environ,
+               TTY25=str(l25.getsockname()[1]),
+               TTY26=str(l26.getsockname()[1]))
+    out = open("boot-run.out", "w")
+    sim = subprocess.Popen(["besm6", os.environ.get("INI", "boot-run.ini")], env=env,
+                           stdin=subprocess.PIPE, stdout=out, stderr=out)
+    try:
+        con, mt = Line("tty25", l25), Line("tty26", l26)
+        con.connect(); mt.connect()
+
+        # Operator console: date, time, printer ready.
+        con.expect(r"W23\n", 30)
+        con.send("\r");        con.expect(r"!!!")
+        con.send("040489D\r"); con.expect(r"04/04/89.*\n")
+        con.send("T\r")
+        con.expect(r"ДАЙТЕ ПРИКАЗ +A1P", 40)
+        con.expect(r"ПЛАНИРОВЩИК")
+        con.send(os.environ.get("ORDER", "A1P") + "\r")
+
+        # Multitype: password, buffer, list and submit the job.
+        mt.send("  ");          mt.expect(r"PASS:")
+        mt.send("MJPOP\r");     mt.expect(r"БУФЕР:")
+        mt.send("7/M\r");       mt.expect(r"\n {5}")
+        mt.send("ЛИС %s\r" % ZONE)
+        mt.expect(r"\*END FILE\n")
+        mt.send("СЛА %s,17\r" % ZONE)
+        mt.expect(r"СЧЕТ")
+
+        # The job starts from the input queue: its code is announced.
+        con.expect(r"Ш17:", 30)
+        # Poll until the job is gone, then wait for the printer.
+        for _ in range(60):
+            mt.send("KAK\r")
+            m = mt.expect(r"KAK\n(.*\n)")
+            if norm("НЕТ ЗАДАЧ") in m.group(1):
+                break
+            time.sleep(1)
+        else:
+            raise Fail("the job did not finish")
+        end = time.time() + int(os.environ.get("PRNWAIT", "20"))
+        while time.time() < end and not prn_bytes():
+            con.read(0.5); mt.read(0.5)
+        print("\n--- printers: %d bytes" % prn_bytes())
+        return 0
+    except Fail as e:
+        print("\nFAIL:", e)
+        return 1
+    finally:
+        # Stop the run and quit, so that SIMH flushes and closes the images.
+        sim.terminate()
+        try:
+            sim.stdin.write(b"quit\n")
+            sim.stdin.close()
+            sim.wait(30)
+        except (BrokenPipeError, subprocess.TimeoutExpired):
+            print("\nFAIL: the simulator did not quit; images may be stale")
+            sim.kill()
+
+sys.exit(main())

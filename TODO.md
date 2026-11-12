@@ -227,8 +227,11 @@ Tasks are done in order. Each one gets a "Findings" note when finished.
   - Scripted input: `set tty26 unicode,authbs` so that `send` can carry Russian commands;
     with `qwerty` the Cyrillic letters are dropped. Multitype drops the line (`ВРЕМЯ`,
     `К О Н Е Ц`) after about 10 s without input.
-  - Telnet variant: `attach tty line=26 4199` is rejected now; use
-    `attach tty26 Line=26,4199` (`boot-mt.ini`, driven by `mt-session.py`).
+  - Scripted run: `mt-run.py` listens on two ports and starts `besm6 boot-run.ini`,
+    whose Consuls dial out (`attach tty25 Line=25,Connect=...;notelnet`); both lines are
+    driven by send/expect, about 45 s per run. SIMH probes a `Connect=` address at attach
+    time and hangs up, so wait for the banner. Stop SIMH with `quit`, not a kill: killed,
+    it loses buffered writes to the images.
   - Not done: listing on `prn0`. The print spooler is `TASK11`, absent until the task
     library is built (`ТАSК!`, see T7), so the listing stays in 3/D73OUT. Moved to T10.
   - Test job: `hello.dub` (checked with `dubna hello.dub`); `put-job.sh deck [zone]`
