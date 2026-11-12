@@ -248,10 +248,12 @@ Bits 34 and 25 have two meanings each. Both readers see the same bit.
 
 Variants:
 
-- `boot-drums.ini` sets ТР2 = `3700 0000 0000 0001`: also clear the auto-input catalog, but
-  use real drums 21/22. This is the first boot.
-- `boot-second.ini` sets ТР2 = `3730 …`, ТР3 = 0.
-- At `ПЛАНИРОВЩИК`, `boot-run.ini` sets ТР6 = `7417 7777 4000 0160`, adding bit 24 so the
+- `boot-run.ini` (drum 20, the boots of `mk-base.sh`) sets ТР2 = `3730 0000 0000 0001`:
+  also clear the auto-input catalog, and model MS drums 21/22 on 9/MONSYS. ТР3 = 0.
+- `boot_dubna-25.b6` (drum 25: `DRUM=25` in `boot-run.ini`, and `dubna.ini`) has
+  ТР2 = `0730 0000 0000 0001`, keeping the input and output catalogs across a reboot, and
+  ТР7 = `0000 0000 0140 1200`, the boot drum address of drum 25₈.
+- At `ПЛАНИРОВЩИК`, `boot-run.ini` and `dubna.ini` set ТР6 = `7417 7777 4000 0160`, adding bit 24 so the
   planner skips the resource check, and ТР3 = `7777 7777 0000 0000`, which gives all math-task
   slots the privileged physical-access extracodes (job `newdd` writes drum 25₈ with them).
   The 2017 scripts also set ТР1 = `… 0360` to reopen drum 25₈. Don't: an open drum gets

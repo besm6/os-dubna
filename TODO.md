@@ -75,18 +75,20 @@ Do the tasks in order; each one ends with a short "Findings" note.
   - Findings: none. In the dispatcher source (`dd-base-src.list`) only `SPECMON` declares
     `INFLOAD*`, `/VERE/`, `RM*`, `A/I0`, `A/MINUS`, `*REGIM//`, and it is pinned in
     `deck-b1/fix-aux.s`. Other hits are unrelated local names.
-- [ ] **T7. Bootstrap from scratch.**
-  - Done: `BUILD/mk-base.sh` makes the SIMH part reproducible: fresh disk and drum images,
-    `tra-libs.b6`, hello into 7/M, then `newbsz` (task library, so the spooler is there) and
-    `newdd` (drum 25), each queued with `ПУС` and started with `{}БП`; the result goes to
-    `data/base/`. `bootstrap.sh` calls it in place of `expect1.ini`/`expect2.ini`. Takes about
-    14 minutes, most of it printing the `newdd` listing.
-    - `mt-run.py` now sends `А1Р` only when the spooler asks for it (an empty task library
-      gives `ТАSК!`), and repeats `CONSUBMIT` orders until the job starts.
-  - Left: remove or convert the 2017 and early files (`expect1.ini`, `expect2.ini`,
-    `expe.ex`, `first-boot.ini`, `first-dd-boot.ini`, `second-boot*.ini`, `d@dubna.ini`,
-    `ddubna.ini`, `boot-drums.ini`, `boot-disks.ini`, `boot-second.ini`, `boot-tty26.ini`,
-    `ReadMeBoot.txt`); run `bootstrap.sh` end to end once.
+- [x] **T7. Bootstrap from scratch.**
+  - Findings: `cd BUILD && ./bootstrap.sh` runs end to end without a terminal in about
+    20 minutes and leaves `data/base/` with the task library and the rebuilt DD on drum 25;
+    a fresh drum-25 boot then prints hello on `prn0`.
+    - `mk-base.sh` does the SIMH part: fresh disk and drum images, `tra-libs.b6`, hello into
+      7/M, then `newbsz` and `newdd`, each queued with `ПУС` and started with `{}БП`.
+    - `mt-run.py` sends `А1Р` only when the spooler asks (an empty task library gives
+      `ТАSК!`), and repeats `CONSUBMIT` orders until the job starts.
+    - New `dubna.ini`: the system from drum 25 for interactive use, console on the terminal,
+      Multitype on telnet port 4199.
+    - Removed: `expect1.ini`, `expect2.ini`, `expe.ex`, `first-boot.ini`,
+      `first-dd-boot.ini`, `second-boot*.ini`, `d@dubna.ini`, `ddubna.ini`,
+      `boot-drums.ini`, `boot-disks.ini`, `boot-second.ini`, `boot-tty26.ini`,
+      `ReadMeBoot.txt`, `ReadMeFirst.txt`. `README.md`, `CLAUDE.md` and the docs follow.
 - [ ] **T8. Write it down.** A document on how the boot fits together; update `README.md`
   and `CLAUDE.md`; remove what is obsolete in `BUILD/`.
 

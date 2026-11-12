@@ -43,19 +43,11 @@ touch $TAPES/1999
 
 echo "Run DEBMULT"
 touch $TAPES/1999
-dispak -l debmult.b6 | tee /dev/tty > debmult.list
+dispak -l debmult.b6 > debmult.list
 
 echo "Compiling the PATCH DECK ... and linking DD...."
-dispak -l deck-b1.b6 | tee /dev/tty > deck-b1.list
+dispak -l deck-b1.b6 > deck-b1.list
 
-echo "Making drum images for SIMH"
-( cd data; ./mkdrumdd.sh)
-
-echo "Copy libraries to build DD and STL in SIMH"
-dispak -l tra-libs.b6 | tee /dev/tty > tra-libs.list
-
-echo "All done and ready for the first boot!"
-sleep 3
-
-echo "Building the task library and drum 25 in SIMH"
+# Drum images, tra-libs.b6, and the jobs newbsz and newdd run in SIMH.
+echo "Building the images, the task library and drum 25 in SIMH"
 ./mk-base.sh

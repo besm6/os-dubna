@@ -59,8 +59,8 @@ Run from `BUILD/`; scripts use relative paths and must be started in their own d
 cd BUILD && ./bootstrap.sh
 ```
 
-Requirements: `dispak` and `besmtool` on PATH, SIMH `besm6` at `$SIMH/besm6` (the `SIMH`
-variable must be set), `expect`, `telnet`, `tempfile`. Dispak system tapes 2048 and 2148 (the latter used by `mk-stl-src.sh`) must
+Requirements: `dispak` and `besmtool` on PATH, SIMH `besm6` on PATH built from branch
+`dubna` of simh-besm6 (`set cpu mem=128`, `set cpu ext32`), Python 3. Dispak system tapes 2048 and 2148 (the latter used by `mk-stl-src.sh`) must
 already be available to `dispak`; nothing in this repo provides them.
 
 The scripts read and write tape images in `BUILD/tapes/` (ignored by git), named by tape
@@ -80,13 +80,17 @@ Pipeline in `bootstrap.sh`:
    `debmult.b6` and the deck under `dispak` to link DD.
 5. `data/mkdrumdd.sh` — cut drum images out of tape 1999.
 6. `tra-libs.b6` — copy libraries and rebuild jobs onto disk for use inside SIMH.
-7. Boot SIMH twice: `expect1.ini` (first boot, drums only, initializes roll tracks) and
-   `expect2.ini` (second boot from disk). During the second boot `expe.ex` must be started
-   in another window; it drives Multitype over telnet port 4199 to rebuild DD and STL
-   inside OS Dubna and put the result on drum 25.
+7. `mk-base.sh` — rebuild the images, then boot SIMH twice with `mt-run.py` (both consoles
+   driven over sockets by send/expect, `boot-run.ini`): job `newbsz` builds the task library
+   5/D73LIB (the print spooler is in it), job `newdd` writes a rebuilt DD to drum 25. The
+   images are saved in `BUILD/data/base/`.
 
-After the bootstrap, run the system with `besm6 -i ddubna.ini` (or `d@dubna.ini`) from
-`BUILD/`. `runtests.ini` runs the hardware tests from the drum images.
+After the bootstrap, run the system with `besm6 dubna.ini` from `BUILD/` (console on the
+terminal, Multitype on telnet port 4199). `./mt-run.py [zone]` boots and runs a job from 7/M
+non-interactively; its options are environment variables listed in the script
+(`FRESH=1` restores `data/base`, `SUBMIT=ПУС` queues the job so its listing is printed,
+`DRUM=25` boots the rebuilt DD). Transcripts: `mt-run-tty25.txt`, `mt-run-tty26.txt`,
+printer: `output.txt`. `runtests.ini` runs the hardware tests from the drum images.
 
 Each job's listing lands in `BUILD/*.list`; errors are found by reading these, not from
 exit codes. Error `E50 0076` at the end of the link job is expected (`deck-b1/deck.notes`

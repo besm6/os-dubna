@@ -11,7 +11,7 @@ OS Dubna talks to people through Consul typewriters. In the SIMH setup there are
 | tty26 | Multitype `MULTITYP` ([nrespost.dd3:9356](../besmdisp/nrespost.dd3#L9356)) | User terminal: log in, edit a deck, start jobs, watch them. |
 
 A free line chooses its role by what is typed first: `ОР` binds it as an operator console
-(reply `!!!`; `expe.ex` does this on tty26), two spaces bind it to Multitype. `REF` gives an
+(reply `!!!`; the 2017 script `expe.ex` did this on tty26), two spaces bind it to Multitype. `REF` gives an
 operator console back.
 
 ## Common rules
@@ -432,13 +432,18 @@ These work on a job started with `ОТЛ` or `СЛО`.
 
 | Script | Line | What it sends |
 | --- | --- | --- |
-| `BUILD/mt-run.py` | tty25 | empty line, `040489D`, `T`, `A1P` (or `$ORDER`), `$CONAFTER` |
-| | tty26 | two spaces, `MJPOP`, `7/M`, `ЛИС 110`, `СЛА 110,17` or `ПУС 110,17` (`$SUBMIT`), `KAK` until the job ends |
-| `BUILD/expe.ex` (2017) | tty26 | `ОР`, date, time, `REF`; log in; `ЛИС`/`СЛА 105,17` (job newbsz); `KAK`; `СЛУ 100`, `7/M`; `ЛИС`/`СЛА 100,17` (job newdd); `ТЕЛЕГРАММА: NEW SYSTEM IS READY! …`; `K O H` |
+| `BUILD/mt-run.py` | tty25 | empty line, `040489D`, `T`, `A1P` when the spooler asks (`$ORDER`); after a `ПУС`, orders such as `01БП` (`$CONSUBMIT`) |
+| | tty26 | two spaces, `MJPOP`, `7/M`, `ЛИС zone` and an empty line, `СЛА zone,17` or `ПУС zone,17` (`$SUBMIT`), `КАК` or `СЧЕ` (`$POLL`) until the job ends |
+| `BUILD/mk-base.sh` | both | `mt-run.py` with `ПУС` and `{}БП` for `newbsz` (zone 105) and `newdd` (zone 100) |
+
+The 2017 script `expe.ex` (removed) ran `newbsz` and `newdd` with `СЛА` on tty26, after
+taking it as an operator console with `ОР` and giving it back with `REF`.
 
 Notes:
 
 - Deck zones of 7/M used here: 100 newdd, 105 newbsz, 110 hello.
-- `СЛА` gives no listing (see [Starting jobs](#starting-jobs)); the self-rebuild jobs do not
-  need one.
+- `СЛА` gives no listing (see [Starting jobs](#starting-jobs)); queue a job with `ПУС` to
+  get it on the printer. `newbsz` and `newdd` ask for 24 minutes, so the planner does not
+  start them in debug mode; `NNБП` starts them at once.
+- A listing that fills a page waits for a key: the first character typed after it is lost.
 - The date must be in 1989.

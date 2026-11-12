@@ -41,8 +41,9 @@ and drum images are assembled and booted in SIMH.
 Requirements:
 
 - `dispak` and `besmtool` on `PATH`, with Dispak system tapes 2048 and 2148;
-- SIMH `besm6` binary, with the `SIMH` variable set to its directory;
-- `expect` and `telnet`.
+- SIMH `besm6` on `PATH`, built from branch `dubna` of
+  [simh-besm6](https://github.com/besm6/simh) (it needs `set cpu mem=128` and `set cpu ext32`);
+- Python 3.
 
 The scripts keep tape images in `BUILD/tapes/`.
 
@@ -51,20 +52,26 @@ cd BUILD
 ./bootstrap.sh
 ```
 
-The script boots the system twice. When the second boot asks for it, start
-`./expe.ex` in a separate window: it connects to the second console on telnet
-port 4199 and rebuilds DD and the static library inside OS Dubna, placing the
-new system on drum 25.
+The script compiles the dispatcher and libraries under `dispak` and builds the drum and
+disk images. Then `mk-base.sh` boots them in SIMH twice, driving both consoles through
+`mt-run.py`: the job `newbsz` builds the task library (the print spooler is in it), and the
+job `newdd` writes a rebuilt dispatcher to drum 25. The resulting images are saved in
+`BUILD/data/base/`. This part takes about a quarter of an hour.
 
 After that, run the system from `BUILD/` with:
 
 ```sh
-besm6 -i ddubna.ini
+besm6 dubna.ini
 ```
+
+This terminal is the operator console; Multitype is on telnet port 4199. Commands and
+replies are described in [docs/Dubna_Commands.md](docs/Dubna_Commands.md).
+`./mt-run.py` boots and runs a job non-interactively (`FRESH=1 SUBMIT=ПУС ./mt-run.py`
+prints the hello job on `output.txt`).
 
 More details are in `BUILD/`:
 
-- [ReadMeFirst.txt](BUILD/ReadMeFirst.txt), [ReadMeBoot.txt](BUILD/ReadMeBoot.txt) — boot steps and known restrictions;
+- [deck-b1/deck.notes](BUILD/deck-b1/deck.notes) — known restrictions of the 2017 build;
 - [ReadMeTapes.txt](BUILD/ReadMeTapes.txt) — tape numbers used by the bootstrap;
 - [ReadMeJobs.txt](BUILD/ReadMeJobs.txt) — how to submit jobs to the running system;
 - [the-bootstrap-plan.txt](BUILD/the-bootstrap-plan.txt) — phases of the bootstrap.
