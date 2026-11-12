@@ -16,3 +16,4 @@ BUILD/output1.txt
 BUILD/mt-run-*.txt
 BUILD/*debug*.txt
 BUILD/data/*.pre-t10
+BUILD/data/base/

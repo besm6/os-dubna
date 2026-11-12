@@ -7,7 +7,7 @@ Starts besm6 with boot-run.ini. The simulator connects tty25 (operator
 console) and tty26 (Multitype) to sockets opened here; both are driven
 with send/expect. Transcripts: mt-run-tty25.txt, mt-run-tty26.txt.
 """
-import os, re, select, socket, subprocess, sys, time
+import os, re, select, shutil, socket, subprocess, sys, time
 
 ZONE = sys.argv[1] if len(sys.argv) > 1 else "110"
 
@@ -90,7 +90,14 @@ def listen():
     s.settimeout(30)
     return s
 
+def fresh():
+    """FRESH=1: start from the images saved in data/base."""
+    for f in ("dubdrum1.bin", "dubdrum2.bin", "disk9.bin", "disk11.bin"):
+        shutil.copyfile("data/base/" + f, "data/" + f)
+
 def main():
+    if os.environ.get("FRESH"):
+        fresh()
     l25, l26 = listen(), listen()
     env = dict(os.environ,
                TTY25=str(l25.getsockname()[1]),
@@ -118,20 +125,43 @@ def main():
         mt.send("7/M\r");       mt.expect(r"\n {5}")
         mt.send("ЛИС %s\r" % ZONE)
         mt.expect(r"\*END FILE\n")
-        mt.send("СЛА %s,17\r" % ZONE)
-        mt.expect(r"СЧЕТ")
+        # Extra Multitype commands before the submit, separated by "|".
+        for cmd in filter(None, os.environ.get("BEFORE", "").split("|")):
+            mt.send(cmd + "\r")
+            mt.expect(r"\n {5}\S.*\n")
+            mt.read(2)
+        # СЛА runs the job from the buffer; ПУС puts it into the input queue.
+        mt.send("%s %s,17\r" % (os.environ.get("SUBMIT", "СЛА"), ZONE))
+        mt.expect(r"\n {5}\S.*\n")
 
         # The job starts from the input queue: its code is announced.
-        con.expect(r"Ш17:", 30)
-        # Poll until the job is gone, then wait for the printer.
-        for _ in range(60):
+        con.expect(r"Ш\d\d:", int(os.environ.get("JOBWAIT", "30")))
+        # Extra operator orders after the job starts, separated by "|".
+        for cmd in filter(None, os.environ.get("CONAFTER", "").split("|")):
+            time.sleep(2)
+            con.send(cmd + "\r")
+            con.read(3)
+        # Poll until the job ends: "СЧЕТ ОКОНЧЕН" for a queued job,
+        # "НЕТ ЗАДАЧ" once it has been seen running.
+        seen = False
+        for _ in range(int(os.environ.get("POLLS", "60"))):
             mt.send("KAK\r")
             m = mt.expect(r"KAK\n(.*\n)")
-            if norm("НЕТ ЗАДАЧ") in m.group(1):
+            if norm("ОКОНЧЕН") in m.group(1):
                 break
+            if norm("НЕТ ЗАДАЧ") in m.group(1):
+                if seen:
+                    break
+            else:
+                seen = True
             time.sleep(1)
         else:
             raise Fail("the job did not finish")
+        # Extra Multitype commands, separated by "|".
+        for cmd in filter(None, os.environ.get("AFTER", "").split("|")):
+            mt.send(cmd + "\r")
+            mt.expect(r"\n {5}\S.*\n")
+            mt.read(2)
         end = time.time() + int(os.environ.get("PRNWAIT", "20"))
         while time.time() < end and not prn_bytes():
             con.read(0.5); mt.read(0.5)
