@@ -1,12 +1,12 @@
 #! /bin/sh
 # Make the baseline images in data/base, used by "FRESH=1 ./mt-run.py".
-# Fresh disks and drums from the dispak build, then two jobs run in SIMH:
+# Fresh disks and drums from the dubna build, then two jobs run in SIMH:
 # newbsz builds the task library 5/D73LIB (the print spooler is in it),
 # newdd writes the rebuilt dispatcher to drum 25.
 . ./env.sh
 set -e
 (cd data && ./mkdisk9.sh && ./mkdisk11.sh && ./mkdrumdd.sh) > mk-base.log 2>&1
-dispak -l tra-libs.b6 > tra-libs.list
+run_job tra-libs.dub tra-libs.list
 ./put-job.sh hello.dub 110 >> mk-base.log
 
 # Queue each job and start it at once (its time limit keeps the planner waiting).

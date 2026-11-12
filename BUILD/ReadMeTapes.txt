@@ -48,14 +48,16 @@
 # 00 - 77 | perso of the compiled source
 #     100 | sources in the cosy format
 #----------------------------------- 
-# Pre-fixed tape number ranges in DD bootstrap
+# Pre-fixed tape number ranges in DD bootstrap.
+# dubna takes tape numbers up to 999: the 2017 numbers lost
+# their thousands digit in 2026 (1400 -> 400, 2209 -> 209).
 #
-#    1- 999 Original tapes  
-# 1000-1199 Compilers
-# 1200-1399 Monitor System (MS) & libraries
-# 1400-1899 OS Dubna Dispatcher (DD)
-# 1900-1999 Temp/Scratch tapes 
-# 2200-2299 Bridge tapes DISPAK/SIMH
+#   1- 99 Original tapes  
+# 100-199 Compilers
+# 200-399 Monitor System (MS) & libraries
+# 400-899 OS Dubna Dispatcher (DD)
+# 900-999 Temp/Scratch tapes 
+# 209, 211, 224 Bridge tapes dubna/SIMH: 2NN = disk NN
 
 ## original tape images (as is)
 #
@@ -63,36 +65,29 @@
   12 - librar-12
   37 - librar-37
 
-## 1000-1199 Compilers
+## 100-199 Compilers
 #
-1000 - Мadlen
-1100 - loader
+100 - loader
 
-## 1200-1399 Monitor System (MS) & libraries
+## 200-399 Monitor System (MS) & libraries
 #
-1200 - Мониторная Система
-1221 - libra21 
-1223 - libra23 (compilation in FOREX-3)
-1247 - task11+task47 (compilation in FOREX-3)
-1300 - exfor - not used (partial source code)
+200 - Мониторная Система
+221 - libra21 
+223 - libra23
+247 - task11+task47 (compilation in FOREX)
+301 - exfor - not used (partial source code)
 
-## 1400-1899 OS Dubna Dispatcher (DD)
+## 400-899 OS Dubna Dispatcher (DD)
 #
-1400 - Диспетчер
-1500 - macro67.dd1   - not used
-1600 - tasksav.dd2   - not used
-1700 - nrespost.dd3  - not used
-1800 - sluga.dd4     - not used
-1899 - extold        - not used
+400 - Диспетчер
 
-## 1900-1999 Temp/Scratch tapes
-1900 -
-1990 -
-1999 - the scratch tape for the source uploading
+## 900-999 Temp/Scratch tapes
+922 - 9/MONSYS from zone 40: MS drum 22 for the link job
+990 - DD perso for linking
+999 - DD with the system, cut into drum images
 
-## 2200-2299 Bridge tapes
+## Bridge tapes
 #
-2209  - disk9    - 7Mb system disk
-2211  - disk11   - 7Mb library disk
-2224  - disk24   - 7Mb source code DD,MS,STL disk
-
+209  - disk9    - 7Mb system disk
+211  - disk11   - 7Mb library disk
+224  - disk24   - 7Mb source code DD,MS,STL disk

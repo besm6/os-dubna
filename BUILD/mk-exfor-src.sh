@@ -1,52 +1,16 @@
 #! /bin/sh
+# Compile EXFOR (besmtask/*.vv) under dubna onto tape 301 and try it.
+# Not used by the bootstrap.
 . ./env.sh
-# Staging OS Dubna sources in Dispak for the bootstrap  
-# Copyright 2017, by Mikhail Popov
-# staging FORTRAN source code
-set -x
-# besm6/besm6.github.io/sources/dubna/besmtask
-REPO=`pwd`/../besmtask/*.vv
-
-TEMP=$(tempfile) || exit
-trap "rm -f -- '$TEMP'" EXIT
-
-(
-cd spl;
-echo loading sources form $TEMP
-#./load $REPO
-if [ $? -ne "0" ]; then
-   rm -f -- "$TEMP"
-   trap - EXIT
-   exit 1
-fi 
-
-)
-
-# numbering the source and place it on tape 1301
-# then do the default compilation with a listing 
-touch $TAPES/1301
-
-cat > $TEMP << EOF
-шифр 419999 зс5^
-лен 50(1999-ЗП)^
-лен 66(1301-ЗП)^
-лен 41(2048)^
-eeв1а3
+run_src_job 301 exfor-base-src.list ../besmtask/*.vv <<'EOF'
 *name exfor-2017
-*      no list
 *edit
-*r:50100
+*r:50000
 *w:66100
 *c All main source are numbered
 *n:    0001
 *ee
-*
-*     The default compilation
-*
-*call putflag*
-5
 *MADLEN(L=FBGR,I=66100)
-*tcatalog
 *to perso:66000,77
 *       perso:66000
 *madlen.
@@ -76,22 +40,4 @@ eeв1а3
         programma
         end
 *end file
-\`\`\`\`\`\`
-еконец
 EOF
-
-cat $TEMP
-sleep 1
-
-echo compiling ...
-dispak -l $TEMP > exfor-base-src.list
-
-if [ $? -ne "0" ]; then
-   rm -f -- "$TEMP"
-   trap - EXIT
-   exit 1
-fi 
-
-rm -f -- "$TEMP"
-trap - EXIT
-exit 0

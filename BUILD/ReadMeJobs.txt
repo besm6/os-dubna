@@ -5,8 +5,8 @@
 # Rev A. 2019/02/01
 #
 
-Tapes with numbers in the range of 2200-2299 are logically distributed as
-bridge between DISPAK and SIMH.  The idea is to use DISPAK environment to
+Tapes 209 and 211 (2209 and 2211 before 2026) are logically distributed as
+bridge between dubna and SIMH.  The idea is to use the dubna environment to
 prepare the work components and then run the job with these componnents in
 SIMH.  Components, it can be sources, libraries or any other data that
 require placement on tapes or disks of the system before starting your job
@@ -16,7 +16,7 @@ MULTITYPE interface is available to start, stop jobs and intercept output.
 Here it is the list of the main steps of preparation and submittion of job.
 
 1. Prepare the batch file for your job and all othe compomments
-2. White this fiile on one of the bridge tape using DISPAK
+2. Write this file on one of the bridge tapes using dubna (put-job.sh)
 3. Do the same for all other commoments in you job
 4. In your MULTITYPE session assign the bridge tape to your working buffer.
 5. Run the task from the buffer zone where you placed your task file.

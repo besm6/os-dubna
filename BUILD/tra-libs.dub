@@ -1,14 +1,7 @@
-шифр 419999 зс5^
-лен 50(1247)^
-лен 41(2048)^
-лен 40(9)^
-лен 66(1990-ЗП)^
-лен 67(2209-ЗП)^
-eeв1а3
 *name TRA-LIBS
-*     no list
-*call putflag*
-5
+*tape:247/stl,50
+*tape:990/,66
+*tape:209/disk9,67,w
 *     Boundaries on disk are very impotart 
 *     copy DD library to 11-LINBUF
 *perso:66040
@@ -612,5 +605,3 @@ C.....
 *     ll
 *ee
 *END FILE
-``````
-еконец

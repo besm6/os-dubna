@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 An archive of OS Dubna for the BESM-6 mainframe (sources saved circa 1988) plus the
 scripts by M. Popov (2017-2019) that rebuild it and boot it on the SIMH `besm6` simulator.
 There is no conventional build system or test suite: "building" means running BESM-6 batch
-jobs under the `dispak` simulator to compile the sources, then assembling disk/drum images
+jobs under the `dubna` simulator to compile the sources, then assembling disk/drum images
 with `dd` and booting them in SIMH.
 
 Terminology used everywhere:
@@ -15,7 +15,9 @@ Terminology used everywhere:
 - **DD** — Dubna Dispatcher (the OS kernel), sources in Madlen assembler.
 - **MS** — Monitor System "Dubna" (monitor + dynamic loader + libraries), sources in Fortran/Madlen.
 - **STL** — static library; **LD** — loader; **Multitype** — the terminal subsystem.
-- **Dispak** — a different BESM-6 OS, used here as the cross-build host via the `dispak` simulator.
+- **dubna** — a fast simulator that runs Monitor Dubna batch jobs (`.dub` files), with its
+  extracodes done in C++; the cross-build host (source at github.com/besm6/dubna). Until 2026
+  the build used `dispak`, which runs a different BESM-6 OS (Диспак) with its own monitor.
 - **perso** — compiled object zones on a tape; **cosy** — the compressed source text format.
 
 ## Layout
@@ -45,7 +47,7 @@ Terminology used everywhere:
     commands, and the values used by the `BUILD` boot scripts.
   - `Dubna_Commands.md` — operator console orders (tty25), print spooler orders, Multitype
     commands (tty26) and the replies to them.
-  - `Boot_Process.md` — how the bootstrap works: dispak stage, disk and drum images, the SIMH
+  - `Boot_Process.md` — how the bootstrap works: dubna stage, disk and drum images, the SIMH
     boot sequence, the rebuild jobs, running and pitfalls.
   - `OS_Dubna_Tutorial.md` — for users: start the system, log in to Multitype, type and run
     a job, read the printout.
@@ -64,27 +66,30 @@ Run from `BUILD/`; scripts use relative paths and must be started in their own d
 cd BUILD && ./bootstrap.sh
 ```
 
-Requirements: `dispak` and `besmtool` on PATH, SIMH `besm6` on PATH built from branch
-`dubna` of simh-besm6 (`set cpu mem=128`, `set cpu ext32`), Python 3. Dispak system tapes 2048 and 2148 (the latter used by `mk-stl-src.sh`) must
-already be available to `dispak`; nothing in this repo provides them.
+Requirements: `dubna` and `besmtool` on PATH, SIMH `besm6` on PATH built from branch
+`dubna` of simh-besm6 (`set cpu mem=128`, `set cpu ext32`), Python 3. `dubna` must be recent
+enough to grow tape images on write, tag the words it writes and do sector exchanges with
+disks (November 2026).
 
 The scripts read and write tape images in `BUILD/tapes/` (ignored by git), named by tape
 number. `BUILD/env.sh`, sourced by every script, sets `TAPES` and exports `BESM6_PATH` so
-that `dispak` and `besmtool` look there first and then in `/usr/local/share/besm6`.
+that `dubna` and `besmtool` look there first and then in `/usr/local/share/besm6`.
 
 Pipeline in `bootstrap.sh`:
 
-1. `populate-dsk.sh` — write the original tape images into `BUILD/tapes`.
-2. `mk-dd-src.sh`, `mk-stl-src.sh`, `mk-ld-src.sh` — each one loads sources via `spl/load`
-   onto scratch tape 1999, then runs a generated Dispak job that copies them to the target
-   tape and compiles them. `mk-ms-src.sh`, `mk-lib21-src.sh`, `mk-lib23-src.sh`,
-   `mk-exfor-src.sh` follow the same pattern but are not called by the bootstrap.
+1. `populate-dsk.sh` — write the original tape images into `BUILD/tapes`, and tape 922
+   (9/MONSYS from zone 40, the MS drum 22 for the link job).
+2. `mk-dd-src.sh`, `mk-stl-src.sh`, `mk-ld-src.sh` — each one runs a dubna job through
+   `run_src_job` (`env.sh`): the sources, concatenated, are mounted as a local file on unit
+   50, copied by the editor to the target tape from zone 100 and compiled to zones 0-77.
+   `mk-ms-src.sh`, `mk-lib21-src.sh`, `mk-lib23-src.sh`, `mk-exfor-src.sh` follow the same
+   pattern but are not called by the bootstrap.
 3. `data/mkdisk9.sh`, `data/mkdisk11.sh`, `data/mkbridges.sh` — concatenate catalog + contents
    + padding into SIMH disk images and symlink them into `BUILD/tapes` as bridge tapes.
 4. `deck-b1/mk-deck-b1.sh` — emit the patch deck job (config + fixes for SIMH), then run
-   `debmult.b6` and the deck under `dispak` to link DD.
-5. `data/mkdrumdd.sh` — cut drum images out of tape 1999.
-6. `tra-libs.b6` — copy libraries and rebuild jobs onto disk for use inside SIMH.
+   `debmult.dub` and the deck under `dubna` to link DD onto tape 999.
+5. `data/mkdrumdd.sh` — cut drum images out of tape 999.
+6. `tra-libs.dub` — copy libraries and rebuild jobs onto disk for use inside SIMH.
 7. `mk-base.sh` — rebuild the images, then boot SIMH twice with `mt-run.py` (both consoles
    driven over sockets by send/expect, `boot-run.ini`): job `newbsz` builds the task library
    5/D73LIB (the print spooler is in it), job `newdd` writes a rebuilt DD to drum 25. The
@@ -100,30 +105,33 @@ non-interactively; its options are environment variables listed in the script
 printer: `output.txt`. `runtests.ini` runs the hardware tests from the drum images.
 
 Each job's listing lands in `BUILD/*.list`; errors are found by reading these, not from
-exit codes. Error `E50 0076` at the end of the link job is expected (`deck-b1/deck.notes`
-lists this and other known restrictions, e.g. the date accepts only year 1989).
+exit codes (`БЫЛИ OШИБKИ`, `Error:`). `deck-b1/deck.notes` lists known restrictions, e.g.
+the date accepts only year 1989.
 
 ## Tape numbers
 
 Tape numbers are hardcoded across the scripts and job files; `BUILD/ReadMeTapes.txt` is the
 authoritative map. Each build tape holds perso (compiled objects) in zones 00-77 and
-cosy sources from zone 100.
+cosy sources from zone 100. dubna takes tape numbers up to 999, so the 2017 numbers lost
+their thousands digit (1400 → 400).
 
 | Range | Use |
 | --- | --- |
 | 9, 12, 37 | original images: monsys, librar-12, librar-37 |
-| 1000-1199 | compilers (1000 Madlen, 1100 loader) |
-| 1200-1399 | MS and libraries (1200 MS, 1221 lib21, 1223 lib23, 1247 tasks) |
-| 1400-1899 | DD (1400) |
-| 1900-1999 | scratch (1999 is the source upload tape) |
-| 2200-2299 | bridge tapes Dispak/SIMH (2209, 2211, 2224 = disks 9, 11, 24) |
+| 100-199 | compilers (100 loader) |
+| 200-399 | MS and libraries (200 MS, 221 lib21, 223 lib23, 247 tasks, 301 exfor) |
+| 400-899 | DD (400) |
+| 900-999 | scratch (922 MS drum 22, 990 DD perso, 999 linked DD with the system) |
+| 209, 211, 224 | bridge tapes dubna/SIMH: symlinks to disks 9, 11, 24 |
 
 ## Job files and sources
 
-- `*.b6` files and the heredocs in `mk-*.sh` are Dispak batch jobs: a passport in Russian
-  (`шифр`, `лен NN(tape)`, `еконец`) followed by Monitor Dubna control cards starting with `*`.
-  `лен 50(1999-ЗП)` maps logical unit 50 to tape 1999 with write permission; `*to perso:66000,77`
-  addresses unit 66, zone 000.
+- `*.dub` files and the heredocs in `mk-*.sh` are Monitor Dubna batch jobs for `dubna`:
+  control cards starting with `*`, from `*name` to `*end file`. `*tape:999/dd,67,w` mounts
+  tape 999 as unit 67 with write permission; `*to perso:66000,77` addresses unit 66, zone 000.
+  Run them with `run_job` (`env.sh`), which turns tabs into spaces. Monitor Dubna's Madlen
+  rejects empty lines, and `*no list` makes the cards after it fail. The `.b6` files left
+  (`pult9*.b6`, `boot_dubna*.b6`, `jobs/monsys.b6`) are SIMH panel files or old Dispak jobs.
 - All texts are UTF-8, but BESM-6 text mixes Latin and Cyrillic lookalike letters within
   one word (e.g. `SТЕХТ=FRЕQ300` contains Cyrillic `Т`, `Е`, `Х`). Keep the existing bytes when
   editing, and search with that in mind — a plain ASCII grep can miss identifiers.

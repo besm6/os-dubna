@@ -11,15 +11,8 @@ JOB=`mktemp` || exit
 trap "rm -f -- '$JOB'" EXIT
 {
 cat <<END
-шифр 419999 зс5^
-лен 41(2048)^
-лен 40(9)^
-лен 67(2209-ЗП)^
-eeв1а3
 *name PUT-JOB
-*     no list
-*call putflag*
-5
+*tape:209/disk9,67,w
 *edit
 *ro
 *w:67$ADDR
@@ -33,9 +26,7 @@ sed -n '$s/^/*l:/p' "$DECK"
 cat <<END
 *EE
 *END FILE
-\`\`\`\`\`\`
-еконец
 END
 } > $JOB
-dispak -l $JOB > put-job.list
+run_job $JOB put-job.list
 grep -a 'ЗAПИCAHO' put-job.list

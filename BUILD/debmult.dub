@@ -1,13 +1,7 @@
-шифр 419999 зс5^
-лен 50(1400)^
-лен 41(2048)^
-лен 40(9)^
-лен 67(1999-ЗП)^
-eeв1а3
 *name DEBMULT
-*     no list
-*call putflag*
-5
+*tape:400/dd,50
+*tape:9/monsys,40
+*tape:999/dd,67,w
 *perso:50000
 *MADLEN,L=BRFG,MODEL=SIMH,STEXT=FREQ300.
  DEBMULT:,NAME,
@@ -51,7 +45,6 @@ C   ПEPEПИCЬ ЗAГOЛOBKA
      ,xta, b23pass
      ,arx,=1
      ,atx, b23pass
-
      ,drum, mt9pass
      ,drum, b23pass
      ,xta, mt9pass
@@ -60,7 +53,6 @@ C   ПEPEПИCЬ ЗAГOЛOBKA
      ,xta, b23pass
      ,arx,=1
      ,atx, b23pass
-
      ,drum, mt9pass
      ,drum, b23pass
      ,xta, mt9pass
@@ -69,7 +61,6 @@ C   ПEPEПИCЬ ЗAГOЛOBKA
      ,xta, b23pass
      ,arx,=1
      ,atx, b23pass
-
 C ,UJ,MONITOR*+1.
  13,uj, 
  IW70:,BSS,
@@ -101,13 +92,10 @@ C
         ,010,100B
         ,067,140B+37B
  ,END,
-*tcatalog
 *MAIN DEBMULT
 *EXECUTE
-*	MAIN DD86
-*	CALL DATAPR*
-*	EXECUTE
+*       MAIN DD86
+*       CALL DATAPR*
+*       EXECUTE
 *READ OLD 
 *END FILE
-``````
-еконец

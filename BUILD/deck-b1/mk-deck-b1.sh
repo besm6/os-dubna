@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-#  Script to make a patch desk for DD system build in dispak
+#  Script to make a patch desk for DD system build in dubna
 #
 #  Copyright 2017, Mikhail Popov.  
 #
@@ -9,20 +9,16 @@
 #  LDSHIFT has to be set for correct environment. 
 #  Configuration for DD BOOTSTRAP
 #
-#  
+#  Unit 41 is MS drum 22: tape 922 holds 9/MONSYS from zone 40.
+#
 cat << END1
-шифр 419999 зс5^
-лен 50(1400)^
-лен 41(2048)^
-лен 66(1990-ЗП)^
-лен 67(1999-ЗП)^
-лен 40(9)^
-eeв1а3
 *name OS-Dubna-SIMH
 *     deck-b1
-*     no list
-*call putflag*
-5
+*tape:400/dd,50
+*tape:9/monsys,40
+*tape:922/monsys,41
+*tape:990/,66,w
+*tape:999/dd,67,w
 *MADLEN,L=B.
  LDSHIFT:,NAME,
  ,XTA,61B
@@ -96,12 +92,9 @@ if [ -f deck.notes ]; then
   cat deck.notes
 fi
 cat <<EOF3 
-*tcatalog
 *MAIN DD86
 *CALL DATAPR*
 *EXECUTE
 *READ OLD 
 *END FILE
 EOF3
-echo "\`\`\`\`\`\`"
-echo еконец
