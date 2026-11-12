@@ -1,4 +1,5 @@
 #! /bin/sh
+. ./env.sh
 # Staging STL sources in Dispak for the bootstrap  
 # Copyright 2017, by Mikhail Popov
 # staging STL source code
@@ -23,8 +24,8 @@ fi
 
 # numbering the source and place it on tape 1247
 # then do the default compilation with a listing 
-rm -f $HOME/.besm6/1247
-touch $HOME/.besm6/1247
+rm -f $TAPES/1247
+touch $TAPES/1247
 
 cat > $TEMP << EOF
 шифр 419999 зс5^

@@ -1,4 +1,5 @@
 #! /bin/sh
+. ./env.sh
 # Staging Lib23 sources in Dispak for the bootstrap  
 # Copyright 2017, by Mikhail Popov
 # staging Lib23 source code
@@ -23,8 +24,8 @@ fi
 
 # the source to be placed on tape 1223
 # then do the default compilation with a listing 
-rm -f $HOME/.besm6/1223
-touch $HOME/.besm6/1223
+rm -f $TAPES/1223
+touch $TAPES/1223
 
 cat > $TEMP << EOF
 шифр 419999 зс5^

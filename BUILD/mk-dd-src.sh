@@ -1,4 +1,5 @@
 #! /bin/sh
+. ./env.sh
 # Staging OS Dubna sources in Dispak for the bootstrap  
 # Copyright 2017, by Mikhail Popov
 # staging DD81 source code
@@ -23,8 +24,8 @@ fi
 
 # the source to be placed it on tape 1400
 # then do the default compilation with a listing 
-rm -f $HOME/.besm6/1400
-touch $HOME/.besm6/1400
+rm -f $TAPES/1400
+touch $TAPES/1400
 
 cat > $TEMP << EOF
 шифр 419999 зс5^

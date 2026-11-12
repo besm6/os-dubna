@@ -44,8 +44,7 @@ Requirements:
 - SIMH `besm6` binary, with the `SIMH` variable set to its directory;
 - `expect` and `telnet`.
 
-The scripts keep tape images in `$HOME/.besm6/` and overwrite tapes 9, 12
-and 37 there.
+The scripts keep tape images in `BUILD/tapes/`.
 
 ```sh
 cd BUILD

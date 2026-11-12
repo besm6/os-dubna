@@ -59,20 +59,19 @@ Requirements: `dispak` and `besmtool` on PATH, SIMH `besm6` at `$SIMH/besm6` (th
 variable must be set), `expect`, `telnet`, `tempfile`. Dispak system tapes 2048 and 2148 (the latter used by `mk-stl-src.sh`) must
 already be available to `dispak`; nothing in this repo provides them.
 
-The scripts read and write tape images in `$HOME/.besm6/`, named by tape number.
-`populate-dsk.sh` runs `mkdir $HOME/.besm6` and overwrites tapes 9, 12, 37 there, and
-`spl/load` does `rm -i` on tape 1999 — this is shared state outside the repo, so check
-before running if that directory is already in use.
+The scripts read and write tape images in `BUILD/tapes/` (ignored by git), named by tape
+number. `BUILD/env.sh`, sourced by every script, sets `TAPES` and exports `BESM6_PATH` so
+that `dispak` and `besmtool` look there first and then in `/usr/local/share/besm6`.
 
 Pipeline in `bootstrap.sh`:
 
-1. `populate-dsk.sh` — write the original tape images into `~/.besm6`.
+1. `populate-dsk.sh` — write the original tape images into `BUILD/tapes`.
 2. `mk-dd-src.sh`, `mk-stl-src.sh`, `mk-ld-src.sh` — each one loads sources via `spl/load`
    onto scratch tape 1999, then runs a generated Dispak job that copies them to the target
    tape and compiles them. `mk-ms-src.sh`, `mk-lib21-src.sh`, `mk-lib23-src.sh`,
    `mk-exfor-src.sh` follow the same pattern but are not called by the bootstrap.
 3. `data/mkdisk9.sh`, `data/mkdisk11.sh`, `data/mkbridges.sh` — concatenate catalog + contents
-   + padding into SIMH disk images and symlink them into `~/.besm6` as bridge tapes.
+   + padding into SIMH disk images and symlink them into `BUILD/tapes` as bridge tapes.
 4. `deck-b1/mk-deck-b1.sh` — emit the patch deck job (config + fixes for SIMH), then run
    `debmult.b6` and the deck under `dispak` to link DD.
 5. `data/mkdrumdd.sh` — cut drum images out of tape 1999.

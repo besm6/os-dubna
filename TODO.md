@@ -51,8 +51,7 @@ Tasks are done in order. Each one gets a "Findings" note when finished.
 - [x] **T1. Workspace.** `TODO.md`, `.gitignore`, where tapes live.
   - Findings: `dispak` and `besmtool` both honour `BESM6_PATH` (`dispak/disk.c:63`), so
     tapes can live in `BUILD/tapes/` with
-    `BESM6_PATH=$PWD/tapes:/usr/local/share/besm6`. The build scripts hardcode
-    `$HOME/.besm6` and need a variable instead (done as part of T3). `~/.besm6` is left
+    `BESM6_PATH=$PWD/tapes:/usr/local/share/besm6` (set up in T3). `~/.besm6` is left
     untouched; it holds only stale symlinks to `../dubna-misha-popov`.
 - [x] **T2. Probe the 1989 call block.** Build `disk9.bin` and `disk11.bin`
   (`data/mkdisk9.sh`, `mkdisk11.sh`). Load zone 0420 of 9/MONSYS into page 0, start at 1000
@@ -81,8 +80,25 @@ Tasks are done in order. Each one gets a "Findings" note when finished.
     - The dispatcher body itself is not on the tape: the source puts it in zones 0440–0477
       of 9/MONSYS, the image has zones 0–0437 only, and in `disk9.bin` those zones are
       empty filler from `tail.d9`. This is from the layout, not from a traced read.
-- [ ] **T3. Rebuild the 2017 dispatcher under dispak.** Run the steps of `bootstrap.sh` one
+- [x] **T3. Rebuild the 2017 dispatcher under dispak.** Run the steps of `bootstrap.sh` one
   by one, read each listing, fix what the current dispak breaks. Done when tape 1999 exists.
+  - Findings: the build works unchanged with the current dispak; the whole of it takes
+    under a minute.
+    - Tapes now live in `BUILD/tapes/`. `BUILD/env.sh` sets `TAPES` and `BESM6_PATH`; every
+      script sources it instead of using `$HOME/.besm6`. `spl/load` no longer asks before
+      deleting tape 1999.
+    - Steps run, from `BUILD/`: `populate-dsk.sh`; `mk-dd-src.sh`; `mk-stl-src.sh`;
+      `mk-ld-src.sh` (tape 1999 removed before each); `data/mkdisk9.sh`, `mkdisk11.sh`,
+      `mkbridges.sh`; `deck-b1/mk-deck-b1.sh > deck-b1.b6`; `dispak -l debmult.b6`;
+      `dispak -l deck-b1.b6`; `dispak -l tra-libs.b6`.
+    - Listings: no assembly errors except one in each of the four dummy `FREQ…` system-text
+      modules (`ДВАЖДЫ ОПРЕДЕЛЕННЫЙ КОП: ГМАС`), which comes from the job text itself. The
+      expected `E50 0076` at the end of the link did not appear; the job ended normally.
+    - Tape 1999 holds 128 zones after the 4-zone header. Its first zone is page 0 of the
+      dispatcher: banner `ОИЯИ. ОС ДУБНА ОТ 11.11.26 М1` at 0765 (the date is the build
+      date), a jump at 01000.
+    - `tra-libs.b6` wrote the rebuild jobs and libraries into `disk9.bin` through bridge
+      tape 2209.
 - [ ] **T4. Drum images.** `data/mkdrumdd.sh`; check the banner at 0765 and the jump at 01000
   in zone 0 of drum 20, and that drums 21–22 equal MONSYS zones 0–077.
 - [ ] **T5. First boot, drums only.** New ini with current device names, console log,

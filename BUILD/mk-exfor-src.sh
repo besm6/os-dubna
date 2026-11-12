@@ -1,4 +1,5 @@
 #! /bin/sh
+. ./env.sh
 # Staging OS Dubna sources in Dispak for the bootstrap  
 # Copyright 2017, by Mikhail Popov
 # staging FORTRAN source code
@@ -23,7 +24,7 @@ fi
 
 # numbering the source and place it on tape 1301
 # then do the default compilation with a listing 
-touch $HOME/.besm6/1301
+touch $TAPES/1301
 
 cat > $TEMP << EOF
 шифр 419999 зс5^

@@ -1,4 +1,5 @@
 #! /bin/sh
+. ./env.sh
 # Staging OS Dubna sources in Dispak for the bootstrap  
 # Copyright 2017, by Mikhail Popov
 # staging LD source code
@@ -23,8 +24,8 @@ fi
 
 # numbering the source and place it on tape 1100
 # then do the default compilation with a listing 
-rm -f $HOME/.besm6/1100
-touch $HOME/.besm6/1100
+rm -f $TAPES/1100
+touch $TAPES/1100
 
 cat > $TEMP << EOF
 шифр 419999 зс5^

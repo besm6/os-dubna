@@ -1,4 +1,5 @@
 #! /bin/sh
+. ./env.sh
 #
 #  Bootstrap sequence for OS Dubna in dispak
 #
@@ -11,37 +12,37 @@
 
 set -x 
 
-echo Populating disks in $HOME/.besm6
+echo Populating disks in $TAPES
 
 ./populate-dsk.sh
 
 
 echo compile DD
-rm -f $HOME/.besm6/1999
+rm -f $TAPES/1999
 ./mk-dd-src.sh
 
 #echo Build MS
-#rm -f $HOME/.besm6/1999
+#rm -f $TAPES/1999
 #./mk-ms-src.sh
 
 echo compile STL
-rm -f $HOME/.besm6/1999
+rm -f $TAPES/1999
 ./mk-stl-src.sh
 
 echo compile LD
-rm -f $HOME/.besm6/1999
+rm -f $TAPES/1999
 ./mk-ld-src.sh
 
 echo "Making disk images for SIMH"
 ( cd data; ./mkdisk9.sh; ./mkdisk11.sh; ./mkbridges.sh)
 
 echo "Making the patch deck"
-touch $HOME/.besm6/1999
+touch $TAPES/1999
 
 ( cd deck-b1; ./mk-deck-b1.sh) > deck-b1.b6 
 
 echo "Run DEBMULT"
-touch $HOME/.besm6/1999
+touch $TAPES/1999
 dispak -l debmult.b6 | tee /dev/tty > debmult.list
 
 echo "Compiling the PATCH DECK ... and linking DD...."
