@@ -67,7 +67,8 @@ besm6 dubna.ini
 This terminal is the operator console; Multitype is on telnet port 4199. Commands and
 replies are described in [docs/Dubna_Commands.md](docs/Dubna_Commands.md).
 `./mt-run.py` boots and runs a job non-interactively (`FRESH=1 SUBMIT=ПУС ./mt-run.py`
-prints the hello job on `output.txt`).
+prints the hello job on `output.txt`). How the pieces fit together is described in
+[docs/Boot_Process.md](docs/Boot_Process.md).
 
 More details are in `BUILD/`:
 
@@ -88,7 +89,13 @@ Reference articles in [docs/](docs/):
 - [Simh_Simulator.md](docs/Simh_Simulator.md) — building and using the SIMH BESM-6 simulator;
 - [KOI7_Encoding.md](docs/KOI7_Encoding.md) — the KOI-7 character set.
 
-These articles are taken from other BESM-6 projects
+Written for this repository:
+
+- [Boot_Process.md](docs/Boot_Process.md) — how the bootstrap builds and boots the system;
+- [Dubna_Commands.md](docs/Dubna_Commands.md) — operator console and Multitype commands;
+- [Switch_Registers.md](docs/Switch_Registers.md) — the switch registers ТР1–ТР7 in DD.
+
+The other articles are taken from other BESM-6 projects
 ([simh](https://github.com/besm6/simh), [v7besm](https://github.com/besm6/v7besm),
 [c-compiler](https://github.com/besm6/c-compiler)); each one names its origin
 under the title.

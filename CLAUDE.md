@@ -45,8 +45,11 @@ Terminology used everywhere:
     commands, and the values used by the `BUILD` boot scripts.
   - `Dubna_Commands.md` — operator console orders (tty25), print spooler orders, Multitype
     commands (tty26) and the replies to them.
+  - `Boot_Process.md` — how the bootstrap works: dispak stage, disk and drum images, the SIMH
+    boot sequence, the rebuild jobs, running and pitfalls.
 
-  The articles, except `Switch_Registers.md` and `Dubna_Commands.md` (written here), are copies from other BESM-6
+  The articles, except `Switch_Registers.md`, `Dubna_Commands.md` and `Boot_Process.md`
+  (written here), are copies from other BESM-6
   projects (besm6/simh, v7besm, c-compiler); a note under each title names the origin. Their "kernel" and "compiler" are those projects', and
   links to files outside `docs/` are absolute GitHub URLs. Keep it that way when adding more:
   no relative links to files that are not in this repo.
@@ -122,8 +125,11 @@ cosy sources from zone 100.
   editing, and search with that in mind — a plain ASCII grep can miss identifiers.
 - Madlen source lines have the form ` label:register,OPCODE,operand.comment`; `C` in
   column 1 starts a comment line (`Cs` marks the 2017 SIMH changes). See `docs/Madlen.md`.
-- `deck-b1/*.s` and `cset/dd/*.s` hold the changes to DD needed for SIMH, as whole patched
-  Madlen modules compiled by the patch deck. Change the system there, not in the archived sources.
+- `deck-b1/*.s` hold the changes to DD needed for SIMH, as whole patched Madlen modules
+  compiled by the patch deck (`deck-b1/mk-deck-b1.sh`). Change the system there, not in the
+  archived sources.
+- Simulator requirements found so far: `set cpu mem=128`, `set cpu ext32` (both on branch
+  `dubna` of simh-besm6). Simulator changes go to that branch; OS changes to `deck-b1/`.
 
 ## Cosy tools
 

@@ -13,7 +13,7 @@ front panel, and debug what happens inside.
 
 The simulator has everything needed to boot the classic **DISPAK** (ДИСПАК) batch operating
 system and run job decks through it — you only need to supply the system disk images
-(see [Booting DISPAK](#booting-dispak)). OS Dubna boots on it too; see `TODO.md` and `BUILD/`
+(see [Booting DISPAK](#booting-dispak)). OS Dubna boots on it too; see [Boot_Process.md](Boot_Process.md) and `BUILD/`
 in this repository.
 
 > **A note on Cyrillic.** The real machine, its operating system, and its assembler mnemonics are
