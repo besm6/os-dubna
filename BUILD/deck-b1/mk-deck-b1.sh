@@ -43,7 +43,6 @@ cat << END1
  CSHIFT:,LOG,70000
  C:,BSS,2
  ,END,
-*tcatalog
 *CALL FICMEMOR:75550
 *CALL LDSHIFT
 *perso:50000

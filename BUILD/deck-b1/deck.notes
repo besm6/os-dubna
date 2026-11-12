@@ -1,14 +1,14 @@
 *
 *      NOTES on BOOTSTRAP DECK #1
 *      03/03/2017: 
-*        1. DISPAK=>SIMH Jump Supports only 128K memmory @SIMH
+*        1. DUBNA=>SIMH Jump Supports only 128K memmory @SIMH
 *        2. ROLL-TRACK initialization, first boot with drums only!
 *        3. STATBUF is disabled. 
 *        4. No real VOL names for DISK
 *        5. Only 2 terminals (consuls) can be used (tty25,tty26)
 *        6. The Clock Frequency is 300 Hz
 *        7. All I/O checks for CW are suppressed
-*        8. DEBMULT runs as a separate job (since the dispak build)
+*        8. DEBMULT runs as a separate job
 *        9. dubna does not show the operator message of WRITDISP
 *       10. NO STL!
 *       11. Date settings accepts only year of 1989!

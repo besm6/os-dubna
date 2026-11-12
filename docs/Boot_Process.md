@@ -10,7 +10,7 @@ done in C++. Then the result is booted in SIMH. There OS Dubna builds the rest o
 dispatcher linked by its own tools.
 
 ```sh
-cd BUILD && ./bootstrap.sh     # about 20 minutes
+cd BUILD && ./bootstrap.sh     # about 15 minutes
 besm6 dubna.ini                # run the system
 ```
 
@@ -156,8 +156,8 @@ the simulator alone.
   printed), `CONSUBMIT`, `POLL`, `BEFORE`, `AFTER`, `JOBWAIT`, `POLLS`, `PRNWAIT`, `SLOW`.
   Transcripts go to `mt-run-tty25.txt` and `mt-run-tty26.txt`.
 
-`FRESH=1 DRUM=25 SUBMIT=ПУС ./mt-run.py` checks the whole chain in about a minute: hello is
-compiled, run and printed on `output.txt`.
+`FRESH=1 DRUM=25 SUBMIT=ПУС ./mt-run.py` checks the whole chain in about three minutes (the
+planner takes two to start a queued job): hello is compiled, run and printed on `output.txt`.
 
 Commands and replies on both lines are in [Dubna_Commands.md](Dubna_Commands.md).
 

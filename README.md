@@ -35,8 +35,9 @@ See [file-list.md](file-list.md) for a per-file list.
 
 ## Building and booting
 
-The sources are compiled by batch jobs under the Dispak simulator, then disk
-and drum images are assembled and booted in SIMH.
+The sources are compiled by Monitor Dubna batch jobs under the
+[dubna](https://github.com/besm6/dubna) simulator, then disk and drum images are
+assembled and booted in SIMH.
 
 The ready images are in the repository, in `BUILD/data/base/`. To just run the system you
 need only the simulator:
@@ -49,7 +50,7 @@ besm6 dubna.ini
 
 To rebuild everything from the sources:
 
-- `dispak` and `besmtool` on `PATH`, with Dispak system tapes 2048 and 2148;
+- `dubna` (November 2026 or later) and `besmtool` on `PATH`;
 - SIMH `besm6` on `PATH`, built from branch `dubna` of
   [simh-besm6](https://github.com/besm6/simh) (it needs `set cpu mem=128` and `set cpu ext32`);
 - Python 3.
@@ -61,7 +62,7 @@ cd BUILD
 ./bootstrap.sh
 ```
 
-The script compiles the dispatcher and libraries under `dispak` and builds the drum and
+The script compiles the dispatcher and libraries under `dubna` and builds the drum and
 disk images. Then `mk-base.sh` boots them in SIMH twice, driving both consoles through
 `mt-run.py`: the job `newbsz` builds the task library (the print spooler is in it), and the
 job `newdd` writes a rebuilt dispatcher to drum 25. The resulting images are saved in

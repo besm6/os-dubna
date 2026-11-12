@@ -1,4 +1,4 @@
-# OS Dubna Bootstrap in Dispak
+# OS Dubna Bootstrap (in Dispak until 2026, now in dubna)
 # Assumptions and requisitions 
 #
 # Copyright, 2017 by Mikhail Popov 

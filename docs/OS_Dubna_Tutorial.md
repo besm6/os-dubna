@@ -28,7 +28,7 @@ You need the simulator `besm6`, built from branch `dubna` of
 
 The repository comes with a ready system: `BUILD/data/base/` holds a clean copy of its
 disks and drums. To rebuild them from the sources instead, run `./bootstrap.sh` in `BUILD/`
-(about 20 minutes, needs `dispak`; see [Boot_Process.md](Boot_Process.md)).
+(about 15 minutes, needs `dubna`; see [Boot_Process.md](Boot_Process.md)).
 
 All commands below are run in `BUILD/`.
 
@@ -241,7 +241,7 @@ while the simulator is **not** running:
 ./put-job.sh mydeck.dub 130
 ```
 
-Then start the machine and run `ПУС 130`. This uses `dispak`, as the build does.
+Then start the machine and run `ПУС 130`. This uses `dubna`, as the build does.
 
 ## 8. Watch and control jobs
 

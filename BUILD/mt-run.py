@@ -147,7 +147,7 @@ def main():
         # repeated every 15 s until the job starts: too early, they are ignored.
         orders = [c.replace("{}", entry) for c in
                   filter(None, os.environ.get("CONSUBMIT", "").split("|"))]
-        end = time.time() + int(os.environ.get("JOBWAIT", "30")) * SLOW
+        end = time.time() + int(os.environ.get("JOBWAIT", "180")) * SLOW
         while True:
             for cmd in orders:
                 time.sleep(2)
