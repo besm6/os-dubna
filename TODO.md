@@ -213,32 +213,29 @@ Tasks are done in order. Each one gets a "Findings" note when finished.
     - Bits 47–43 of register 2 are still set, as in 2017, so catalogs and the roll track
       are cleaned again on this boot. Keeping them (the `0730…` value of
       `boot_dubna-25.b6`) is left for T10.
-- [ ] **T9. Multitype** on `tty26` over telnet: `OP`, `REF`, password, buffer `7/M`; run a
-  job and get its listing on `prn0`.
-  - Progress (not finished): the second terminal works as an operator console, Multitype
-    starts, but never asks for the password.
-    - Telnet: `attach tty line=26 4199` is rejected now ("Unit disabled: TTY0"); use
-      `attach tty26 Line=26,4199` (`boot-mt.ini`, driven by `mt-session.py`).
-    - Deterministic variant without telnet: `boot-tty26.ini` makes `tty26` the SIMH console
-      and sends the 2017 dialogue with `send`. Same result, and it can be traced.
-    - On `tty26`: `OP` + Enter → `!!!` (operator console); date entry works; `REF` is
-      accepted; two spaces are echoed and nothing follows. Further input (`MJPOP`, `7/M`)
-      gets `!!!`, so the line stays unbound.
-    - Trace after the two spaces (`set cpu debug`, idle loop filtered out): task 5 starts
-      module `MULTITYP` at 20211, runs its first-time setup — fixes its pages, reads its
-      non-resident part from the drum, installs the event branch `VALERINA` — and ends with
-      extracode 74 at 23274. That is the normal end of the setup
-      (`besmdisp/nrespost.dd3:9648-9750`), not a crash. No terminal output follows.
-    - Not yet known: why the line is not handed to Multitype after the setup. Next: trace
-      the second pair of spaces and follow the binding code (`*TLCONN`, tables in
-      `deck-b1/conf-tty.s`), where the 2017 patches zeroed several channel descriptors.
-    - Test job: `hello.dub` (checked with `dubna hello.dub`); `put-job.sh deck [zone]`
-      writes a deck into 7/M on `disk9.bin` through dispak. 7/M starts at disk zone 0700,
-      so zone 110 is address 1010.
-    - `ОШ22-ТАSК11` is unrelated to this: it is the print spooler (see T7); Multitype is
-      not loaded through the static library.
+- [x] **T9. Multitype** on `tty26`: `OP`, `REF`, password, buffer `7/M`; run a job.
+  - Result: `boot-tty26.ini` logs in to Multitype, lists the deck in 7/M zone 110 (`ЛИС 110`),
+    submits it (`СЛА 110,17` → `СЧЕТ`) and the job finishes (`КАК` → `НЕТ ЗАДАЧ`).
+  - Root cause of the missing `РАSS:` prompt: memory size. The dispatcher keeps the shadow
+    of page register 7 and `TMATH[0]` (physical page number in bits 31-40) in the same cell
+    of the task descriptor. The real machine had 7-bit page numbers and ignored the extra
+    bits; SIMH with 512K took them as bits 8-9, so Multitype's page 34 (the kernel table
+    page `*TLSYS`, which it maps into its own space) went to empty physical page 0434 and
+    Multitype never saw the "knocking" channel.
+  - Fix: new simulator option `set cpu mem=128` (branch `dubna`), now in all `boot-*.ini`.
+  - The trace shows page registers: each `mod 20+i` prints `RPi = ...`.
+  - Scripted input: `set tty26 unicode,authbs` so that `send` can carry Russian commands;
+    with `qwerty` the Cyrillic letters are dropped. Multitype drops the line (`ВРЕМЯ`,
+    `К О Н Е Ц`) after about 10 s without input.
+  - Telnet variant: `attach tty line=26 4199` is rejected now; use
+    `attach tty26 Line=26,4199` (`boot-mt.ini`, driven by `mt-session.py`).
+  - Not done: listing on `prn0`. The print spooler is `TASK11`, absent until the task
+    library is built (`ТАSК!`, see T7), so the listing stays in 3/D73OUT. Moved to T10.
+  - Test job: `hello.dub` (checked with `dubna hello.dub`); `put-job.sh deck [zone]`
+    writes a deck into 7/M on `disk9.bin` through dispak. 7/M starts at disk zone 0700,
+    so zone 110 is address 1010.
 - [ ] **T10. Self-rebuild.** The `expe.ex` dialogue (jobs `newdd`, `newbsz`), then boot from
-  drum 25.
+  drum 25. Then check that a job listing is printed on `prn0`.
 - [ ] **T11. Write it down.** Working ini files and scripts in `BUILD/`, a document on how
   the boot fits together, `README.md` and `CLAUDE.md` updated.
 
