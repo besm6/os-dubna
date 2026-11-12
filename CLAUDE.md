@@ -41,9 +41,11 @@ Terminology used everywhere:
   - `Simh_Simulator.md` — building and operating SIMH `besm6`: `attach`/`set` commands,
     loading, front panel, debugging and tracing.
   - `KOI7_Encoding.md` — the KOI-7 code page used by BESM-6 text and the line printer.
+  - `Switch_Registers.md` — meaning of each bit of switch registers ТР1–ТР7 in DD, panel
+    commands, and the values used by the `BUILD` boot scripts.
 
-  The articles are copies from other BESM-6 projects (besm6/simh, v7besm, c-compiler); a note
-  under each title names the origin. Their "kernel" and "compiler" are those projects', and
+  The articles, except `Switch_Registers.md` (written here), are copies from other BESM-6
+  projects (besm6/simh, v7besm, c-compiler); a note under each title names the origin. Their "kernel" and "compiler" are those projects', and
   links to files outside `docs/` are absolute GitHub URLs. Keep it that way when adding more:
   no relative links to files that are not in this repo.
 
