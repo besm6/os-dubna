@@ -158,9 +158,20 @@ Tasks are done in order. Each one gets a "Findings" note when finished.
       `D73STA/6 W15`, `USESTA/0 W16`, `LINBUF/1 W17`, `ROLLIB/1 W20`, `LIBRAR/2 W21`,
       `LIBRAR/7 W22`, `CATALO/8 W23` (switch register 1 bit 24 asks for this list).
     - `МЛ ВВ/ВЫВ!` is gone; `Д-2000  МС-21,22` is followed by `ВЫВОД БУФЕРИЗОВАН`.
-    - Open: `ОШ22-ТАSК11` appears before `ПЛАНИРОВЩИК`. Not traced yet. Likely the static
-      library task 11 failing because 5/D73LIB is still empty (`deck.notes`: "NO STL!"); the
-      2017 first boot stopped at `ПЛАНИРОВЩИК` regardless.
+    - `ОШ22-ТАSК11` before `ПЛАНИРОВЩИК` is the print spooler failing to load, because the
+      static task library is still empty. Traced with `set cpu debug`:
+      - Task 11 in the dispatcher's task table is `SPECMON` under the name `В Ы В О Д`
+        (`besmdisp/macro67.dd1:18776`), the launcher of standard tasks kept in the library
+        5/D73LIB (БСЗ). It starts right after `ВЫВОД БУФЕРИЗОВАН`.
+      - `SPECMON` gets the tape D73LIB, reads zone 0 of it into page 35 and looks for the
+        name `STALOA` (the static loader) at 73400. The zone is all zeros.
+      - It then falls back to `INFLOA` (`8,014,3503B / ,021,101B`: one sector from drum 21
+        track 1 to 73400) and jumps to 73401. That jump raises an instruction-protection
+        interrupt (ГРП bit 14), and the dispatcher kills the task with the message.
+      - So the message is expected until the library is built by the job `newbsz` (T10);
+        `deck.notes` says "NO STL!" for this stage. It does not block the start.
+      - Not checked: why the fallback loader is not executable (the sector read from
+        MONSYS zone 1 begins with zero words).
     - The boot writes to the disk images as well as the drums. To start over, rebuild them
       (`data/mkdisk9.sh`, `mkdisk11.sh`, `mkdrumdd.sh`) and rerun `dispak -l tra-libs.b6`.
 - [x] **T8. Second boot** with Monitor System drums modelled from 9/MONSYS and the roll
@@ -174,7 +185,7 @@ Tasks are done in order. Each one gets a "Findings" note when finished.
       `second-boot.ini` did in 2017: register 1 `…0360` (drum 25 opened), register 3
       `7700 0000 0000 0000`, register 6 `…4000 0160` (no resource check). The console keeps
       answering afterwards.
-    - `ОШ22-ТАSК11` appears here too (see T7).
+    - `ОШ22-ТАSК11` appears here too; it is expected at this stage (see T7).
     - Bits 47–43 of register 2 are still set, as in 2017, so catalogs and the roll track
       are cleaned again on this boot. Keeping them (the `0730…` value of
       `boot_dubna-25.b6`) is left for T10.
@@ -200,8 +211,8 @@ Tasks are done in order. Each one gets a "Findings" note when finished.
     - Test job: `hello.dub` (checked with `dubna hello.dub`); `put-job.sh deck [zone]`
       writes a deck into 7/M on `disk9.bin` through dispak. 7/M starts at disk zone 0700,
       so zone 110 is address 1010.
-    - `ОШ22-ТАSК11` is unrelated to this: Multitype is not loaded through the static
-      library.
+    - `ОШ22-ТАSК11` is unrelated to this: it is the print spooler (see T7); Multitype is
+      not loaded through the static library.
 - [ ] **T10. Self-rebuild.** The `expe.ex` dialogue (jobs `newdd`, `newbsz`), then boot from
   drum 25.
 - [ ] **T11. Write it down.** Working ini files and scripts in `BUILD/`, a document on how
