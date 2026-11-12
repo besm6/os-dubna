@@ -100,7 +100,7 @@ def main():
                            stdin=subprocess.PIPE, stdout=out, stderr=out)
     try:
         con, mt = Line("tty25", l25), Line("tty26", l26)
-        con.connect(); mt.connect()
+        con.connect()
 
         # Operator console: date, time, printer ready.
         con.expect(r"W23\n", 30)
@@ -112,6 +112,7 @@ def main():
         con.send(os.environ.get("ORDER", "A1P") + "\r")
 
         # Multitype: password, buffer, list and submit the job.
+        mt.connect()
         mt.send("  ");          mt.expect(r"PASS:")
         mt.send("MJPOP\r");     mt.expect(r"БУФЕР:")
         mt.send("7/M\r");       mt.expect(r"\n {5}")
