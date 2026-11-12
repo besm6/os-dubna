@@ -11,3 +11,4 @@ BUILD/spl/x??
 BUILD/cosy/cosy2utf
 BUILD/cosy/utf2cosy
 BUILD/cosy/utf2iso
+BUILD/*.out

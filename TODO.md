@@ -113,8 +113,23 @@ Tasks are done in order. Each one gets a "Findings" note when finished.
       source with drum arithmetic, which moves from unit 40 (tape 9) to unit 41 (tape 2048)
       after 32 zones. `mkdrumdd.sh` now overlays drum 22 from `mons9.d9`; the deck itself is
       unchanged. Drums 21–22 now equal MONSYS zones 0–077.
-- [ ] **T5. First boot, drums only.** New ini with current device names, console log,
+- [x] **T5. First boot, drums only.** New ini with current device names, console log,
   `runlimit`, scripted input. Target: the banner line.
+  - Findings: `besm6 boot-drums.ini` (run from `BUILD/`) prints
+    `ОИЯИ. ОС ДУБНА ОТ 11.11.26 М1` on the console and in `boot-drums-log.txt`.
+    - The 2017 sequence works as it was: clear page 0, `set cpu pult=9`, `load pult9.b6`,
+      `go` (reads drum 20), `load boot_dubna.b6`, `set cpu pult=0`, set switch register 2,
+      deposit at 2257, start at 1000. The ini starts with `reset`, `d PC 1000`,
+      `step 300000000` instead of `run 1000`, so the run is bounded.
+    - The banner needs patience: the dispatcher first does about 2100 drum exchanges
+      (the first-boot cleanup), reaches its idle loop at 72163 after 13.5M instructions, and
+      prints the banner only later. A 30M-instruction run shows nothing; 300M (8 seconds)
+      is enough.
+    - The idle loop at 72163–72207 walks a pattern through the index registers and is where
+      the PC sits when the system has nothing to do.
+    - Switch register 3 is now cleared; the old scripts left the page-clearing loader in it.
+    - The boot writes to both drum images. Rebuild them with `data/mkdrumdd.sh` for a
+      clean first boot.
 - [ ] **T6. Operator console** on `tty25`: empty line → `!!!`, `D`, date `040489D`, `T`.
   Target: `Д-2000 МС-21,22`.
 - [ ] **T7. Disks.** Attach `md00`/`md04`, make the dispatcher find D73INP and D73OUT.
