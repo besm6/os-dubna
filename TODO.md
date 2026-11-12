@@ -158,8 +158,8 @@ Tasks are done in order. Each one gets a "Findings" note when finished.
       `D73STA/6 W15`, `USESTA/0 W16`, `LINBUF/1 W17`, `ROLLIB/1 W20`, `LIBRAR/2 W21`,
       `LIBRAR/7 W22`, `CATALO/8 W23` (switch register 1 bit 24 asks for this list).
     - `МЛ ВВ/ВЫВ!` is gone; `Д-2000  МС-21,22` is followed by `ВЫВОД БУФЕРИЗОВАН`.
-    - `ОШ22-ТАSК11` before `ПЛАНИРОВЩИК` is the print spooler failing to load, because the
-      static task library is still empty. Traced with `set cpu debug`:
+    - `ОШ22-ТАSК11` before `ПЛАНИРОВЩИК` was the print spooler failing to load; now it is
+      `ТАSК!` (see the fix below), which stays until the task library is built in T10. Traced with `set cpu debug`:
       - Task 11 in the dispatcher's task table is `SPECMON` under the name `В Ы В О Д`
         (`besmdisp/macro67.dd1:18776`), the launcher of standard tasks kept in the library
         5/D73LIB (БСЗ). It starts right after `ВЫВОД БУФЕРИЗОВАН`.
@@ -170,8 +170,32 @@ Tasks are done in order. Each one gets a "Findings" note when finished.
         interrupt (ГРП bit 14), and the dispatcher kills the task with the message.
       - So the message is expected until the library is built by the job `newbsz` (T10);
         `deck.notes` says "NO STL!" for this stage. It does not block the start.
-      - Not checked: why the fallback loader is not executable (the sector read from
-        MONSYS zone 1 begins with zero words).
+      - Why the fallback loader fails: it is executable, but the rebuilt dispatcher and the
+        Monitor System disagree on where the monitor common blocks live.
+        - The instruction-protection interrupt is only the dispatcher opening page 35 on
+          first use; it maps the page (physical 0177) and resumes at 73401.
+        - The sector is the Monitor System loader: words 73400–73417 are zero (harmless
+          `atx 0`), real code starts at 73420 with `wtc 716`.
+        - 716 is the Monitor Dubna address of the common block `INFLOAD*`
+          (`BUILD/elements/MonitorDubna.txt`: `INFLOAD* C 00716`, `RM* 00711`, `A/I0 00517`,
+          `A/MINUS 00520`, `*REGIM// 00523`). `SPECMON` stores the loader address there
+          before the jump (`XTA ALOAD / ATX INFLOAD*`).
+        - In the dispatcher linked under dispak, `SPECMON` writes those blocks at 422
+          (`INFLOAD*`), 432 (`RM*+2`), 415 (`A/I0`), 416 (`A/MINUS`), 604 (`*REGIM//`). Cell
+          716 keeps the fill pattern `7727 0707 0000 0172`, the loader jumps to 0214, hits
+          `ij 70707(17)` (illegal in user mode, ГРП bit 13) and the task is killed.
+        - Cause: the link job resolves these commons against the monitor of the build host
+          (dispak), whose low-memory map differs from Monitor Dubna on 9/MONSYS.
+          `MonitorDubna.txt` warns about exactly this difference for Monitor 80.
+        - Fixed: `BUILD/deck-b1/fix-aux.s` is a copy of `SPECMON` with the blocks pinned by
+          `EQU` to the Monitor Dubna addresses (`INFLOAD*` 716, `RM*` 711, `A/I0` 517,
+          `A/MINUS` 520, `*REGIM//` 523, and `M/STL`, `A/CAT`, `INF0` of `/VERE/` at
+          510–512). `mk-deck-b1.sh` already includes that file. After relinking, the boot
+          prints `ТАSК!` instead of `ОШ22-ТАSК11`: the loader now runs, does not find
+          TASK11 in the empty library, and `SPECMON` reports "no such task" in the normal
+          way. Other dispatcher modules that use monitor commons were not checked.
+        - Ruled out: physical page numbers wider than 128K. A test build of the simulator
+          masking them to 7 bits gave the same error; the change was reverted.
     - The boot writes to the disk images as well as the drums. To start over, rebuild them
       (`data/mkdisk9.sh`, `mkdisk11.sh`, `mkdrumdd.sh`) and rerun `dispak -l tra-libs.b6`.
 - [x] **T8. Second boot** with Monitor System drums modelled from 9/MONSYS and the roll
