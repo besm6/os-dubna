@@ -114,9 +114,10 @@ def main():
         con.send("\r");        con.expect(r"!!!")
         con.send("040489D\r"); con.expect(r"04/04/89.*\n")
         con.send("T\r")
-        con.expect(r"ДАЙТЕ ПРИКАЗ +A1P", 40)
-        con.expect(r"ПЛАНИРОВЩИК")
-        con.send(os.environ.get("ORDER", "A1P") + "\r")
+        # The spooler asks for paper, unless the task library is still empty (ТАSК!).
+        m = con.expect(r"([\s\S]*?)ПЛАНИРОВЩИК", 40)
+        if norm("ДАЙТЕ ПРИКАЗ") in norm(m.group(1)):
+            con.send(os.environ.get("ORDER", "A1P") + "\r")
 
         # Multitype: password, buffer, list and submit the job.
         mt.connect()
@@ -130,12 +131,34 @@ def main():
             mt.send(cmd + "\r")
             mt.expect(r"\n {5}\S.*\n")
             mt.read(2)
+        # A listing that fills a page waits for a key: end it with an empty line.
+        mt.send("\r")
+        mt.read(1)
         # СЛА runs the job from the buffer; ПУС puts it into the input queue.
-        mt.send("%s %s,17\r" % (os.environ.get("SUBMIT", "СЛА"), ZONE))
+        submit = os.environ.get("SUBMIT", "СЛА")
+        mt.send("%s %s,17\r" % (submit, ZONE))
         mt.expect(r"\n {5}\S.*\n")
+        entry = ""
+        if submit == "ПУС":
+            entry = mt.expect(r"ВВОДА: (\d+)").group(1)
 
-        # The job starts from the input queue: its code is announced.
-        con.expect(r"Ш\d\d:", int(os.environ.get("JOBWAIT", "30")))
+        # Operator orders after the submit, separated by "|"; {} is the input
+        # file entry of a ПУС job, e.g. "{}БП" starts it at once. They are
+        # repeated every 15 s until the job starts: too early, they are ignored.
+        orders = [c.replace("{}", entry) for c in
+                  filter(None, os.environ.get("CONSUBMIT", "").split("|"))]
+        end = time.time() + int(os.environ.get("JOBWAIT", "30")) * SLOW
+        while True:
+            for cmd in orders:
+                time.sleep(2)
+                con.send(cmd + "\r")
+            try:
+                # The job starts from the input queue: its code is announced.
+                con.expect(r"Ш\d\d:", 15 if orders else end - time.time())
+                break
+            except Fail:
+                if time.time() >= end:
+                    raise
         # Extra operator orders after the job starts, separated by "|".
         for cmd in filter(None, os.environ.get("CONAFTER", "").split("|")):
             time.sleep(2)
@@ -144,9 +167,10 @@ def main():
         # Poll until the job ends: "СЧЕТ ОКОНЧЕН" for a queued job,
         # "НЕТ ЗАДАЧ" once it has been seen running.
         seen = False
+        poll = os.environ.get("POLL", "KAK")    # СЧЕ shows all jobs
         for _ in range(int(os.environ.get("POLLS", "60"))):
-            mt.send("KAK\r")
-            m = mt.expect(r"KAK\n(.*\n)")
+            mt.send(poll + "\r")
+            m = mt.expect(re.escape(poll) + r"\n(.*\n)")
             if norm("ОКОНЧЕН") in m.group(1):
                 break
             if norm("НЕТ ЗАДАЧ") in m.group(1):
@@ -156,15 +180,21 @@ def main():
                 seen = True
             time.sleep(1)
         else:
-            raise Fail("the job did not finish")
+            print("\n--- the job was not seen to finish")
         # Extra Multitype commands, separated by "|".
-        for cmd in filter(None, os.environ.get("AFTER", "").split("|")):
+        # An empty command is an empty line (next page, or end of a listing).
+        after = os.environ.get("AFTER")
+        for cmd in after.split("|") if after else []:
             mt.send(cmd + "\r")
-            mt.expect(r"\n {5}\S.*\n")
-            mt.read(2)
+            mt.read(3)
+        # Wait for printing to start, then until it stops for 3 s.
         end = time.time() + int(os.environ.get("PRNWAIT", "20"))
-        while time.time() < end and not prn_bytes():
+        size, still = 0, 0
+        while time.time() < end and (not size or still < 3):
             con.read(0.5); mt.read(0.5)
+            n = prn_bytes()
+            still = still + 1 if n == size else 0
+            size = n
         print("\n--- printers: %d bytes" % prn_bytes())
         return 0
     except Fail as e:

@@ -57,9 +57,5 @@ dispak -l tra-libs.b6 | tee /dev/tty > tra-libs.list
 echo "All done and ready for the first boot!"
 sleep 3
 
-#besm6 -i first-dd-boot.ini
-# first boot 
-$SIMH/besm6 -i expect1.ini
-# second boot
-$SIMH/besm6 -i expect2.ini
-cat ReadMeBoot.txt
+echo "Building the task library and drum 25 in SIMH"
+./mk-base.sh

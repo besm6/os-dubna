@@ -3,8 +3,8 @@
 The system boots on the current simulator (branch `dubna` of `simh-besm6`, `set cpu mem=128`),
 reaches `ПЛАНИРОВЩИК`, and Multitype takes logins and runs jobs. The rebuild jobs `newbsz`
 and `newdd` have run once: the spooler now loads from the new task library and asks for
-`А1Р`. What does not work yet: a job listing on the printer, and booting the rebuilt
-dispatcher from drum 25.
+`А1Р`. A job queued with `ПУС` prints its listing on `prn0` (needs `set cpu ext32`), and the
+dispatcher rebuilt by `newdd` boots from drum 25.
 
 Do the tasks in order; each one ends with a short "Findings" note.
 
@@ -25,54 +25,68 @@ Do the tasks in order; each one ends with a short "Findings" note.
 
 ## Tasks
 
-- [ ] **T1. Queued job hangs the system.** `FRESH=1 SUBMIT=ПУС ./mt-run.py` puts hello into
-  the input file (`ПАКЕТ В ФАЙЛЕ ВВОДА: 01`), the planner starts it (`01Ш05:НЕLLО`), it reads
-  Monitor System zones from `md00`, writes and reads zone 1205, reads drum 20 zone 23. Then
-  DD queries the status of disk units 03–07 once (commands `2410`, `2420`, `2440`, `2500`,
-  `2600`; only 04 answers 1400, the rest 1000) and nothing more happens. `КАК` says
-  `НЕТ ЗАДАЧ`, the operator `D` gets no reply. Ideas:
-  - Find the code that issues the scan: the archived driver or `BUILD/deck-b1/fix-dsk.s`.
-    See what it waits for next: an interrupt, a status bit, or a reply from the operator
-    (a volume request on the console that is never printed).
-  - Compare with what the simulator does for an unattached unit (status 1000,
-    `besm6_disk.c`). Try attaching dummy images on `md03`–`md07`.
-  - Trace a short window after the scan with `set cpu debug` (trigger on `Ш05:`).
-  - One run from non-fresh images did finish (`СЧЕТ ОКОНЧЕН ВЫ/ВВ=0101`, an entry in
-    `КВЫ`). Find what differed: the images, or the order of commands.
-- [ ] **T2. Listing on the printer.** Note that `СЛА` and `RUN` block printer output by
-  design (`БЛОКАЦПУ`, see the commands doc), so the test must use `ПУС`. Once T1 lets the
-  job finish, its listing should be in 3/D73OUT and in `КВЫ`. In the run that finished, the
-  entry was ready (`-`) and the spooler in automatic mode, but `prn0` got no command. Ideas:
-  - Trace task 47 (the spooler) after `А1Р`: does it read the output catalogue, does it see
-    the entry?
-  - Try `ПЕЧ NN` from Multitype, and `CCCNNЭ1Р` from the console.
-  - Check the printer driver against `besm6_printer.c` (status bits, ready, the two
-    printers, ТР7 bits 46–45 are 0).
-- [ ] **T3. Check `newbsz` and `newdd`.** Both ran with `СЛА`, so they left no listings and
-  their success is not known. Run them with `ПУС` once T2 works and read the listings.
-  Expected: `newbsz` writes the task library 5/D73LIB, `newdd` writes the new dispatcher
-  to drum 25.
-- [ ] **T4. Boot from drum 25.** `DRUM=25 ./mt-run.py` stops at once with an instruction
-  parity error at 01000: the word there is tagged as a number. The banner text is only on
-  drum 20, and zones 0240–0266 changed already during `newbsz`. Ideas:
-  - Read the job text of `newdd` (7/M zone 100) for where it writes, and compare with the
-    control word in `pult9-25.b6` (`0140 1200`) and the drum-to-file mapping in the
-    simulator. One of them may address the wrong drum or zone.
-  - Check the tags: a dispatcher written by a job may need a tag-setting step that the
-    2017 simulator did not enforce.
-- [ ] **T5. Keep the catalogues across a reboot.** The second boot still uses ТР2
-  `3730 0000 0000 0001`, whose bits 47–43 clean the catalogues and the roll track. Use the
-  `0730…` value of `boot_dubna-25.b6` and check that queued input and output survive.
-- [ ] **T6. Other monitor common blocks.** Only `SPECMON` is pinned to the Monitor Dubna
-  addresses (`BUILD/deck-b1/fix-aux.s`). Search the link listing of the dispatcher for other
-  modules that use `INFLOAD*`, `RM*`, `A/I0`, `A/MINUS`, `*REGIM//` or `/VERE/`, and pin them
-  the same way. A wrong address there may be behind T1 or T2.
-- [ ] **T7. Bootstrap from scratch.** `bootstrap.sh` still calls the 2017 `expect1.ini`,
-  `expect2.ini` and `expe.ex`. Replace them with the current steps: build, first boot,
-  second boot, then the `newbsz`/`newdd` dialogue scripted in `mt-run.py` style, so that
-  `data/base/` is produced by a script. `boot-drums.ini`, `boot-disks.ini`,
-  `boot-second.ini` and `boot-tty26.ini` have not been rerun with `mem=128`; convert them to
-  send/expect or drop them.
+- [x] **T1. Queued job hangs the system.**
+  - Findings: there is no hang. `ПУС 110,17` queues hello; it runs on Ш05 and ends within
+    seconds, so `КАК` and `СЧЕ` already say `НЕТ ЗАДАЧ`. `КВЫ` shows its listing in the
+    output file (`Т 0101`), and `РЕЗ 01` lists it on the terminal: compiled, ran, printed
+    `НЕLLО FRОМ ОS DUВNА`.
+    - The disk scan of units 03–07 is routine polling; it also runs for units 00–02.
+    - The unanswered `D` came from the script sending it while the console was busy; sent
+      later, it is answered.
+    - `mt-run.py` got `POLL=` (e.g. `СЧЕ`), and `AFTER` commands may be empty lines.
+- [x] **T2. Listing on the printer.**
+  - Findings: the dispatcher's printer driver uses instruction 032 as a second `ext`
+    (`,032,4031B` ready bits, `13,032,14B` motor and feed; `tasksav.dd2:3080,3390,3437`,
+    `nrespost.dd3:6694,7695`). The 2017 simulator treated 032 as 033; the current one sends
+    032 to КАДОПАМ, so the spooler printed into nothing and stayed `+` forever.
+    - Fix in the simulator (branch `dubna`): `set cpu ext32` makes 032 act as 033; default
+      unchanged (КАДОПАМ), all simulator tests pass. `boot-run.ini` sets it.
+    - With it, `FRESH=1 SUBMIT=ПУС ./mt-run.py` prints the whole hello listing on `prn0`
+      (`output.txt`, 3653 bytes) with only `А1Р`.
+    - Also added `ex -v addr` (examine a virtual address through the page registers).
+    - Found on the way: `СЛА`/`RUN` block printer output by design; `ВnР` toggles the
+      "ЛВТА only" filter; `CCCNNЭnР` reprints.
+- [x] **T3. Check `newbsz` and `newdd`.**
+  - Findings: both work when queued with `ПУС` and started at once with the operator order
+    `01БП` (`CONSUBMIT=01БП`; their `*ТIМЕ:24.00` keeps the planner from starting them in
+    debug mode). Listings come out on `prn0`.
+    - `newbsz` (zone 105): links 42 tasks into 5/D73LIB, ends normally.
+    - `newdd` (zone 100) first failed with `ПЛОХ.ОБМЕН`: its physical drum exchanges need
+      privilege, and ТР3 `7700…` did not cover its slot (Ш04). ТР3 `7777 7777 0000 0000`
+      (the 2017 value) fixes it: `ОС 'ДУБНА' НА 25/000-037/. Д=035 ЗОН.`
+    - Multitype drops the first character after a listing that fills a page;
+      `mt-run.py` now ends `ЛИС` with an empty line before the submit.
+- [x] **T4. Boot from drum 25.**
+  - Findings: `DRUM=25 ./mt-run.py` boots the rebuilt dispatcher
+    (`ОИЯИ. ОС ДУБНА ОТ 04/04/89`, `Д-2500 МС-Ф10`), and a queued hello prints on `prn0`.
+    - It used to halt at 25412: `STARTDD` checks the image sum (`CALCSUM`, word 0101).
+      Drum 25 zones 017 and 020 held the job's own pages: the ini unlocked drum 25
+      (ТР1 `…0360`), so the system paged there while `newdd` wrote the dispatcher. With
+      128K memory paging is common; with 512K in 2017 it probably never happened.
+    - Fix: leave drum 25 locked (ТР1 `…0364`). Physical exchanges of a privileged job still
+      reach it. `boot-run.ini` now only sets ТР3 and ТР6 at the planner.
+    - `data/base/` now holds the images after `newbsz` and a good `newdd`.
+- [x] **T5. Keep the catalogues across a reboot.**
+  - Findings: the drum-25 boot (`boot_dubna-25.b6`, ТР2 `0730 0000 0000 0001`) keeps both
+    catalogues: after a reboot `КВЫ` still lists `NЕWDD` (entry 01, printed) and a new job
+    becomes entry 02. The drum-20 boot keeps ТР2 `3730…`, which cleans them: it is the clean
+    first start of the bootstrap, so that is intended.
+- [x] **T6. Other monitor common blocks.**
+  - Findings: none. In the dispatcher source (`dd-base-src.list`) only `SPECMON` declares
+    `INFLOAD*`, `/VERE/`, `RM*`, `A/I0`, `A/MINUS`, `*REGIM//`, and it is pinned in
+    `deck-b1/fix-aux.s`. Other hits are unrelated local names.
+- [ ] **T7. Bootstrap from scratch.**
+  - Done: `BUILD/mk-base.sh` makes the SIMH part reproducible: fresh disk and drum images,
+    `tra-libs.b6`, hello into 7/M, then `newbsz` (task library, so the spooler is there) and
+    `newdd` (drum 25), each queued with `ПУС` and started with `{}БП`; the result goes to
+    `data/base/`. `bootstrap.sh` calls it in place of `expect1.ini`/`expect2.ini`. Takes about
+    14 minutes, most of it printing the `newdd` listing.
+    - `mt-run.py` now sends `А1Р` only when the spooler asks for it (an empty task library
+      gives `ТАSК!`), and repeats `CONSUBMIT` orders until the job starts.
+  - Left: remove or convert the 2017 and early files (`expect1.ini`, `expect2.ini`,
+    `expe.ex`, `first-boot.ini`, `first-dd-boot.ini`, `second-boot*.ini`, `d@dubna.ini`,
+    `ddubna.ini`, `boot-drums.ini`, `boot-disks.ini`, `boot-second.ini`, `boot-tty26.ini`,
+    `ReadMeBoot.txt`); run `bootstrap.sh` end to end once.
 - [ ] **T8. Write it down.** A document on how the boot fits together; update `README.md`
   and `CLAUDE.md`; remove what is obsolete in `BUILD/`.
 

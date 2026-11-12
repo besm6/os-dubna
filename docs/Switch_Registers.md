@@ -251,9 +251,12 @@ Variants:
 - `boot-drums.ini` sets ТР2 = `3700 0000 0000 0001`: also clear the auto-input catalog, but
   use real drums 21/22. This is the first boot.
 - `boot-second.ini` sets ТР2 = `3730 …`, ТР3 = 0.
-- After boot it sets ТР1 = `… 0360`, which reopens drum 25₈. It sets ТР6 = `7417 7777 4000 0160`,
-  adding bit 24 so the planner skips the resource check. It sets ТР3 = `7700 0000 0000 0000`,
-  which gives the first six math-task slots the privileged physical-access extracodes.
+- At `ПЛАНИРОВЩИК`, `boot-run.ini` sets ТР6 = `7417 7777 4000 0160`, adding bit 24 so the
+  planner skips the resource check, and ТР3 = `7777 7777 0000 0000`, which gives all math-task
+  slots the privileged physical-access extracodes (job `newdd` writes drum 25₈ with them).
+  The 2017 scripts also set ТР1 = `… 0360` to reopen drum 25₈. Don't: an open drum gets
+  paging tracks, and with 128K of memory the system pages over the dispatcher being written.
+  A locked drum still takes physical exchanges from a privileged job.
 
 ## Open questions
 

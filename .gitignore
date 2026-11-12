@@ -6,6 +6,7 @@ BUILD/data/dr00
 BUILD/deck-b1.b6
 BUILD/*.list
 BUILD/*log*.txt
+BUILD/mk-base.log
 BUILD/output.txt
 BUILD/spl/x??
 BUILD/cosy/cosy2utf
