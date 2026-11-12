@@ -29,6 +29,7 @@ the system and boot it on the SIMH `besm6` simulator.
 | `tapes/`, `jobs/` | MS sources as a tape image and the job to compile them |
 | `d_besm6/` | miscellaneous old files |
 | `BUILD/` | bootstrap scripts, patches for SIMH, simulator configs |
+| `docs/` | reference articles on the BESM-6, Madlen and the simulator |
 
 See [file-list.md](file-list.md) for a per-file list.
 
@@ -70,6 +71,21 @@ More details are in `BUILD/`:
 - [the-bootstrap-plan.txt](BUILD/the-bootstrap-plan.txt) — phases of the bootstrap.
 
 ## Documentation
+
+Reference articles in [docs/](docs/):
+
+- [Madlen.md](docs/Madlen.md) — the Madlen autocode assembler;
+- [Besm6_Instruction_Set.md](docs/Besm6_Instruction_Set.md) — CPU registers and instructions;
+- [Besm6_Data_Representation.md](docs/Besm6_Data_Representation.md) — how numbers, characters and pointers are stored in a 48-bit word;
+- [Memory_Mapping.md](docs/Memory_Mapping.md) — memory mapping and protection;
+- [Peripherals.md](docs/Peripherals.md) — peripherals and their control registers;
+- [Simh_Simulator.md](docs/Simh_Simulator.md) — building and using the SIMH BESM-6 simulator;
+- [KOI7_Encoding.md](docs/KOI7_Encoding.md) — the KOI-7 character set.
+
+These articles are taken from other BESM-6 projects
+([simh](https://github.com/besm6/simh), [v7besm](https://github.com/besm6/v7besm),
+[c-compiler](https://github.com/besm6/c-compiler)); each one names its origin
+under the title.
 
 [BUILD/elements/MonitorDubna.txt](BUILD/elements/MonitorDubna.txt) is a
 description of Monitor Dubna (in Russian), based on the original 1988 texts.

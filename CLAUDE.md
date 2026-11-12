@@ -31,6 +31,21 @@ Terminology used everywhere:
 - `BUILD/elements/MonitorDubna.txt` — a description of Monitor Dubna, written in Russian. This is
   where nearly all recent commits go.
 - `file-list.md` — annotated list of the archive files.
+- `docs/` — reference articles in English; read the relevant one before working on that topic:
+  - `Madlen.md` — Madlen assembler syntax, declarations, control cards, error diagnostics.
+  - `Besm6_Instruction_Set.md` — registers, instruction formats, every opcode.
+  - `Besm6_Data_Representation.md` — 48-bit word layout, integers, floating point, characters.
+  - `Memory_Mapping.md` — page registers, protection, supervisor mode, the БРЗ cache.
+  - `Peripherals.md` — device registers, control words and interrupt bits (drums, disks,
+    tapes, printer, terminals) as seen by a driver.
+  - `Simh_Simulator.md` — building and operating SIMH `besm6`: `attach`/`set` commands,
+    loading, front panel, debugging and tracing.
+  - `KOI7_Encoding.md` — the KOI-7 code page used by BESM-6 text and the line printer.
+
+  The articles are copies from other BESM-6 projects (besm6/simh, v7besm, c-compiler); a note
+  under each title names the origin. Their "kernel" and "compiler" are those projects', and
+  links to files outside `docs/` are absolute GitHub URLs. Keep it that way when adding more:
+  no relative links to files that are not in this repo.
 
 ## Bootstrap
 
@@ -98,8 +113,8 @@ cosy sources from zone 100.
 - All texts are UTF-8, but BESM-6 text mixes Latin and Cyrillic lookalike letters within
   one word (e.g. `SТЕХТ=FRЕQ300` contains Cyrillic `Т`, `Е`, `Х`). Keep the existing bytes when
   editing, and search with that in mind — a plain ASCII grep can miss identifiers.
-- Madlen source lines have the fixed form ` label:register,OPCODE,operand.comment`; `C` in
-  column 1 starts a comment line (`Cs` marks the 2017 SIMH changes).
+- Madlen source lines have the form ` label:register,OPCODE,operand.comment`; `C` in
+  column 1 starts a comment line (`Cs` marks the 2017 SIMH changes). See `docs/Madlen.md`.
 - `deck-b1/*.s` and `cset/dd/*.s` hold the changes to DD needed for SIMH, as whole patched
   Madlen modules compiled by the patch deck. Change the system there, not in the archived sources.
 
