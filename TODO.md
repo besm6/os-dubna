@@ -145,9 +145,24 @@ Tasks are done in order. Each one gets a "Findings" note when finished.
       attached. `13/` at that point answers `А Я ЗАНЯТА`. This is exactly the sample output.
     - Speed: the 1.9G instructions of this run took about 1.5 minutes of host time and
       about 45 seconds of BESM-6 time.
-- [ ] **T7. Disks.** Attach `md00`/`md04`, make the dispatcher find D73INP and D73OUT.
+- [x] **T7. Disks.** Attach `md00`/`md04`, make the dispatcher find D73INP and D73OUT.
   Needs the simulator from branch `dubna` (disk status fix, see T2).
   Target: `ВЫВОД БУФЕРИЗОВАН`, `ПЛАНИРОВЩИК`.
+  - Findings: `besm6 boot-disks.ini` reaches `ВЫВОД БУФЕРИЗОВАН` and `ПЛАНИРОВЩИК` in under
+    a minute. No change to the dispatcher or the disk images was needed once the simulator
+    returned the old disk status.
+    - Devices: `attach -e md00 data/disk9.bin`, `attach -e md04 data/disk11.bin` (the old
+      `disk0` and `disk4`).
+    - Right after the banner the dispatcher lists the tape models it found on the disks:
+      `MONSYS/9 W10`, `D73LIB/5 W11`, `M/7 W12`, `D73INP/1 W13`, `D73OUT/3 W14`,
+      `D73STA/6 W15`, `USESTA/0 W16`, `LINBUF/1 W17`, `ROLLIB/1 W20`, `LIBRAR/2 W21`,
+      `LIBRAR/7 W22`, `CATALO/8 W23` (switch register 1 bit 24 asks for this list).
+    - `МЛ ВВ/ВЫВ!` is gone; `Д-2000  МС-21,22` is followed by `ВЫВОД БУФЕРИЗОВАН`.
+    - Open: `ОШ22-ТАSК11` appears before `ПЛАНИРОВЩИК`. Not traced yet. Likely the static
+      library task 11 failing because 5/D73LIB is still empty (`deck.notes`: "NO STL!"); the
+      2017 first boot stopped at `ПЛАНИРОВЩИК` regardless.
+    - The boot writes to the disk images as well as the drums. To start over, rebuild them
+      (`data/mkdisk9.sh`, `mkdisk11.sh`, `mkdrumdd.sh`) and rerun `dispak -l tra-libs.b6`.
 - [ ] **T8. Second boot** with Monitor System drums modelled from 9/MONSYS and the roll
   track kept.
 - [ ] **T9. Multitype** on `tty26` over telnet: `OP`, `REF`, password, buffer `7/M`; run a
