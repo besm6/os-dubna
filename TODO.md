@@ -180,6 +180,28 @@ Tasks are done in order. Each one gets a "Findings" note when finished.
       `boot_dubna-25.b6`) is left for T10.
 - [ ] **T9. Multitype** on `tty26` over telnet: `OP`, `REF`, password, buffer `7/M`; run a
   job and get its listing on `prn0`.
+  - Progress (not finished): the second terminal works as an operator console, Multitype
+    starts, but never asks for the password.
+    - Telnet: `attach tty line=26 4199` is rejected now ("Unit disabled: TTY0"); use
+      `attach tty26 Line=26,4199` (`boot-mt.ini`, driven by `mt-session.py`).
+    - Deterministic variant without telnet: `boot-tty26.ini` makes `tty26` the SIMH console
+      and sends the 2017 dialogue with `send`. Same result, and it can be traced.
+    - On `tty26`: `OP` + Enter → `!!!` (operator console); date entry works; `REF` is
+      accepted; two spaces are echoed and nothing follows. Further input (`MJPOP`, `7/M`)
+      gets `!!!`, so the line stays unbound.
+    - Trace after the two spaces (`set cpu debug`, idle loop filtered out): task 5 starts
+      module `MULTITYP` at 20211, runs its first-time setup — fixes its pages, reads its
+      non-resident part from the drum, installs the event branch `VALERINA` — and ends with
+      extracode 74 at 23274. That is the normal end of the setup
+      (`besmdisp/nrespost.dd3:9648-9750`), not a crash. No terminal output follows.
+    - Not yet known: why the line is not handed to Multitype after the setup. Next: trace
+      the second pair of spaces and follow the binding code (`*TLCONN`, tables in
+      `deck-b1/conf-tty.s`), where the 2017 patches zeroed several channel descriptors.
+    - Test job: `hello.dub` (checked with `dubna hello.dub`); `put-job.sh deck [zone]`
+      writes a deck into 7/M on `disk9.bin` through dispak. 7/M starts at disk zone 0700,
+      so zone 110 is address 1010.
+    - `ОШ22-ТАSК11` is unrelated to this: Multitype is not loaded through the static
+      library.
 - [ ] **T10. Self-rebuild.** The `expe.ex` dialogue (jobs `newdd`, `newbsz`), then boot from
   drum 25.
 - [ ] **T11. Write it down.** Working ini files and scripts in `BUILD/`, a document on how
