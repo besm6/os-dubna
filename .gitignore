@@ -17,7 +17,6 @@ BUILD/output1.txt
 BUILD/mt-run-*.txt
 BUILD/*debug*.txt
 BUILD/data/*.pre-t10
-BUILD/data/base/
 BUILD/runtests.log
 BUILD/FSINP.TXT
 BUILD/data/CAMdrum20.bin

@@ -47,9 +47,11 @@ Terminology used everywhere:
     commands (tty26) and the replies to them.
   - `Boot_Process.md` — how the bootstrap works: dispak stage, disk and drum images, the SIMH
     boot sequence, the rebuild jobs, running and pitfalls.
+  - `OS_Dubna_Tutorial.md` — for users: start the system, log in to Multitype, type and run
+    a job, read the printout.
 
-  The articles, except `Switch_Registers.md`, `Dubna_Commands.md` and `Boot_Process.md`
-  (written here), are copies from other BESM-6
+  The articles, except `Switch_Registers.md`, `Dubna_Commands.md`, `Boot_Process.md` and
+  `OS_Dubna_Tutorial.md` (written here), are copies from other BESM-6
   projects (besm6/simh, v7besm, c-compiler); a note under each title names the origin. Their "kernel" and "compiler" are those projects', and
   links to files outside `docs/` are absolute GitHub URLs. Keep it that way when adding more:
   no relative links to files that are not in this repo.
@@ -86,7 +88,9 @@ Pipeline in `bootstrap.sh`:
 7. `mk-base.sh` — rebuild the images, then boot SIMH twice with `mt-run.py` (both consoles
    driven over sockets by send/expect, `boot-run.ini`): job `newbsz` builds the task library
    5/D73LIB (the print spooler is in it), job `newdd` writes a rebuilt DD to drum 25. The
-   images are saved in `BUILD/data/base/`.
+   images are saved in `BUILD/data/base/`, which is tracked in git (about 4 MB per version
+   in history), so users can run the system without building it. Commit new images only
+   when the system changes.
 
 After the bootstrap, run the system with `besm6 dubna.ini` from `BUILD/` (console on the
 terminal, Multitype on telnet port 4199). `./mt-run.py [zone]` boots and runs a job from 7/M

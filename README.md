@@ -38,7 +38,16 @@ See [file-list.md](file-list.md) for a per-file list.
 The sources are compiled by batch jobs under the Dispak simulator, then disk
 and drum images are assembled and booted in SIMH.
 
-Requirements:
+The ready images are in the repository, in `BUILD/data/base/`. To just run the system you
+need only the simulator:
+
+```sh
+cd BUILD
+cp data/base/*.bin data/
+besm6 dubna.ini
+```
+
+To rebuild everything from the sources:
 
 - `dispak` and `besmtool` on `PATH`, with Dispak system tapes 2048 and 2148;
 - SIMH `besm6` on `PATH`, built from branch `dubna` of
@@ -56,13 +65,12 @@ The script compiles the dispatcher and libraries under `dispak` and builds the d
 disk images. Then `mk-base.sh` boots them in SIMH twice, driving both consoles through
 `mt-run.py`: the job `newbsz` builds the task library (the print spooler is in it), and the
 job `newdd` writes a rebuilt dispatcher to drum 25. The resulting images are saved in
-`BUILD/data/base/`. This part takes about a quarter of an hour.
+`BUILD/data/base/`. This part takes about a quarter of an hour. Commit the new images only
+when the system has changed: each version adds about 4 MB to the history.
 
-After that, run the system from `BUILD/` with:
+Run the system from `BUILD/` with `besm6 dubna.ini`.
 
-```sh
-besm6 dubna.ini
-```
+A step-by-step guide for users is [docs/OS_Dubna_Tutorial.md](docs/OS_Dubna_Tutorial.md).
 
 This terminal is the operator console; Multitype is on telnet port 4199. Commands and
 replies are described in [docs/Dubna_Commands.md](docs/Dubna_Commands.md).
@@ -91,6 +99,7 @@ Reference articles in [docs/](docs/):
 
 Written for this repository:
 
+- [OS_Dubna_Tutorial.md](docs/OS_Dubna_Tutorial.md) — start the system and run your own jobs;
 - [Boot_Process.md](docs/Boot_Process.md) — how the bootstrap builds and boots the system;
 - [Dubna_Commands.md](docs/Dubna_Commands.md) — operator console and Multitype commands;
 - [Switch_Registers.md](docs/Switch_Registers.md) — the switch registers ТР1–ТР7 in DD.

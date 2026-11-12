@@ -131,7 +131,8 @@ exchanges from a privileged job.
 
 Each job is queued with `ПУС` and started at once with the operator order `{}БП`: both ask
 for 24 minutes, and in debug mode (ТР6 bit 6) the planner starts such jobs only on Ш01. The images are then saved
-in `data/base/`.
+in `data/base/`. These images are kept in the repository, so a user can run the system with
+the simulator alone.
 
 ## 5. Running
 
