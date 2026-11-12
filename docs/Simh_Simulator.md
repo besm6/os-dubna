@@ -1,34 +1,21 @@
 # BESM-6 simulator
 
-> This article comes from the [v7besm](https://github.com/besm6/v7besm) project, a port of
-> Unix v7 to the BESM-6. "The kernel", "the compiler" and "this project" in the text refer to
-> that project, not to OS Dubna.
+> This article is the user guide of the [besm6/simh](https://github.com/besm6/simh/tree/master/BESM6)
+> simulator (`BESM6/README.md` there). Three sections — Latin trace mnemonics, asserting on
+> memory, and `expect` actions — come from the [v7besm](https://github.com/besm6/v7besm) copy
+> of this guide.
 
-This document describes [besm6/simh](https://github.com/besm6/simh/tree/master/BESM6/), a
-[SIMH](http://simh.trailing-edge.com/)-based simulator of the **BESM-6** (БЭСМ-6), the most widely
-used Soviet mainframe of the 1960s–80s — a 48-bit machine with sign-magnitude floating-point
-arithmetic. It explains how to build the simulator, load and run BESM-6 software, attach
-peripherals, drive the machine from its front panel, and debug what happens inside.
+This document describes a [SIMH](http://simh.trailing-edge.com/)-based simulator of the
+**BESM-6** (БЭСМ-6), the most widely used Soviet mainframe of the 1960s–80s. The BESM-6 is a
+48-bit machine with sign-magnitude floating-point arithmetic. This guide explains how to
+build the simulator, load and run BESM-6 software, attach peripherals, drive the machine from its
+front panel, and debug what happens inside.
 
-**This is the machine our Unix kernel will run on.** The simulator reproduces the real hardware in
-detail and boots a whole operating-system image, so it is the target for the kernel being built in
-[`kernel/`](https://github.com/besm6/v7besm/tree/main/kernel): an authentic BESM-6, with drums, disks, printers and terminals that the
-drivers in [`kernel/dev/`](https://github.com/besm6/v7besm/tree/main/kernel/dev) must drive for real. That makes it the counterpart of
-`b6sim` ([Aout_Simulator.md](https://github.com/besm6/v7besm/blob/main/doc/Aout_Simulator.md)), which is a *user-level* simulator — it models one
-running process, not a whole machine. Use `b6sim` to run and check one program quickly; use SIMH
-to run the whole system. What the peripherals look like from *inside* a program — the `033 «увв»`
-I/O instruction, every device register, and the ГРП/ПРП interrupt bits — is the subject of the
-companion [Peripherals.md](Peripherals.md).
+The simulator has everything needed to boot the classic **DISPAK** (ДИСПАК) batch operating
+system and run job decks through it — you only need to supply the system disk images
+(see [Booting DISPAK](#booting-dispak)). OS Dubna boots on it too; see `TODO.md` and `BUILD/`
+in this repository.
 
-The simulator ships with everything needed to boot the classic **DISPAK** (ДИСПАК) batch
-operating system and run job decks through it — you only need to supply the system disk images
-(see [Booting DISPAK](#booting-dispak)).
-
-> **Paths in this document are relative to a `besm6/simh` checkout**, not to this repository:
-> `make besm6` is run in the simh working copy, the binary lands in its `BIN/`, and the demo and
-> test scripts live under its `BESM6/` directory. Clone it separately:
-> `git clone https://github.com/besm6/simh.git`.
->
 > **A note on Cyrillic.** The real machine, its operating system, and its assembler mnemonics are
 > all in Russian. The simulator exposes register names in Cyrillic *and* Latin, accepts both the
 > BEMSH (БЕМШ) and MADLEN mnemonic dialects, and lets terminals type Cyrillic from a Latin
@@ -57,7 +44,7 @@ operating system and run job decks through it — you only need to supply the sy
 
 ## Building
 
-Build from the **root of the simh working copy**:
+Build from the **repository root** of `besm6/simh`:
 
 ```sh
 make besm6
@@ -67,6 +54,8 @@ This produces the binary `BIN/besm6`. The build uses `-DUSE_INT64` (the 48-bit w
 64-bit integer type) and pulls in SDL2 video plus SDL_ttf font support, which are required only
 for the optional graphical [front panel](#the-front-panel). The link step runs an internal
 register sanity check on success.
+
+See the repository `CLAUDE.md` for more build details.
 
 ---
 
@@ -178,34 +167,7 @@ can be used in `ASSERT` conditions (e.g. `assert ACC==0`).
 
 The simulator loads programs from a **text** file in the same format used by the DISPAK
 operating system. This is the `.b6` format used by `demo/boot_dispak.b6`, `tests/alu.b6`, and the
-other bundled programs.
-
-`load` also auto-detects **binary `a.out` executables** (see `tests/aout/`) — and that is how
-code built in this repository gets into the machine. The executables our linker produces are in
-exactly this format, so a program assembled and linked here can be loaded straight into SIMH and
-run:
-
-```sh
-b6as -o hello.o hello.s && b6ld -o hello hello.o     # in this repository
-```
-
-and then, in the simulator:
-
-```
-sim> load hello
-sim> run
-```
-
-See [Linker_Manual.md](https://github.com/besm6/v7besm/blob/main/doc/Linker_Manual.md) and [File_Magic.md](https://github.com/besm6/v7besm/blob/main/doc/File_Magic.md) for the object and
-executable format.
-
-> **A recent simulator is required to load this repository's kernel.** Words are stored with a
-> 2-bit instruction/number tag, and fetching a data-tagged word raises *«контроль команды»* (see
-> [Machine model and word format](#machine-model-and-word-format)). The a.out loader used to tag
-> const-segment words as instructions only in `0500..0547` — which covers the two interrupt vectors
-> but **not** the extracode vectors at `0550`–`0577`, so those loaded as *data* and the first
-> system call check-halted. `BESM6/besm6_sys.c` now covers `0500..0577`. A simulator predating that
-> fix will load `kernel/unix` and fail on its first extracode.
+other bundled programs. (`load` also auto-detects binary `a.out` executables; see `tests/aout/`.)
 
 Load and start:
 
@@ -339,15 +301,11 @@ The memory-management unit is a separate device, `MMU`:
 | `set mmu cache` / `set mmu nocache` | Enable/disable true LRU write-cache modelling. Accurate but ~20 % slower; off by default. |
 | `set mmu check` / `set mmu nocheck` | Enable/disable parity checking. |
 
-> **Programming the MMU.** This section covers how to *configure* the memory-management unit. For
-> what a program sees — how a virtual address becomes a physical one, the page registers РП and the
-> protection register РЗ, why an instruction fetch is protected differently from a data load, and how
-> a protection fault is reported in ГРП — see **[Memory_Mapping.md](Memory_Mapping.md)**. That is the
-> reference the kernel's memory management is written against.
->
-> Both options above matter to a kernel, not just to the operator. `set mmu cache` is what makes the
-> БРЗ write-back cache behave as the real hardware did, and a kernel that only works with it off is a
-> kernel that would not have worked on the real machine — so test with it **on**.
+> **Programming the MMU.** This section covers how to *configure* the simulated MMU. For how a
+> program *drives* it — the page registers РП and the protection register РЗ, virtual-to-physical
+> translation, how protection differs between user and supervisor mode and between instruction fetch
+> and data access, and how a protection fault is reported — see
+> **[Memory_Mapping.md](Memory_Mapping.md)**.
 
 ---
 
@@ -387,9 +345,7 @@ implicitly when you attach or `set` them.
 
 > **Programming the peripherals.** This section covers how to *connect* a device. For how a program
 > *drives* one — the `033` «увв» I/O instruction and its full address map, each device's control
-> word and bit fields, and the ГРП/ПРП interrupt bits — see
-> **[Peripherals.md](Peripherals.md)**. That is the reference the kernel's device
-> drivers are written against.
+> word and bit fields, and the ГРП/ПРП interrupt bits — see **[Peripherals.md](Peripherals.md)**.
 
 Disk and drum images share the same on-disk geometry: storage is divided into *zones* of
 `8 + 1024` words (8 service words followed by 1024 user words), and each word is written as an
@@ -493,6 +449,18 @@ sim> attach -r  mg31 archive.tap    ; mount read-only
 
 With `-n` the tape is formatted and its volume number (from the filename) **must be 1–2047**.
 
+Direction 4 can instead be an **ЕС-5017** controller, as DISPAK expects when its configuration has
+`ЕСМЛ 4` (most variants of the stock `sbor2053.bin` do; a `tools/makeBESM2053.py` section file
+with `ЕСМЛ 4` / `ЕСМЛ НЕТ` sets or clears it):
+
+```
+sim> set mg4 es                     ; before attaching MG4 tapes
+sim> attach -n mg40 1234.tap        ; BESM-6-mode ES tape, volume 1234
+sim> attach -n mg41 blank.tap       ; blank ES tape; operator: ЕСМ 1234 41
+```
+
+ES tape images differ from native ones; see [Peripherals.md](Peripherals.md#ес-5017-controller-on-direction-4-set-mg4-es).
+
 ---
 
 ## Terminals (TTY)
@@ -524,17 +492,46 @@ set together, e.g. `set tty1 unicode,authbs` or `set tty1 qwerty,authbs`.
 | `unicode` | UTF-8 in and out. |
 | `jcuken`  | Type Russian using the standard ЙЦУКЕН keyboard layout mapped onto Latin keys. |
 | `qwerty`  | Type Russian as transliterated Latin letters: `Q`=я, `W`=в, `Y`=ы, `J`=й, `X`=ь, `C`=ц, `V`=ж, `` ` ``=ю, `~`=ч, `{`=ш, `}`=щ, `|`=э. |
-| `raw`     | No conversion; bytes pass through unchanged. The authentic seven-bits-plus-parity contract of the hardware still holds: a code above `0177` is dropped on input, output is masked to `0177`, and the Consul and mux lines synthesise the odd-parity bit. |
-| `raw8`    | The same, but literally eight bits both ways — no truncation on output, nothing above `0177` dropped on input, no parity bit synthesised — so the guest owns the character set. A connecting client also gets no `^C` injected, the byte there being data rather than a request. `v7besm`'s kernel depends on all of that to carry UTF-8, which is why every `.ini` here says `set tty25 raw8`. |
+| `raw`     | No conversion; bytes pass through unchanged. The authentic seven-bits-plus-parity contract of the hardware still holds: a character above `0177` is dropped on input, output is masked to `0177`, and the Consul and mux lines synthesise bit 8 as a parity bit — even overall parity, except on a line in `consul` mode, which gets odd. |
+| `raw8`    | The same, but eight bits wide: nothing is truncated on output, nothing above `0177` is dropped on input, and no parity bit is synthesised — the guest owns the character set. A connecting client gets no `^C` injected, the byte being data rather than a request. This is what `v7besm`'s kernel uses to carry UTF-8. |
 
 **Terminal type:**
 
 | Mode | Meaning |
 |------|---------|
 | `vt`     | Videoton-340; the machine's control codes are translated to ANSI/VT100 escape sequences (cursor keys, clear screen, home). Default for new telnet connections. |
-| `tt`     | MTK-2 (Baudot, 5-bit) teletype. Serial lines only. |
+| `tt`     | MTK-2 (Baudot, 5-bit) teletype. Lines 1–16 only. Register shifts are sent as needed; Enter sends ПС. |
 | `consul` | Consul-254 typewriter. Only valid on the two parallel lines (25/26). |
 | `off`    | Take the line offline. |
+
+**Lines 25/26 and Диспак's `VIDI`.** The OS drives a parallel line one of two ways, chosen by the
+`VIDI N` section of its configuration (N=2: line `'31'` = `tty25`, N=1: `'32'` = `tty26`, N=3:
+both), and the simulator's terminal type has to match:
+
+* With `VIDI`, the line is a Videoton on the Consul channel: KOI-7 with even parity. Use `vt`.
+* Without it, the line is a real Consul-254: the Consul's own code (GOST-10859 for digits and
+  Cyrillic, different for punctuation, space and Latin), odd parity. Use `consul`. Enter ends the
+  line, Backspace cancels a symbol, and `%` or Ctrl-U cancel the whole line, as the Consul's `%` key
+  did. Characters the Consul cannot print come out as `?`.
+
+A mismatch fails quietly: every keystroke is a parity error to the OS, and output is garbled.
+
+Leaving `VIDI` off is not enough to get a Consul. Диспак gives a line the Consul device code only if
+it is also listed in `ЕСТЕРМ` (`ЕСТЕРМ 31` / `ЕСТЕРМ 32`). Otherwise it treats the line as a direct
+teletype and never prints to it. `tools/makeBESM2053.py` patches a system disk from a file of
+ВЫДИНС-style sections; for a Consul on line 26 (`'32'`):
+
+```
+ТЕРМ СОNS:32
+ШКОПТТ 32
+ТКАНАЛ Ф32:0-7
+VIDI НЕТ
+ЕСТЕРМ 32
+```
+
+For a Videoton on the Consul channel, use `VIDI 1` and `ЕСТЕРМ НЕТ` instead. Sections not in the
+file are left as they are in the image; see the script's help for the supported sections.
+`attach ttyN console` switches the line to `vt` unless it is already `consul`.
 
 **Backspace:**
 
@@ -570,30 +567,96 @@ sim> set drum debug
 sim> set md0 debug
 ```
 
-`set cpu debug` in particular emits a detailed per-instruction trace — one line per executed
-instruction with the disassembly and the registers it touches — which is the fastest way to
-see exactly what a program does. It can be voluminous, so route it to a file (below).
-
 The disk device is the exception — it has named debug categories you can enable selectively:
 `OPS` (transactions), `RRD`/`RWR` (register reads/writes), `INTERRUPT`, `TRACE`, `DATA`
 (transferred data), and `STATUS`.
 
-Route the debug output straight to a file:
-
-```
-sim> set debug "trace.txt"          ; all debug output goes here
-sim> set cpu debug                  ; ...e.g. the per-instruction CPU trace
-```
-
-or fold it into the console log instead:
+Route the output to a file with the console log:
 
 ```
 sim> set -n console log=log.txt     ; -n truncates/creates the file
 sim> set console debug=log          ; send debug output to the console log too
 ```
 
-The kernel's `kernel/unix.ini` carries both trace lines commented out; uncomment them to dump
-a full `unix.trace` of the boot.
+or send the debug stream straight to its own file:
+
+```
+sim> set debug "out.trace"          ; all debug output goes here
+```
+
+### The CPU instruction trace
+
+`set cpu debug` turns the processor into a full instruction tracer. While it is
+on, every executed instruction is logged, together with the machine state it
+touches, to the debug output. A typical run looks like:
+
+```
+sim> set debug "out.trace"
+sim> set cpu debug
+sim> dep PC 32000
+sim> step 20
+```
+
+The trace covers four things, all controlled by the one `set cpu debug` toggle:
+
+1. **Instructions.** One line per executed command:
+
+   ```
+   32016 L: 01 010 4412 сч 4412(1)
+   ```
+
+   `32016` is the instruction address (octal `СчАС`); `L`/`R` marks the left or
+   right half-word of the double-command word; then the octal instruction fields
+   (register, opcode, address) and the disassembled mnemonic. For an extracode
+   (`э50`…`э77`) the executive address is appended as `= ⟨addr⟩`.
+
+2. **Register changes.** After each instruction, only the registers that
+   *changed* are printed, indented, so the trace stays readable:
+
+   ```
+         ACC = 7777 7777 7777 7777
+         M1 = 34412
+         RAU = 10
+   ```
+
+   All CPU state is covered, including supervisor-only registers and the page
+   table: `ACC`, `RMR`, `RAU`, `RUU`, the whole `M0`…`M35` file (index registers
+   plus `MOD`/`PSW`/`SPSW`/… ), the interrupt registers `GRP`/`MGRP` and
+   `PRP`/`MPRP`, the mapping registers `RP0`…`RP7`, and the protection register
+   `RZ`. The very first trace line dumps every register as the initial state.
+   (The left/right half-word bit of `RUU` is *not* reported as a change, since it
+   flips every instruction and is already shown by the `L`/`R` marker.)
+
+3. **Memory read/write.** Operand loads and stores show the address and 48-bit
+   value:
+
+   ```
+         Memory Read [34412] = 7777 7777 7777 7777
+         Memory Write [77766] = 0000 0000 0000 0000
+   ```
+
+   Instruction *fetches* are deliberately not traced (they would double every
+   line); only operand accesses appear.
+
+4. **Exceptions and interrupts.** Internal faults and external interrupts are
+   flagged on their own line, with the address and the reason:
+
+   ```
+   ----- 00500L: Запрещенная команда -----
+   ```
+
+Put together, a short fragment reads:
+
+```
+32012 R: 00 100 7766 зп -12
+      Memory Write [77766] = 0000 0000 0000 0000
+32013 L: 00 037 0000 ржа
+      RAU = 00
+```
+
+The trace can be very large — thousands of lines per millisecond of simulated
+time — so enable it around a bounded `step`/`go`, or combine it with a
+breakpoint, rather than over a whole DISPAK boot. `set cpu nodebug` turns it off.
 
 ### Latin (MADLEN) trace mnemonics
 
@@ -703,22 +766,8 @@ the machine from the front panel and by scripting the operator console:
   bring the printer online, wait for printing to finish).
 * Results are written to `output.txt`.
 
-A bare `expect "text"` matches the quoted byte string **exactly**; `-r` asks for a regular
-expression instead. `-p` makes the rule persistent (it stays armed after firing), and `-c`
-means **clear all other rules** once this one matches — not "compare literally", which is
-what the wording here used to say. Without `-p` a rule is removed as soon as it fires, so a
-sequence of rules armed together fires once each, in whatever order the output produces them.
-
-A match **halts the simulator** and then runs the rule's action, which is an ordinary
-command list — so an action typically ends with its own `go` or `step` to set the machine
-going again. `send "..."` injects keystrokes (C-style escapes: `\r`, `\004`, `\x04`);
-`send after=N "..."` waits N simulated cycles first, and `delay=N` spaces the characters out.
-
-Injected input arrives through `sim_poll_kbd()`, which serves it **before** it looks at the
-real keyboard — so a scripted dialogue works with no terminal on stdin, which is what lets
-`kernel/test/console.ini` run under ctest. Console output reaches the matcher through
-`sim_putchar` → `tmxr_putc_ln` → `sim_exp_check`, so nothing has to be logged for `expect`
-to see it.
+`expect` supports `-r` (regex), `-p` (persistent — stays armed after firing), and `-c` (exact
+substring); `send after=N "..."` injects characters after N simulated cycles.
 
 ### Regression tests
 
@@ -739,8 +788,7 @@ echof "PASS: alu"
 `pprog05.ini` compares the accumulator against the raw octal words for 1.0, 2.0, 3.0, 4.0, and
 `aout.ini` exercises the binary `a.out` loader. Note that numbers in `if` expressions are
 decimal unless written with a leading `0` (octal). See
-[BESM6/tests/README.md](https://github.com/besm6/simh/blob/master/BESM6/tests/README.md) for how
-to run and add tests.
+[tests/README.md](https://github.com/besm6/simh/blob/master/BESM6/tests/README.md) for how to run and add tests.
 
 ### Asserting on memory, not just registers
 
@@ -764,9 +812,7 @@ Two things bite in the bare form on this machine:
 * **No space may appear inside the condition token**, because `get_glyph` splits on space.
 
 `DEPOSIT` is the other half of the same idea: `deposit <addr> <octal>` after `load` and before
-the machine starts overrides an initialized variable in the loaded image. `v7besm`'s
-`kernel/test/swap.ini` uses both — it deposits a smaller `phymem` to model a machine too small
-for its workload, then asserts on the kernel's swap counters afterwards. Note that a deposit
+the machine starts overrides an initialized variable in the loaded image. Note that a deposit
 that silently missed (a moved symbol, a mistyped address) leaves a test that passes for the
 wrong reason, so pair it with an `expect` on something the new value makes the program print.
 
@@ -828,8 +874,6 @@ the full reference.
   `033 «увв»` address map, every device's control word, and the ГРП/ПРП interrupt bits.
 * [Memory_Mapping.md](Memory_Mapping.md) — the programmer's view of the `MMU` device configured
   above: address translation, the page and protection registers, supervisor mode, and the БРЗ cache.
-* [Aout_Simulator.md](https://github.com/besm6/v7besm/blob/main/doc/Aout_Simulator.md) — `b6sim`, the user-level simulator that runs a single
-  BESM-6 `a.out` and emulates its Unix v7 system calls on the host.
 * [Besm6_Instruction_Set.md](Besm6_Instruction_Set.md) — the instruction set the simulator's
   symbolic assembler and disassembler speak.
 * [besm6/simh](https://github.com/besm6/simh/tree/master/BESM6/) — the simulator's sources.

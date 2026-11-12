@@ -130,8 +130,21 @@ Tasks are done in order. Each one gets a "Findings" note when finished.
     - Switch register 3 is now cleared; the old scripts left the page-clearing loader in it.
     - The boot writes to both drum images. Rebuild them with `data/mkdrumdd.sh` for a
       clean first boot.
-- [ ] **T6. Operator console** on `tty25`: empty line → `!!!`, `D`, date `040489D`, `T`.
+- [x] **T6. Operator console** on `tty25`: empty line → `!!!`, `D`, date `040489D`, `T`.
   Target: `Д-2000 МС-21,22`.
+  - Findings: the console works with the current simulator as it is; `boot-drums.ini` now
+    carries the dialogue and reaches `Д-2000  МС-21,22` (about 1.5 minutes of host time).
+    - Settings: `attach tty25 console`, `set tty25 qwerty,authbs`, `set tty25 vt`. Neither
+      `invready` nor the `consul` type was needed.
+    - Scripted input is bare `send "...\r"` followed by `step N`; it works with stdin not a
+      terminal. Output goes to stdout and the console log.
+    - Replies seen: empty line → `!!!`; `D` → `00/00/00 Т=00.00.07`; `040489D` →
+      `04/04/89 Т=…`; `T` → `Д00.00.13 Ж00.00.13`.
+    - About 16 seconds of BESM-6 time after the start the dispatcher prints
+      `Д-2000  МС-21,22`, then `МЛ ВВ/ВЫВ!` every 20 seconds or so, since no disks are
+      attached. `13/` at that point answers `А Я ЗАНЯТА`. This is exactly the sample output.
+    - Speed: the 1.9G instructions of this run took about 1.5 minutes of host time and
+      about 45 seconds of BESM-6 time.
 - [ ] **T7. Disks.** Attach `md00`/`md04`, make the dispatcher find D73INP and D73OUT.
   Needs the simulator from branch `dubna` (disk status fix, see T2).
   Target: `ВЫВОД БУФЕРИЗОВАН`, `ПЛАНИРОВЩИК`.
