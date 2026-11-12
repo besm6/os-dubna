@@ -99,8 +99,20 @@ Tasks are done in order. Each one gets a "Findings" note when finished.
       date), a jump at 01000.
     - `tra-libs.b6` wrote the rebuild jobs and libraries into `disk9.bin` through bridge
       tape 2209.
-- [ ] **T4. Drum images.** `data/mkdrumdd.sh`; check the banner at 0765 and the jump at 01000
+- [x] **T4. Drum images.** `data/mkdrumdd.sh`; check the banner at 0765 and the jump at 01000
   in zone 0 of drum 20, and that drums 21–22 equal MONSYS zones 0–077.
+  - Findings: `dubdrum1.bin` and `dubdrum2.bin` are built and checked.
+    - Layout of each image (256 zones; the second 128 repeat the first, so drums 24–27
+      mirror 20–23): drum 20 tracks 0–034 dispatcher, 036–037 Multitype data; drums 21–22
+      Monitor System; drum 23 tracks 0–2 password and name tables (MONSYS zones
+      0402–0404), 034–037 Multitype.
+    - Drum 20 track 0 has the banner at 0765 and a jump at 01000; every word of the
+      dispatcher is tagged as an instruction.
+    - **Bug inherited from 2017:** drum 22 came out as zones 0–037 of Dispak tape 2048, not
+      MONSYS zones 040–077. The copy loop in `deck-b1/fix-misc.s` (`ПЕРЕМС`) steps its
+      source with drum arithmetic, which moves from unit 40 (tape 9) to unit 41 (tape 2048)
+      after 32 zones. `mkdrumdd.sh` now overlays drum 22 from `mons9.d9`; the deck itself is
+      unchanged. Drums 21–22 now equal MONSYS zones 0–077.
 - [ ] **T5. First boot, drums only.** New ini with current device names, console log,
   `runlimit`, scripted input. Target: the banner line.
 - [ ] **T6. Operator console** on `tty25`: empty line → `!!!`, `D`, date `040489D`, `T`.
