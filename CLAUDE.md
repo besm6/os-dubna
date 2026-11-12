@@ -43,8 +43,10 @@ Terminology used everywhere:
   - `KOI7_Encoding.md` — the KOI-7 code page used by BESM-6 text and the line printer.
   - `Switch_Registers.md` — meaning of each bit of switch registers ТР1–ТР7 in DD, panel
     commands, and the values used by the `BUILD` boot scripts.
+  - `Dubna_Commands.md` — operator console orders (tty25), print spooler orders, Multitype
+    commands (tty26) and the replies to them.
 
-  The articles, except `Switch_Registers.md` (written here), are copies from other BESM-6
+  The articles, except `Switch_Registers.md` and `Dubna_Commands.md` (written here), are copies from other BESM-6
   projects (besm6/simh, v7besm, c-compiler); a note under each title names the origin. Their "kernel" and "compiler" are those projects', and
   links to files outside `docs/` are absolute GitHub URLs. Keep it that way when adding more:
   no relative links to files that are not in this repo.
