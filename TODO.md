@@ -163,8 +163,21 @@ Tasks are done in order. Each one gets a "Findings" note when finished.
       2017 first boot stopped at `ПЛАНИРОВЩИК` regardless.
     - The boot writes to the disk images as well as the drums. To start over, rebuild them
       (`data/mkdisk9.sh`, `mkdisk11.sh`, `mkdrumdd.sh`) and rerun `dispak -l tra-libs.b6`.
-- [ ] **T8. Second boot** with Monitor System drums modelled from 9/MONSYS and the roll
+- [x] **T8. Second boot** with Monitor System drums modelled from 9/MONSYS and the roll
   track kept.
+  - Findings: `besm6 boot-second.ini`, run after `boot-disks.ini`, starts cleanly in under
+    a minute.
+    - Only switch register 2 differs at start: `3730 0000 0000 0001` (bits 41 and 40 added).
+      The dispatcher then reports `Д-2000  МС-Ф10,` instead of `Д-2000  МС-21,22`: the
+      Monitor System comes from disk file W10 (9/MONSYS), not from drums 21 and 22.
+    - After `ПЛАНИРОВЩИК` the ini changes the switch registers on the running system, as
+      `second-boot.ini` did in 2017: register 1 `…0360` (drum 25 opened), register 3
+      `7700 0000 0000 0000`, register 6 `…4000 0160` (no resource check). The console keeps
+      answering afterwards.
+    - `ОШ22-ТАSК11` appears here too (see T7).
+    - Bits 47–43 of register 2 are still set, as in 2017, so catalogs and the roll track
+      are cleaned again on this boot. Keeping them (the `0730…` value of
+      `boot_dubna-25.b6`) is left for T10.
 - [ ] **T9. Multitype** on `tty26` over telnet: `OP`, `REF`, password, buffer `7/M`; run a
   job and get its listing on `prn0`.
 - [ ] **T10. Self-rebuild.** The `expe.ex` dialogue (jobs `newdd`, `newbsz`), then boot from
