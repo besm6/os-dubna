@@ -72,6 +72,9 @@
 ## 200-399 Monitor System (MS) & libraries
 #
 200 - Мониторная Система
+201 - MS: common library written by COLLECT
+202 - MS: working copy of drums 21, 22 written by COMTODRU
+203 - 9/MONSYS with the rebuilt MS (ms-splice.py)
 221 - libra21 
 223 - libra23
 247 - task11+task47 (compilation in FOREX)
@@ -82,7 +85,7 @@
 400 - Диспетчер
 
 ## 900-999 Temp/Scratch tapes
-922 - 9/MONSYS from zone 40: MS drum 22 for the link job
+922 - tape 203 from zone 40: MS drum 22 for the link job
 990 - DD perso for linking
 999 - DD with the system, cut into drum images
 

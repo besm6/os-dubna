@@ -19,8 +19,11 @@ echo Populating disks in $TAPES
 echo compile DD
 ./mk-dd-src.sh
 
-#echo Build MS
-#./mk-ms-src.sh
+echo compile MS
+./mk-ms-src.sh
+
+echo "Assembling the MS image"
+./mk-ms-img.sh || exit 1
 
 echo compile STL
 ./mk-stl-src.sh

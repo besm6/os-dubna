@@ -9,13 +9,14 @@
 #  LDSHIFT has to be set for correct environment. 
 #  Configuration for DD BOOTSTRAP
 #
-#  Unit 41 is MS drum 22: tape 922 holds 9/MONSYS from zone 40.
+#  Units 40, 41 are MS drums 21, 22: tape 203 is 9/MONSYS with the
+#  rebuilt MS (mk-ms-img.sh), tape 922 the same from zone 40.
 #
 cat << END1
 *name OS-Dubna-SIMH
 *     deck-b1
 *tape:400/dd,50
-*tape:9/monsys,40
+*tape:203/monsys,40
 *tape:922/monsys,41
 *tape:990/,66,w
 *tape:999/dd,67,w

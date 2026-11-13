@@ -13,9 +13,6 @@ mkdir -p $TAPES
 touch $TAPES/9
 besmtool write 9 --from-file=../monsys/monsys.9
 
-# 922: MS drum 22, i.e. 9/MONSYS from zone 40, for the link job
-{ head -c $((8256*4)) $TAPES/9; dd if=$TAPES/9 bs=8256 skip=36 status=none; } > $TAPES/922
-
 # 12
 touch $TAPES/12
 besmtool write 12 --from-file=../lib12/librar.12 

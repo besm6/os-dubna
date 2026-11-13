@@ -26,7 +26,8 @@ Terminology used everywhere:
   (DD, MS, Madlen/loader/system tasks, library 21, library 23). Large files are split into sections.
 - `dub_besm/` — the same DD and MS texts as single files, for reference only.
 - `monsys/`, `lib12/`, `lib37/` — original binary tape images (9/MONSYS, 12/LIBRAR, 37/LIBRAR).
-  The bootstrap uses these binaries; MS and the libraries are not yet rebuilt from source.
+  The libraries and the compilers inside 9/MONSYS are used as binaries; the rest of MS is
+  rebuilt from `besmmons/`.
 - `drums/` — drum images with hardware tests; `d_besm6/` — miscellaneous old files, not used by the build.
 - `tapes/1200`, `jobs/monsys.b6` — MS sources as a tape image and the job that compiles them.
 - `BUILD/` — everything needed for the bootstrap (see below).
@@ -79,13 +80,17 @@ that `dubna` and `besmtool` look there first and then in `/usr/local/share/besm6
 
 Pipeline in `bootstrap.sh`:
 
-1. `populate-dsk.sh` — write the original tape images into `BUILD/tapes`, and tape 922
-   (9/MONSYS from zone 40, the MS drum 22 for the link job).
-2. `mk-dd-src.sh`, `mk-stl-src.sh`, `mk-ld-src.sh` — each one runs a dubna job through
-   `run_src_job` (`env.sh`): the sources, concatenated, are mounted as a local file on unit
-   50, copied by the editor to the target tape from zone 100 and compiled to zones 0-77.
-   `mk-ms-src.sh`, `mk-lib21-src.sh`, `mk-lib23-src.sh`, `mk-exfor-src.sh` follow the same
+1. `populate-dsk.sh` — write the original tape images into `BUILD/tapes`.
+2. `mk-dd-src.sh`, `mk-ms-src.sh`, `mk-stl-src.sh`, `mk-ld-src.sh` — each one runs a dubna
+   job through `run_src_job` (`env.sh`): the sources, concatenated, are mounted as a local
+   file on unit 50, copied by the editor to the target tape from zone 100 and compiled to
+   zones 0-77. `mk-lib21-src.sh`, `mk-lib23-src.sh`, `mk-exfor-src.sh` follow the same
    pattern but are not called by the bootstrap.
+   `mk-ms-img.sh` then assembles the MS: `COLLECT` and `COMTODRU` (library 21) link the
+   perso of tape 200 into a copy of drums 21, 22, and `ms-splice.py` puts it into a copy of
+   9/MONSYS (tape 203, `data/mons9.bin`), keeping the old static sections of the compilers,
+   which have no perso. `ms-check.sh` compares tape 200 with the archived library: only
+   `CHKBEG*` and `EDIT***` differ in size.
 3. `data/mkdisk9.sh`, `data/mkdisk11.sh`, `data/mkbridges.sh` — concatenate catalog + contents
    + padding into SIMH disk images and symlink them into `BUILD/tapes` as bridge tapes.
 4. `deck-b1/mk-deck-b1.sh` — emit the patch deck job (config + fixes for SIMH), then run
@@ -125,9 +130,9 @@ their thousands digit (1400 → 400).
 | --- | --- |
 | 9, 12, 37 | original images: monsys, librar-12, librar-37 |
 | 100-199 | compilers (100 loader) |
-| 200-399 | MS and libraries (200 MS, 221 lib21, 223 lib23, 247 tasks, 301 exfor) |
+| 200-399 | MS and libraries (200 MS, 201 COLLECT output, 202 MS drums, 203 9/MONSYS with the rebuilt MS, 221 lib21, 223 lib23, 247 tasks, 301 exfor) |
 | 400-899 | DD (400) |
-| 900-999 | scratch (922 MS drum 22, 990 DD perso, 999 linked DD with the system) |
+| 900-999 | scratch (922 tape 203 from zone 40: MS drum 22, 990 DD perso, 999 linked DD with the system) |
 | 209, 211, 224 | bridge tapes dubna/SIMH: symlinks to disks 9, 11, 24 |
 
 ## Job files and sources

@@ -3,6 +3,7 @@ BUILD/tapes/
 BUILD/data/disk*.bin
 BUILD/data/dubdrum*
 BUILD/data/dr00
+BUILD/data/mons9.bin
 BUILD/deck-b1.dub
 BUILD/*.list
 BUILD/*log*.txt

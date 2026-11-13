@@ -4,7 +4,7 @@
 > archived sources into a system that boots on the SIMH `besm6` simulator, as of November
 > 2026.
 
-The build has two halves. First, the dispatcher (DD) and the standard tasks are compiled and
+The build has two halves. First, the dispatcher (DD), the Monitor System (MS) and the standard tasks are compiled and
 linked under the `dubna` simulator, which runs Monitor Dubna batch jobs with the extracodes
 done in C++. Then the result is booted in SIMH. There OS Dubna builds the rest of itself: the task library and a
 dispatcher linked by its own tools.
@@ -23,8 +23,10 @@ codes. Tapes live in `BUILD/tapes/`, named by number (`ReadMeTapes.txt`; the map
 
 | Step | What it does |
 | --- | --- |
-| `populate-dsk.sh` | Writes the archived tape images 9/MONSYS, 12 and 37/LIBRAR, and tape 922. |
+| `populate-dsk.sh` | Writes the archived tape images 9/MONSYS, 12 and 37/LIBRAR. |
 | `mk-dd-src.sh` | Puts the DD sources (`besmdisp/`) on tape 400 and compiles them. |
+| `mk-ms-src.sh` | The same for the MS sources (`besmmons/`), tape 200. |
+| `mk-ms-img.sh` | Assembles the MS: tapes 201–203, 922 and `data/mons9.bin` (below). |
 | `mk-stl-src.sh` | The same for the standard tasks (`besmtask/`), tape 247, with Monitor Dubna's `*FOREX`. |
 | `mk-ld-src.sh` | The loader, tape 100. |
 | `data/mkdisk9.sh`, `mkdisk11.sh`, `mkbridges.sh` | Disk images and bridge tapes (below). |
@@ -37,7 +39,52 @@ which `*FILE:SRC,50` mounts (dubna converts it to cosy); the editor copies it to
 from zone 100.
 
 The link job copies the Monitor System from units 40 and 41, the two MS drums 21 and 22.
-Unit 40 is 9/MONSYS; unit 41 is tape 922, the same image from zone 40.
+Unit 40 is tape 203, a 9/MONSYS with the rebuilt MS; unit 41 is tape 922, the same image
+from zone 40.
+
+### The Monitor System
+
+The MS is zones 0–77 of 9/MONSYS (drums 21 and 22): the dynamic loader and tables in
+zones 0–6, the catalog of the dynamic part in 7–10, the dynamic part (166 modules) from
+zone 11, the monitor page in zone 35, and the static part from zone 36 to the end:
+sections `INPUTCAL`, `FORTRAN`, `CBDPR`, `CONTROL`, `ENDPRO`, `GLINK`, `ASEMBLER`, `ALGOL`,
+`A/PRINTM`, `WRITLIB*`, with their catalog in zone 1 from word 1400.
+
+`mk-ms-src.sh` compiles `besmmons/` (5 Fortran and 161 Madlen modules); the Madlen
+compiler, which the job leaves in the temporary library, is taken out with `*EXCLUDE`.
+`ms-check.sh` compares the result with the permanent library of the archived system: the
+same 166 modules, of the same sizes except `CHKBEG*` and `EDIT***`.
+
+`mk-ms-img.sh` runs the original tools from library 21:
+
+```
+*tape:200/ms,66
+*tape:201/msimg,67,w
+*tape:202/msdrum,65,w
+*library:21
+*library:23
+*perso:66000
+*call collect:670000
+MONITOR*(INPUTCAL)
+*end record
+*call comtodru:670000,650000
+```
+
+`COLLECT` passes control to `NEW//MON`, which loads the resident `MONITOR*` afresh (it
+lands at the same addresses as in the archive) and reloads `COLLECT`. That writes to
+unit 67 zones 0–6 of the running system, the dynamic part with its catalog, the static
+sections named on the cards, and the monitor page. `INPUTCAL` comes from library 21 and
+needs `DATE` and `DTOI` from library 23. `COMTODRU` makes the drum form: catalog entries
+become physical exchanges, the static part moves to the end of drum 22.
+
+The compilers and `WRITLIB*` cannot be on the cards: they exist only as linked static
+sections in the archived image, without perso or sources. So `ms-splice.py` builds the final
+image: everything from the new drums, the static part and its catalog from the archive
+at the old place, and in it the relinked `INPUTCAL` (the same size; six words differ). The
+result goes to tape 203 and to `data/mons9.bin` for `mkdisk9.sh`.
+
+The date in the banner of a listing, `МОНИТОРНАЯ СИСТЕМА 'Д У Б Н А' - 13/11/26`, is
+the date of this assembly; the archived system shows `20/10/88`.
 
 Until 2026 these jobs ran under `dispak`, which runs Диспак with its own monitor; DD was
 linked against that monitor, and unit 41 was a Диспак system tape. dubna runs the
@@ -63,7 +110,7 @@ clock is assumed to run at 300 Hz, and so on.
 
 ### Disks
 
-`data/mkdisk9.sh` concatenates a catalog, 9/MONSYS and filler into `disk9.bin` (SIMH `md00`);
+`data/mkdisk9.sh` concatenates a catalog, 9/MONSYS (`mons9.bin`, with the rebuilt MS) and filler into `disk9.bin` (SIMH `md00`);
 `mkdisk11.sh` does the same with the libraries for `disk11.bin` (`md04`). DD models tapes as
 files on these disks. At boot it lists them on the console:
 
