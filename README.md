@@ -51,7 +51,7 @@ besm6 dubna.ini
 To rebuild everything from the sources:
 
 - `dubna` (November 2026 or later) and `besmtool` on `PATH`;
-- SIMH `besm6` on `PATH`, built from branch `dubna` of
+- SIMH `besm6` on `PATH`, built from branch `master` of
   [simh-besm6](https://github.com/besm6/simh) (it needs `set cpu mem=128` and `set cpu ext32`);
 - Python 3.
 
@@ -76,7 +76,8 @@ A step-by-step guide for users is [docs/OS_Dubna_Tutorial.md](docs/OS_Dubna_Tuto
 This terminal is the operator console; Multitype is on telnet port 4199. Commands and
 replies are described in [docs/Dubna_Commands.md](docs/Dubna_Commands.md).
 `./mt-run.py` boots and runs a job non-interactively (`FRESH=1 SUBMIT=ПУС ./mt-run.py`
-prints the hello job on `output.txt`). How the pieces fit together is described in
+prints the hello job on `output.txt`); `./card-run.sh hello.dub` runs it from a deck of
+punch cards. How the pieces fit together is described in
 [docs/Boot_Process.md](docs/Boot_Process.md).
 
 More details are in `BUILD/`:

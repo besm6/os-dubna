@@ -23,7 +23,7 @@ the machine from Multitype.
 
 ## 1. Before you start
 
-You need the simulator `besm6`, built from branch `dubna` of
+You need the simulator `besm6`, built from branch `master` of
 [simh-besm6](https://github.com/besm6/simh), on your `PATH`, and a `telnet` client.
 
 The repository comes with a ready system: `BUILD/data/base/` holds a clean copy of its
@@ -243,6 +243,32 @@ while the simulator is **not** running:
 
 Then start the machine and run `ПУС 130`. This uses `dubna`, as the build does.
 
+### Feeding a deck of punch cards
+
+A job can also come from the card reader, with no Multitype at all. The deck is a text file,
+one card per line, and it must end with the end-of-deck card, written as a line of six
+backquotes:
+
+~~~
+*NAME HELLO
+...
+*END FILE
+``````
+~~~
+
+On the operator console press Ctrl-E to get the `sim>` prompt, put the deck into the reader
+and go on:
+
+```
+sim> attach vu0 mydeck.txt
+sim> go
+```
+
+Then give the order `01В`: the job starts at once on channel 01 (`Ш01:НЕLLО`), and its
+listing is printed. The order `ПВ` instead reads every deck in the reader into the input
+file, and the scheduler runs them like `ПУС` jobs. `ВУ НЕ ВКЛ` means the reader is empty.
+This needs a recent `besm6` (simh-besm6 of November 2026, with the card reader fixes).
+
 ## 8. Watch and control jobs
 
 On Multitype:
@@ -304,3 +330,6 @@ FRESH=1 DRUM=25 SUBMIT=ПУС ./mt-run.py 110
 
 It starts from the clean copy, boots, logs in, runs the deck at zone 110 and waits for the
 printout in `output.txt`. Its options are listed at the top of the script.
+
+`./card-run.sh hello.dub` does the same with a deck of punch cards: it adds the end-of-deck
+card, puts the deck into the reader and gives the order `01В`.

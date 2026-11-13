@@ -20,3 +20,4 @@ BUILD/data/*.pre-t10
 BUILD/runtests.log
 BUILD/FSINP.TXT
 BUILD/data/CAMdrum20.bin
+BUILD/card-run.deck

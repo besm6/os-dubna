@@ -111,9 +111,9 @@ Multitype (tty26), from `BUILD/mt-run-tty26.txt`:
 
 | Order | Meaning |
 | --- | --- |
-| `NNВ` | Start job input from the input device on Ш`NN`. |
+| `NNВ` | Start a job on Ш`NN` straight from the card reader: `01В`. Reply `ШNN:NAME`. |
 | `NNВСВ` | The same, input "with passport" (like ТР1 bit 48). |
-| `ПВ` | Start batch input (task 74). |
+| `ПВ` | Start batch input (task 74, `Ш23(S)-ПАКЕТНЫЙ ВВОД`): every deck in the reader goes into the input file, reply `Вnn(mm)-NAME` for each; the planner runs them later. |
 | `Н` | Start the planner (task 10) and allow all шифры. The planner starts by itself at boot. |
 | `NNН` | Allow the planner to use Ш`NN`. |
 | `SН` | Forbid all шифры. |
@@ -237,6 +237,22 @@ Messages that appear on their own:
 | `ПЛАНИРОВЩИК` | The planner started; jobs from the input file can run. |
 | `nnШNN:NAME` | Job `NAME` (input file entry `nn`) started on Ш`NN`. |
 | `ПФ-An-name` | Take the punched cards of `name` from punch `n`, then answer `nР`. |
+| `NNNN-КШNN-hh.mm.ss-NAME` | Job `NAME` on Ш`NN` ended (seen for jobs from cards); the time is its commercial time. |
+| `ВУ НЕ ВКЛ` | No card reader is ready: nothing attached, or the deck has run out. Normal after `ПВ` has taken the last deck. |
+| `ВУ ЗАНЯТО` | The card reader is in use by another шифр. |
+| `ОШ ВУ Кn` | Card reader fault, e.g. the deck ran out without an end-of-deck card. |
+| `НЕТ ПК NАМЕ` | Batch input found a deck that does not start with `*NAME`. |
+
+### Card decks
+
+A deck is the same text as a Multitype job, from `*NAME` to `*END FILE`, followed by the
+end-of-deck card ("диспетчерский конец": columns 1 and 41 punched in all twelve rows,
+[dubna.dd:21824](../dub_besm/dubna.dd#L21824)). Several decks may follow each other for `ПВ`.
+Text cards are accepted in both codes, the row-wise UPP and the column-wise UPDK; the
+decoder tells them apart. In a SIMH deck file each line is a card, UPP by default
+(`set vu0 updk` for UPDK), and a line of six backquotes is the end-of-deck card. DD is
+configured with two column-wise readers (УВВК), which is what SIMH `vu0`, `vu1` model.
+`BUILD/card-run.sh` runs a deck this way.
 
 ## Multitype
 
@@ -434,6 +450,7 @@ These work on a job started with `ОТЛ` or `СЛО`.
 | --- | --- | --- |
 | `BUILD/mt-run.py` | tty25 | empty line, `040489D`, `T`, `A1P` when the spooler asks (`$ORDER`); after a `ПУС`, orders such as `01БП` (`$CONSUBMIT`) |
 | | tty26 | two spaces, `MJPOP`, `7/M`, `ЛИС zone` and an empty line, `СЛА zone,17` or `ПУС zone,17` (`$SUBMIT`), `КАК` or `СЧЕ` (`$POLL`) until the job ends |
+| `BUILD/card-run.sh` | tty25 | as `mt-run.py`, then `01В` (`$CARDORDER`) with the deck in `vu0` |
 | `BUILD/mk-base.sh` | both | `mt-run.py` with `ПУС` and `{}БП` for `newbsz` (zone 105) and `newdd` (zone 100) |
 
 The 2017 script `expe.ex` (removed) ran `newbsz` and `newdd` with `СЛА` on tty26, after

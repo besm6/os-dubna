@@ -3,6 +3,10 @@
 
 Usage: mt-run.py [zone]     (zone of 7/M, octal, default 110 = hello.dub)
 
+With CARDS=deck the job comes from card reader vu0 instead, started by the
+operator order CARDORDER (01В by default; ПВ puts the deck into the input
+file). See card-run.sh.
+
 Starts besm6 with boot-run.ini. The simulator connects tty25 (operator
 console) and tty26 (Multitype) to sockets opened here; both are driven
 with send/expect. Transcripts: mt-run-tty25.txt, mt-run-tty26.txt.
@@ -82,6 +86,17 @@ def prn_bytes():
     return sum(os.path.getsize(f) for f in ("output.txt", "output1.txt")
                if os.path.exists(f))
 
+def listing_done():
+    """The printer file ends with the trailer of a job listing."""
+    for f in ("output.txt", "output1.txt"):
+        if os.path.exists(f):
+            with open(f, "rb") as fd:
+                fd.seek(max(0, os.path.getsize(f) - 600))
+                tail = norm(fd.read().decode("utf-8", "replace")).rstrip()
+            if norm("КОНЕЦ ЗАДАЧИ") in tail and tail.endswith("*" * 20):
+                return True
+    return False
+
 def listen():
     s = socket.socket()
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -94,6 +109,86 @@ def fresh():
     """FRESH=1: start from the images saved in data/base."""
     for f in ("dubdrum1.bin", "dubdrum2.bin", "disk9.bin", "disk11.bin"):
         shutil.copyfile("data/base/" + f, "data/" + f)
+
+def by_multitype(con, mt):
+    """Submit the job from zone ZONE of 7/M and wait until it ends."""
+    # Multitype: password, buffer, list and submit the job.
+    mt.connect()
+    mt.send("  ");          mt.expect(r"PASS:")
+    mt.send("MJPOP\r");     mt.expect(r"БУФЕР:")
+    mt.send("7/M\r");       mt.expect(r"\n {5}")
+    mt.send("ЛИС %s\r" % ZONE)
+    mt.expect(r"\*END FILE\n")
+    # Extra Multitype commands before the submit, separated by "|".
+    for cmd in filter(None, os.environ.get("BEFORE", "").split("|")):
+        mt.send(cmd + "\r")
+        mt.expect(r"\n {5}\S.*\n")
+        mt.read(2)
+    # A listing that fills a page waits for a key: end it with an empty line.
+    mt.send("\r")
+    mt.read(1)
+    # СЛА runs the job from the buffer; ПУС puts it into the input queue.
+    submit = os.environ.get("SUBMIT", "СЛА")
+    mt.send("%s %s,17\r" % (submit, ZONE))
+    mt.expect(r"\n {5}\S.*\n")
+    entry = ""
+    if submit == "ПУС":
+        entry = mt.expect(r"ВВОДА: (\d+)").group(1)
+
+    # Operator orders after the submit, separated by "|"; {} is the input
+    # file entry of a ПУС job, e.g. "{}БП" starts it at once. They are
+    # repeated every 15 s until the job starts: too early, they are ignored.
+    orders = [c.replace("{}", entry) for c in
+              filter(None, os.environ.get("CONSUBMIT", "").split("|"))]
+    end = time.time() + int(os.environ.get("JOBWAIT", "180")) * SLOW
+    while True:
+        for cmd in orders:
+            time.sleep(2)
+            con.send(cmd + "\r")
+        try:
+            # The job starts from the input queue: its code is announced.
+            con.expect(r"Ш\d\d:", 15 if orders else end - time.time())
+            break
+        except Fail:
+            if time.time() >= end:
+                raise
+    # Extra operator orders after the job starts, separated by "|".
+    for cmd in filter(None, os.environ.get("CONAFTER", "").split("|")):
+        time.sleep(2)
+        con.send(cmd + "\r")
+        con.read(3)
+    # Poll until the job ends: "СЧЕТ ОКОНЧЕН" for a queued job,
+    # "НЕТ ЗАДАЧ" once it has been seen running.
+    seen = False
+    poll = os.environ.get("POLL", "KAK")    # СЧЕ shows all jobs
+    for _ in range(int(os.environ.get("POLLS", "60"))):
+        mt.send(poll + "\r")
+        m = mt.expect(re.escape(poll) + r"\n(.*\n)")
+        if norm("ОКОНЧЕН") in m.group(1) or listing_done():
+            break
+        if norm("НЕТ ЗАДАЧ") in m.group(1):
+            if seen:
+                break
+        else:
+            seen = True
+        time.sleep(1)
+    else:
+        print("\n--- the job was not seen to finish")
+    # Extra Multitype commands, separated by "|".
+    # An empty command is an empty line (next page, or end of a listing).
+    after = os.environ.get("AFTER")
+    for cmd in after.split("|") if after else []:
+        mt.send(cmd + "\r")
+        mt.read(3)
+
+def by_cards(con, deck):
+    """Start a job from the deck in card reader vu0 (see boot-run.ini)."""
+    time.sleep(2)
+    con.send(os.environ.get("CARDORDER", "01В") + "\r")
+    wait = int(os.environ.get("JOBWAIT", "180"))
+    con.expect(r"Ш\d\d:", wait)
+    # The job ends: NNNN-КШnn-time-name.
+    con.expect(r"-КШ\d\d-.*\n", wait)
 
 def main():
     if os.environ.get("FRESH"):
@@ -119,79 +214,21 @@ def main():
         if norm("ДАЙТЕ ПРИКАЗ") in norm(m.group(1)):
             con.send(os.environ.get("ORDER", "A1P") + "\r")
 
-        # Multitype: password, buffer, list and submit the job.
-        mt.connect()
-        mt.send("  ");          mt.expect(r"PASS:")
-        mt.send("MJPOP\r");     mt.expect(r"БУФЕР:")
-        mt.send("7/M\r");       mt.expect(r"\n {5}")
-        mt.send("ЛИС %s\r" % ZONE)
-        mt.expect(r"\*END FILE\n")
-        # Extra Multitype commands before the submit, separated by "|".
-        for cmd in filter(None, os.environ.get("BEFORE", "").split("|")):
-            mt.send(cmd + "\r")
-            mt.expect(r"\n {5}\S.*\n")
-            mt.read(2)
-        # A listing that fills a page waits for a key: end it with an empty line.
-        mt.send("\r")
-        mt.read(1)
-        # СЛА runs the job from the buffer; ПУС puts it into the input queue.
-        submit = os.environ.get("SUBMIT", "СЛА")
-        mt.send("%s %s,17\r" % (submit, ZONE))
-        mt.expect(r"\n {5}\S.*\n")
-        entry = ""
-        if submit == "ПУС":
-            entry = mt.expect(r"ВВОДА: (\d+)").group(1)
-
-        # Operator orders after the submit, separated by "|"; {} is the input
-        # file entry of a ПУС job, e.g. "{}БП" starts it at once. They are
-        # repeated every 15 s until the job starts: too early, they are ignored.
-        orders = [c.replace("{}", entry) for c in
-                  filter(None, os.environ.get("CONSUBMIT", "").split("|"))]
-        end = time.time() + int(os.environ.get("JOBWAIT", "180")) * SLOW
-        while True:
-            for cmd in orders:
-                time.sleep(2)
-                con.send(cmd + "\r")
-            try:
-                # The job starts from the input queue: its code is announced.
-                con.expect(r"Ш\d\d:", 15 if orders else end - time.time())
-                break
-            except Fail:
-                if time.time() >= end:
-                    raise
-        # Extra operator orders after the job starts, separated by "|".
-        for cmd in filter(None, os.environ.get("CONAFTER", "").split("|")):
-            time.sleep(2)
-            con.send(cmd + "\r")
-            con.read(3)
-        # Poll until the job ends: "СЧЕТ ОКОНЧЕН" for a queued job,
-        # "НЕТ ЗАДАЧ" once it has been seen running.
-        seen = False
-        poll = os.environ.get("POLL", "KAK")    # СЧЕ shows all jobs
-        for _ in range(int(os.environ.get("POLLS", "60"))):
-            mt.send(poll + "\r")
-            m = mt.expect(re.escape(poll) + r"\n(.*\n)")
-            if norm("ОКОНЧЕН") in m.group(1):
-                break
-            if norm("НЕТ ЗАДАЧ") in m.group(1):
-                if seen:
-                    break
-            else:
-                seen = True
-            time.sleep(1)
+        cards = os.environ.get("CARDS")
+        if cards:
+            by_cards(con, cards)
         else:
-            print("\n--- the job was not seen to finish")
-        # Extra Multitype commands, separated by "|".
-        # An empty command is an empty line (next page, or end of a listing).
-        after = os.environ.get("AFTER")
-        for cmd in after.split("|") if after else []:
-            mt.send(cmd + "\r")
-            mt.read(3)
-        # Wait for printing to start, then until it stops for 3 s.
-        end = time.time() + int(os.environ.get("PRNWAIT", "20"))
+            by_multitype(con, mt)
+        # Wait for the trailer of the listing; failing that, for printing
+        # to start and then stop for 3 s.
+        end = time.time() + int(os.environ.get("PRNWAIT", "60" if cards else "20"))
         size, still = 0, 0
-        while time.time() < end and (not size or still < 3):
-            con.read(0.5); mt.read(0.5)
+        while time.time() < end and (not size or still < 6):
+            if listing_done():
+                break
+            con.read(0.25)
+            if mt.sock:
+                mt.read(0.25)
             n = prn_bytes()
             still = still + 1 if n == size else 0
             size = n

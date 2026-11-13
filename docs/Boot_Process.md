@@ -154,14 +154,22 @@ the simulator alone.
   driven by send/expect. Options are environment variables, listed in the script:
   `FRESH=1` (start from `data/base`), `DRUM=25`, `SUBMIT=ПУС` (queue the job, so it is
   printed), `CONSUBMIT`, `POLL`, `BEFORE`, `AFTER`, `JOBWAIT`, `POLLS`, `PRNWAIT`, `SLOW`.
-  Transcripts go to `mt-run-tty25.txt` and `mt-run-tty26.txt`.
+  Transcripts go to `mt-run-tty25.txt` and `mt-run-tty26.txt`. The run ends when the
+  trailer of the listing (`КОНЕЦ ЗАДАЧИ`) appears in `output.txt`.
+- `./card-run.sh job.dub`: the same boot, but the job comes from card reader `vu0`
+  (`CARDS=deck` in `mt-run.py`, attached by `boot-run.ini`) and is started by the console
+  order `01В`; `CARDORDER=ПВ` sends it through the input file, `UPDK=1` punches the deck in
+  the UPDK code instead of UPP, `VUDEBUG=1` traces the reader. About 35 seconds.
 
-`FRESH=1 DRUM=25 SUBMIT=ПУС ./mt-run.py` checks the whole chain in about three minutes (the
-planner takes two to start a queued job): hello is compiled, run and printed on `output.txt`.
+`FRESH=1 DRUM=25 SUBMIT=ПУС ./mt-run.py` checks the whole chain in a little over a minute: hello is compiled, run and printed on `output.txt`.
 
 Commands and replies on both lines are in [Dubna_Commands.md](Dubna_Commands.md).
 
 ## Pitfalls
+
+- The card reader needs a recent simh-besm6 (November 2026): without the "feed" ready
+  flag DD answers `ВУ НЕ ВКЛ`, and a reader stopped at the start of a card (DD does that
+  after an end-of-deck card) must keep that card for the next start.
 
 - Stop SIMH with `quit`. Killed, it loses buffered writes to the images.
 - SIMH probes a `Connect=` address at attach time and hangs up; the real connection comes

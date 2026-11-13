@@ -67,7 +67,7 @@ cd BUILD && ./bootstrap.sh
 ```
 
 Requirements: `dubna` and `besmtool` on PATH, SIMH `besm6` on PATH built from branch
-`dubna` of simh-besm6 (`set cpu mem=128`, `set cpu ext32`), Python 3. `dubna` must be recent
+`master` of simh-besm6 (`set cpu mem=128`, `set cpu ext32`), Python 3. `dubna` must be recent
 enough to grow tape images on write, tag the words it writes and do sector exchanges with
 disks (November 2026).
 
@@ -101,7 +101,8 @@ After the bootstrap, run the system with `besm6 dubna.ini` from `BUILD/` (consol
 terminal, Multitype on telnet port 4199). `./mt-run.py [zone]` boots and runs a job from 7/M
 non-interactively; its options are environment variables listed in the script
 (`FRESH=1` restores `data/base`, `SUBMIT=ПУС` queues the job so its listing is printed,
-`DRUM=25` boots the rebuilt DD). Transcripts: `mt-run-tty25.txt`, `mt-run-tty26.txt`,
+`DRUM=25` boots the rebuilt DD). `./card-run.sh job.dub` runs a job from a deck of punch
+cards instead (card reader `vu0`, console order `01В`). Transcripts: `mt-run-tty25.txt`, `mt-run-tty26.txt`,
 printer: `output.txt`. `runtests.ini` runs the hardware tests from the drum images.
 
 Each job's listing lands in `BUILD/*.list`; errors are found by reading these, not from
@@ -140,8 +141,8 @@ their thousands digit (1400 → 400).
 - `deck-b1/*.s` hold the changes to DD needed for SIMH, as whole patched Madlen modules
   compiled by the patch deck (`deck-b1/mk-deck-b1.sh`). Change the system there, not in the
   archived sources.
-- Simulator requirements found so far: `set cpu mem=128`, `set cpu ext32` (both on branch
-  `dubna` of simh-besm6). Simulator changes go to that branch; OS changes to `deck-b1/`.
+- Simulator requirements found so far: `set cpu mem=128`, `set cpu ext32`, the card
+  reader fixes (all on branch `master` of simh-besm6). Simulator changes go to that branch; OS changes to `deck-b1/`.
 
 ## Cosy tools
 
