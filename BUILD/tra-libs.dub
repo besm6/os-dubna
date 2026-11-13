@@ -163,6 +163,10 @@ C.....   ПEPEПИCЬ 'MAINSW' HA CBOE MECTO
   ,XTA,DATA*
   13,ATX,
   ,XTA,DATA*+1
+Cs Tail of the date word: version Д1 and 0 instead of
+Cs spaces: Д1 on the console, Д1*** in the listing tail
+  ,AAX,=:7777 7777
+  ,AOX,=31030400
   13,ATX,1
  L1:2,UTC,MAINSW
  ,XTA,
