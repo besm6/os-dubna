@@ -90,12 +90,13 @@ Pipeline in `bootstrap.sh`:
    `debmult.dub` and the deck under `dubna` to link DD onto tape 999.
 5. `data/mkdrumdd.sh` — cut drum images out of tape 999.
 6. `tra-libs.dub` — copy libraries and rebuild jobs onto disk for use inside SIMH.
-7. `mk-base.sh` — rebuild the images, then boot SIMH twice with `mt-run.py` (both consoles
-   driven over sockets by send/expect, `boot-run.ini`): job `newbsz` builds the task library
+7. `mk-base.sh` — rebuild the images, then boot SIMH twice with `card-run.sh` (the job is a
+   deck of punch cards in reader `vu0`, started by console order `01В`; `mt-run.py` drives
+   the consoles over sockets by send/expect, `boot-run.ini`): job `newbsz` builds the task library
    5/D73LIB (the print spooler is in it), job `newdd` writes a rebuilt DD to drum 25. The
    images are saved in `BUILD/data/base/`, which is tracked in git (about 4 MB per version
    in history), so users can run the system without building it. Commit new images only
-   when the system changes.
+   when the system changes. A last `mt-run.py` run checks Multitype with hello.
 
 After the bootstrap, run the system with `besm6 dubna.ini` from `BUILD/` (console on the
 terminal, Multitype on telnet port 4199). `./mt-run.py [zone]` boots and runs a job from 7/M

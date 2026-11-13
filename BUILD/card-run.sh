@@ -7,4 +7,4 @@
 deck=card-run.deck
 tr -d '\r' < "$1" > $deck
 [ "$(tail -n 1 $deck)" = '``````' ] || echo '``````' >> $deck
-CARDS=$deck DRUM=${DRUM:-25} FRESH=${FRESH-1} exec ./mt-run.py
+CARDS=$deck DRUM=${DRUM-25} FRESH=${FRESH-1} exec ./mt-run.py

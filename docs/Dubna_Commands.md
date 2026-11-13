@@ -451,7 +451,7 @@ These work on a job started with `ОТЛ` or `СЛО`.
 | `BUILD/mt-run.py` | tty25 | empty line, `040489D`, `T`, `A1P` when the spooler asks (`$ORDER`); after a `ПУС`, orders such as `01БП` (`$CONSUBMIT`) |
 | | tty26 | two spaces, `MJPOP`, `7/M`, `ЛИС zone` and an empty line, `СЛА zone,17` or `ПУС zone,17` (`$SUBMIT`), `КАК` or `СЧЕ` (`$POLL`) until the job ends |
 | `BUILD/card-run.sh` | tty25 | as `mt-run.py`, then `01В` (`$CARDORDER`) with the deck in `vu0` |
-| `BUILD/mk-base.sh` | both | `mt-run.py` with `ПУС` and `{}БП` for `newbsz` (zone 105) and `newdd` (zone 100) |
+| `BUILD/mk-base.sh` | both | `card-run.sh` (`01В`) for the decks `newbsz` and `newdd`, then `mt-run.py` for hello |
 
 The 2017 script `expe.ex` (removed) ran `newbsz` and `newdd` with `СЛА` on tty26, after
 taking it as an operator console with `ОР` and giving it back with `REF`.
@@ -460,7 +460,8 @@ Notes:
 
 - Deck zones of 7/M used here: 100 newdd, 105 newbsz, 110 hello.
 - `СЛА` gives no listing (see [Starting jobs](#starting-jobs)); queue a job with `ПУС` to
-  get it on the printer. `newbsz` and `newdd` ask for 24 minutes, so the planner does not
-  start them in debug mode; `NNБП` starts them at once.
+  get it on the printer. `newbsz` and `newdd` ask for 24 minutes, so queued with `ПУС` the
+  planner does not start them in debug mode; `NNБП` starts them at once. The build feeds
+  them as card decks with `01В` instead.
 - A listing that fills a page waits for a key: the first character typed after it is lost.
 - The date must be in 1989.

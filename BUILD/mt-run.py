@@ -140,7 +140,7 @@ def by_multitype(con, mt):
     # repeated every 15 s until the job starts: too early, they are ignored.
     orders = [c.replace("{}", entry) for c in
               filter(None, os.environ.get("CONSUBMIT", "").split("|"))]
-    end = time.time() + int(os.environ.get("JOBWAIT", "180")) * SLOW
+    end = time.time() + int(os.environ.get("JOBWAIT", "600")) * SLOW
     while True:
         for cmd in orders:
             time.sleep(2)
@@ -157,38 +157,33 @@ def by_multitype(con, mt):
         time.sleep(2)
         con.send(cmd + "\r")
         con.read(3)
-    # Poll until the job ends: "СЧЕТ ОКОНЧЕН" for a queued job,
-    # "НЕТ ЗАДАЧ" once it has been seen running.
-    seen = False
-    poll = os.environ.get("POLL", "KAK")    # СЧЕ shows all jobs
-    for _ in range(int(os.environ.get("POLLS", "60"))):
+    # The job has started, so "НЕТ ЗАДАЧ" means it has ended. A queued job
+    # is not shown by КАК (СЧЕ shows all jobs); its listing ends the wait.
+    poll = os.environ.get("POLL", "KAK")
+    while not listing_done():
         mt.send(poll + "\r")
         m = mt.expect(re.escape(poll) + r"\n(.*\n)")
-        if norm("ОКОНЧЕН") in m.group(1) or listing_done():
+        if re.search(norm("ОКОНЧЕН|НЕТ ЗАДАЧ"), norm(m.group(1))):
             break
-        if norm("НЕТ ЗАДАЧ") in m.group(1):
-            if seen:
-                break
-        else:
-            seen = True
-        time.sleep(1)
-    else:
-        print("\n--- the job was not seen to finish")
+        if time.time() >= end:
+            raise Fail("the job did not finish")
+        time.sleep(0.3)
     # Extra Multitype commands, separated by "|".
     # An empty command is an empty line (next page, or end of a listing).
     after = os.environ.get("AFTER")
     for cmd in after.split("|") if after else []:
         mt.send(cmd + "\r")
         mt.read(3)
+    return submit == "ПУС"         # a listing is printed
 
 def by_cards(con, deck):
     """Start a job from the deck in card reader vu0 (see boot-run.ini)."""
-    time.sleep(2)
+    wait = int(os.environ.get("JOBWAIT", "600")) * SLOW
     con.send(os.environ.get("CARDORDER", "01В") + "\r")
-    wait = int(os.environ.get("JOBWAIT", "180"))
     con.expect(r"Ш\d\d:", wait)
     # The job ends: NNNN-КШnn-time-name.
     con.expect(r"-КШ\d\d-.*\n", wait)
+    return True                     # a listing is printed
 
 def main():
     if os.environ.get("FRESH"):
@@ -211,27 +206,23 @@ def main():
         con.send("T\r")
         # The spooler asks for paper, unless the task library is still empty (ТАSК!).
         m = con.expect(r"([\s\S]*?)ПЛАНИРОВЩИК", 40)
-        if norm("ДАЙТЕ ПРИКАЗ") in norm(m.group(1)):
+        spooler = norm("ДАЙТЕ ПРИКАЗ") in norm(m.group(1))
+        if spooler:
             con.send(os.environ.get("ORDER", "A1P") + "\r")
 
         cards = os.environ.get("CARDS")
         if cards:
-            by_cards(con, cards)
+            listing = by_cards(con, cards)
         else:
-            by_multitype(con, mt)
-        # Wait for the trailer of the listing; failing that, for printing
-        # to start and then stop for 3 s.
-        end = time.time() + int(os.environ.get("PRNWAIT", "60" if cards else "20"))
-        size, still = 0, 0
-        while time.time() < end and (not size or still < 6):
-            if listing_done():
-                break
-            con.read(0.25)
+            listing = by_multitype(con, mt)
+        # Wait for the trailer of the listing, if there is a spooler to print it.
+        end = time.time() + int(os.environ.get("PRNWAIT", "600")) * SLOW
+        while listing and spooler and not listing_done():
+            if time.time() > end:
+                raise Fail("the listing was not printed to the end")
+            con.read(0.2)
             if mt.sock:
-                mt.read(0.25)
-            n = prn_bytes()
-            still = still + 1 if n == size else 0
-            size = n
+                mt.read(0.05)
         print("\n--- printers: %d bytes" % prn_bytes())
         return 0
     except Fail as e:

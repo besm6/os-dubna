@@ -9,15 +9,31 @@ set -e
 run_job tra-libs.dub tra-libs.list
 ./put-job.sh hello.dub 110 >> mk-base.log
 
-# Queue each job and start it at once (its time limit keeps the planner waiting).
-export SUBMIT=ПУС CONSUBMIT={}БП POLL=СЧЕ POLLS=200 JOBWAIT=120 PRNWAIT=600
+# The jobs are also on 7/M (tra-libs.dub), but here they come from punch
+# cards: order 01В starts a job at once, without Multitype and the planner.
+DECK=`mktemp`
+trap "rm -f -- '$DECK'" EXIT
+deck() {
+    awk -v n="$1" '$0 == "*l:*name " n { on = 1; print substr($0, 4); next }
+        on && /^\*l:/ { print substr($0, 4); exit }
+        on && $0 != "*(((" && $0 != "*)))"' tra-libs.dub |
+    expand | tr a-z A-Z > $DECK
+}
+# Boot drum 20, keep the images.
+export DRUM= FRESH=
 
-./mt-run.py 105 >> mk-base.log 2>&1 && grep -q -- "-КШ" mt-run-tty25.txt ||
+deck newbsz
+./card-run.sh $DECK >> mk-base.log 2>&1 && grep -q -- "-КШ" mt-run-tty25.txt ||
     { echo "newbsz failed, see mk-base.log"; exit 1; }
 
-./mt-run.py 100 >> mk-base.log 2>&1 && grep -q "НА 25/" mt-run-tty25.txt ||
+deck newdd
+./card-run.sh $DECK >> mk-base.log 2>&1 && grep -q "НА 25/" mt-run-tty25.txt ||
     { echo "newdd failed, see mk-base.log"; exit 1; }
 
 mkdir -p data/base
 cp data/dubdrum1.bin data/dubdrum2.bin data/disk9.bin data/disk11.bin data/base/
 echo "Baseline images are in data/base"
+
+# Check the new dispatcher and Multitype: hello from 7/M.
+FRESH=1 DRUM=25 ./mt-run.py >> mk-base.log 2>&1 ||
+    { echo "Multitype check failed, see mk-base.log"; exit 1; }

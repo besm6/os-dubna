@@ -63,10 +63,10 @@ cd BUILD
 ```
 
 The script compiles the dispatcher and libraries under `dubna` and builds the drum and
-disk images. Then `mk-base.sh` boots them in SIMH twice, driving both consoles through
-`mt-run.py`: the job `newbsz` builds the task library (the print spooler is in it), and the
+disk images. Then `mk-base.sh` boots them in SIMH twice, feeding each job as a deck of
+punch cards (`card-run.sh`): the job `newbsz` builds the task library (the print spooler is in it), and the
 job `newdd` writes a rebuilt dispatcher to drum 25. The resulting images are saved in
-`BUILD/data/base/`. This part takes about a quarter of an hour. Commit the new images only
+`BUILD/data/base/`. This part takes about a minute and a half. Commit the new images only
 when the system has changed: each version adds about 4 MB to the history.
 
 Run the system from `BUILD/` with `besm6 dubna.ini`.

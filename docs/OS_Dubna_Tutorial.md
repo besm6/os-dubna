@@ -28,7 +28,7 @@ You need the simulator `besm6`, built from branch `master` of
 
 The repository comes with a ready system: `BUILD/data/base/` holds a clean copy of its
 disks and drums. To rebuild them from the sources instead, run `./bootstrap.sh` in `BUILD/`
-(about 15 minutes, needs `dubna`; see [Boot_Process.md](Boot_Process.md)).
+(about two minutes, needs `dubna`; see [Boot_Process.md](Boot_Process.md)).
 
 All commands below are run in `BUILD/`.
 

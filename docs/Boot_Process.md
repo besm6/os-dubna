@@ -10,7 +10,7 @@ done in C++. Then the result is booted in SIMH. There OS Dubna builds the rest o
 dispatcher linked by its own tools.
 
 ```sh
-cd BUILD && ./bootstrap.sh     # about 15 minutes
+cd BUILD && ./bootstrap.sh     # about two minutes
 besm6 dubna.ini                # run the system
 ```
 
@@ -131,18 +131,21 @@ exchanges from a privileged job.
 ## 4. The rebuild in SIMH
 
 `mk-base.sh` makes fresh images, runs `tra-libs.dub` (jobs `newdd` and `newbsz` into 7/M zones
-100 and 105) and `put-job.sh hello.dub 110`, then boots drum 20 twice through `mt-run.py`:
+100 and 105) and `put-job.sh hello.dub 110`, then boots drum 20 twice through `card-run.sh`,
+each time with one of these jobs as a deck of punch cards:
 
 1. **`newbsz`** links the standard tasks (compiled under dubna, perso on 11/LINBUF) with the
    Monitor Dubna loader into the task library 5/D73LIB. On this first boot there is no spooler yet.
 2. **`newdd`** compiles `*DRUMBAS` with `,LOG,2500` (drum 25, track 0), links DD and writes it:
-   `ОС 'ДУБНА' НА 25/000-037/. Д=035 ЗОН.` Its listing is printed: about 1400 lines, most of
-   the quarter hour this step takes.
+   `ОС 'ДУБНА' НА 25/000-037/. Д=035 ЗОН.` Its listing is printed: about 1400 lines.
 
-Each job is queued with `ПУС` and started at once with the operator order `{}БП`: both ask
-for 24 minutes, and in debug mode (ТР6 bit 6) the planner starts such jobs only on Ш01. The images are then saved
-in `data/base/`. These images are kept in the repository, so a user can run the system with
-the simulator alone.
+The decks are cut out of `tra-libs.dub` and started with the operator order `01В`, which
+needs neither Multitype nor the planner (queued with `ПУС` the jobs had to be pushed with
+`{}БП`: both ask for 24 minutes, and in debug mode, ТР6 bit 6, the planner starts such jobs
+only on Ш01). The images are then saved in `data/base/`. These images are kept in the
+repository, so a user can run the system with the simulator alone. Last, `mt-run.py` boots
+drum 25 and runs hello from 7/M, as a check of the new dispatcher and of Multitype. The
+whole step takes about a minute and a half.
 
 ## 5. Running
 
@@ -153,9 +156,11 @@ the simulator alone.
   110, hello). Python listens on two ports and SIMH dials out to them, so both Consuls are
   driven by send/expect. Options are environment variables, listed in the script:
   `FRESH=1` (start from `data/base`), `DRUM=25`, `SUBMIT=ПУС` (queue the job, so it is
-  printed), `CONSUBMIT`, `POLL`, `BEFORE`, `AFTER`, `JOBWAIT`, `POLLS`, `PRNWAIT`, `SLOW`.
-  Transcripts go to `mt-run-tty25.txt` and `mt-run-tty26.txt`. The run ends when the
-  trailer of the listing (`КОНЕЦ ЗАДАЧИ`) appears in `output.txt`.
+  printed), `CONSUBMIT`, `POLL`, `BEFORE`, `AFTER`, `SLOW`.
+  Transcripts go to `mt-run-tty25.txt` and `mt-run-tty26.txt`. The run ends on an event,
+  not on a timer: `НЕТ ЗАДАЧ` for a terminal job, the trailer of the listing
+  (`КОНЕЦ ЗАДАЧИ`) in `output.txt` for a queued or card job. `JOBWAIT` and `PRNWAIT`
+  (600 s each) only bound a run that has gone wrong.
 - `./card-run.sh job.dub`: the same boot, but the job comes from card reader `vu0`
   (`CARDS=deck` in `mt-run.py`, attached by `boot-run.ini`) and is started by the console
   order `01В`; `CARDORDER=ПВ` sends it through the input file, `UPDK=1` punches the deck in
