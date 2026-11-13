@@ -1,10 +1,15 @@
 #!/bin/sh
-# Boot OS Dubna and run a job from a deck of punch cards.
+# Boot OS Dubna and run a job from a deck of punch cards; see card-run.ini.
 # Usage: ./card-run.sh job.dub      (text, one card per line, e.g. hello.dub)
-# The end-of-deck card (a line of six backquotes) is added if missing.
-# Options are those of mt-run.py; CARDORDER=ПВ goes through the input file.
+# The listing goes to output.txt.
 [ -r "$1" ] || { echo "Usage: $0 job.dub" >&2; exit 1; }
+
+# Start from the ready images.
+cp data/base/*.bin data/
+
+# The deck ends with the end-of-deck card, a line of six backquotes.
 deck=card-run.deck
 tr -d '\r' < "$1" > $deck
 [ "$(tail -n 1 $deck)" = '``````' ] || echo '``````' >> $deck
-CARDS=$deck DRUM=${DRUM-25} FRESH=${FRESH-1} exec ./mt-run.py
+
+exec besm6 card-run.ini $deck

@@ -5,7 +5,7 @@ Usage: mt-run.py [zone]     (zone of 7/M, octal, default 110 = hello.dub)
 
 With CARDS=deck the job comes from card reader vu0 instead, started by the
 operator order CARDORDER (01В by default; ПВ puts the deck into the input
-file). See card-run.sh.
+file); the deck ends with a line of six backquotes.
 
 Starts besm6 with boot-run.ini. The simulator connects tty25 (operator
 console) and tty26 (Multitype) to sockets opened here; both are driven

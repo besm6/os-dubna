@@ -90,7 +90,7 @@ Pipeline in `bootstrap.sh`:
    `debmult.dub` and the deck under `dubna` to link DD onto tape 999.
 5. `data/mkdrumdd.sh` — cut drum images out of tape 999.
 6. `tra-libs.dub` — copy libraries and rebuild jobs onto disk for use inside SIMH.
-7. `mk-base.sh` — rebuild the images, then boot SIMH twice with `card-run.sh` (the job is a
+7. `mk-base.sh` — rebuild the images, then boot SIMH twice with `CARDS=deck mt-run.py` (the job is a
    deck of punch cards in reader `vu0`, started by console order `01В`; `mt-run.py` drives
    the consoles over sockets by send/expect, `boot-run.ini`): job `newbsz` builds the task library
    5/D73LIB (the print spooler is in it), job `newdd` writes a rebuilt DD to drum 25. The
@@ -103,7 +103,8 @@ terminal, Multitype on telnet port 4199). `./mt-run.py [zone]` boots and runs a 
 non-interactively; its options are environment variables listed in the script
 (`FRESH=1` restores `data/base`, `SUBMIT=ПУС` queues the job so its listing is printed,
 `DRUM=25` boots the rebuilt DD). `./card-run.sh job.dub` runs a job from a deck of punch
-cards instead (card reader `vu0`, console order `01В`). Transcripts: `mt-run-tty25.txt`, `mt-run-tty26.txt`,
+cards instead: a demo in plain SIMH script (`card-run.ini`, `go until`/`send` on the console,
+console order `01В`). Transcripts: `mt-run-tty25.txt`, `mt-run-tty26.txt`,
 printer: `output.txt`. `runtests.ini` runs the hardware tests from the drum images.
 
 Each job's listing lands in `BUILD/*.list`; errors are found by reading these, not from

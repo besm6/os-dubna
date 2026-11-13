@@ -252,7 +252,7 @@ Text cards are accepted in both codes, the row-wise UPP and the column-wise UPDK
 decoder tells them apart. In a SIMH deck file each line is a card, UPP by default
 (`set vu0 updk` for UPDK), and a line of six backquotes is the end-of-deck card. DD is
 configured with two column-wise readers (УВВК), which is what SIMH `vu0`, `vu1` model.
-`BUILD/card-run.sh` runs a deck this way.
+`BUILD/card-run.sh` runs a deck this way (`BUILD/card-run.ini`).
 
 ## Multitype
 
@@ -450,8 +450,9 @@ These work on a job started with `ОТЛ` or `СЛО`.
 | --- | --- | --- |
 | `BUILD/mt-run.py` | tty25 | empty line, `040489D`, `T`, `A1P` when the spooler asks (`$ORDER`); after a `ПУС`, orders such as `01БП` (`$CONSUBMIT`) |
 | | tty26 | two spaces, `MJPOP`, `7/M`, `ЛИС zone` and an empty line, `СЛА zone,17` or `ПУС zone,17` (`$SUBMIT`), `КАК` or `СЧЕ` (`$POLL`) until the job ends |
-| `BUILD/card-run.sh` | tty25 | as `mt-run.py`, then `01В` (`$CARDORDER`) with the deck in `vu0` |
-| `BUILD/mk-base.sh` | both | `card-run.sh` (`01В`) for the decks `newbsz` and `newdd`, then `mt-run.py` for hello |
+| `BUILD/mt-run.py` with `CARDS` | tty25 | as above, then `01В` (`$CARDORDER`) with the deck in `vu0` |
+| `BUILD/card-run.ini` | tty25 | the same orders and `01В` from SIMH `send`, console on the terminal |
+| `BUILD/mk-base.sh` | both | `mt-run.py` with `CARDS` (`01В`) for the decks `newbsz` and `newdd`, then `mt-run.py` for hello |
 
 The 2017 script `expe.ex` (removed) ran `newbsz` and `newdd` with `СЛА` on tty26, after
 taking it as an operator console with `ОР` and giving it back with `REF`.

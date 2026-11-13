@@ -131,7 +131,7 @@ exchanges from a privileged job.
 ## 4. The rebuild in SIMH
 
 `mk-base.sh` makes fresh images, runs `tra-libs.dub` (jobs `newdd` and `newbsz` into 7/M zones
-100 and 105) and `put-job.sh hello.dub 110`, then boots drum 20 twice through `card-run.sh`,
+100 and 105) and `put-job.sh hello.dub 110`, then boots drum 20 twice through `mt-run.py` with `CARDS=deck`,
 each time with one of these jobs as a deck of punch cards:
 
 1. **`newbsz`** links the standard tasks (compiled under dubna, perso on 11/LINBUF) with the
@@ -161,10 +161,17 @@ whole step takes about a minute and a half.
   not on a timer: `НЕТ ЗАДАЧ` for a terminal job, the trailer of the listing
   (`КОНЕЦ ЗАДАЧИ`) in `output.txt` for a queued or card job. `JOBWAIT` and `PRNWAIT`
   (600 s each) only bound a run that has gone wrong.
-- `./card-run.sh job.dub`: the same boot, but the job comes from card reader `vu0`
-  (`CARDS=deck` in `mt-run.py`, attached by `boot-run.ini`) and is started by the console
-  order `01В`; `CARDORDER=ПВ` sends it through the input file, `UPDK=1` punches the deck in
-  the UPDK code instead of UPP, `VUDEBUG=1` traces the reader. About 35 seconds.
+- `CARDS=deck ./mt-run.py`: the same boot, but the job comes from card reader `vu0`
+  (attached by `boot-run.ini`) and is started by the console order `01В`; the deck ends
+  with a line of six backquotes. `CARDORDER=ПВ` sends it through the input file, `UPDK=1`
+  punches the deck in the UPDK code instead of UPP, `VUDEBUG=1` traces the reader.
+- `./card-run.sh job.dub`: a demo without Python. It restores `data/base`, adds the
+  end-of-deck card and runs `besm6 card-run.ini deck`. The script boots drum 25 with the
+  console on the terminal and plays the operator: `go until "text"` runs until the console
+  prints the text, `send "text\r"` types a line (`send delay=100000`: the console takes one
+  character at a time). After `-КШ01-` it steps the simulator until `fgrep` finds the
+  trailer line of stars in `output.txt`; `on step` and `on error` (with `set on`) make the
+  loop, since both the end of a step and a failed `!` command are errors. About 35 seconds.
 
 `FRESH=1 DRUM=25 SUBMIT=ПУС ./mt-run.py` checks the whole chain in a little over a minute: hello is compiled, run and printed on `output.txt`.
 

@@ -332,4 +332,6 @@ It starts from the clean copy, boots, logs in, runs the deck at zone 110 and wai
 printout in `output.txt`. Its options are listed at the top of the script.
 
 `./card-run.sh hello.dub` does the same with a deck of punch cards: it adds the end-of-deck
-card, puts the deck into the reader and gives the order `01В`.
+card, puts the deck into the reader and gives the order `01В`. It needs no Python: the
+operator's part is played by the SIMH script `card-run.ini`, which you can read as an
+example of a console session.

@@ -64,7 +64,7 @@ cd BUILD
 
 The script compiles the dispatcher and libraries under `dubna` and builds the drum and
 disk images. Then `mk-base.sh` boots them in SIMH twice, feeding each job as a deck of
-punch cards (`card-run.sh`): the job `newbsz` builds the task library (the print spooler is in it), and the
+punch cards (in reader `vu0`): the job `newbsz` builds the task library (the print spooler is in it), and the
 job `newdd` writes a rebuilt dispatcher to drum 25. The resulting images are saved in
 `BUILD/data/base/`. This part takes about a minute and a half. Commit the new images only
 when the system has changed: each version adds about 4 MB to the history.
@@ -77,7 +77,7 @@ This terminal is the operator console; Multitype is on telnet port 4199. Command
 replies are described in [docs/Dubna_Commands.md](docs/Dubna_Commands.md).
 `./mt-run.py` boots and runs a job non-interactively (`FRESH=1 SUBMIT=ПУС ./mt-run.py`
 prints the hello job on `output.txt`); `./card-run.sh hello.dub` runs it from a deck of
-punch cards. How the pieces fit together is described in
+punch cards, with a plain SIMH script (`card-run.ini`). How the pieces fit together is described in
 [docs/Boot_Process.md](docs/Boot_Process.md).
 
 More details are in `BUILD/`:

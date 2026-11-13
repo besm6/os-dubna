@@ -18,16 +18,17 @@ deck() {
         on && /^\*l:/ { print substr($0, 4); exit }
         on && $0 != "*(((" && $0 != "*)))"' tra-libs.dub |
     expand | tr a-z A-Z > $DECK
+    echo '``````' >> $DECK      # end-of-deck card
 }
 # Boot drum 20, keep the images.
 export DRUM= FRESH=
 
 deck newbsz
-./card-run.sh $DECK >> mk-base.log 2>&1 && grep -q -- "-КШ" mt-run-tty25.txt ||
+CARDS=$DECK ./mt-run.py >> mk-base.log 2>&1 && grep -q -- "-КШ" mt-run-tty25.txt ||
     { echo "newbsz failed, see mk-base.log"; exit 1; }
 
 deck newdd
-./card-run.sh $DECK >> mk-base.log 2>&1 && grep -q "НА 25/" mt-run-tty25.txt ||
+CARDS=$DECK ./mt-run.py >> mk-base.log 2>&1 && grep -q "НА 25/" mt-run-tty25.txt ||
     { echo "newdd failed, see mk-base.log"; exit 1; }
 
 mkdir -p data/base
