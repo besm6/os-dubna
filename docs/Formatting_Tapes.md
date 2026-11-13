@@ -244,21 +244,77 @@ words of every block say what the tape is:
 | 5 | A checksum |
 | 7 | All ones |
 
+Every zone is written twice, in two blocks one after the other: the second copy is a
+spare in case the first one cannot be read. So a tape of `N` zones has `2N+8` blocks: `N`+4 zones of two blocks.
+
 So the name is not kept in one place at the start of the tape: every zone carries it. The
 system reads it from whatever zone is under the head.
 
-## What does not work yet
+## Using the tape
 
-After a new boot the system recognises a formatted tape, and a job can ask for it:
+Boot the system with the reel on a drive. The system reads the name from the tape and
+prints nothing: a known tape is quiet. A job asks for the tape by reel number and name
+on a `*TAPE` card, and gives it a unit number, here 40:
 
 ```
 *TAPE:1234/DEMO,40,W
 ```
 
-The console confirms with `МЛ-Ш01:60` ("tape for job Ш01 is on drive 60"). But reading and
-writing zones from a job fail for now, with the message `СБ/СИ 60-Ш01/0001/` repeated.
-The dispatcher and the simulator disagree about some bits of the exchange word. This will
-be fixed later.
+`W` allows writing; without it the job can only read. When the job starts, the console
+shows which drive it got:
+
+```
+Ш01:ТАРЕ
+МЛ-Ш01:60
+```
+
+("tape for job Ш01 is on drive 60"). The job then addresses zone `NNNN` of the tape as
+`40NNNN`. This job writes a line to zone 1 and reads it back with the text editor:
+
+```
+*NAME TAPE
+*TAPE:1234/DEMO,40,W
+*EDIT
+*RO
+*W:400001
+*L:HELLO, TAPE
+*EE
+*EDIT
+*R:400001
+*LL
+*EE
+*END FILE
+```
+
+The listing shows:
+
+```
+         *W:400001
+         *L:НЕLLО, ТАРЕ
+               ФАЙЛ 400001   :ЗАПИСАНО      1 КАРТ (0001 ЗОН)
+         ...
+         *R:400001
+         *LL
+         НЕLLО, ТАРЕ
+               ФАЙЛ 400001   :СЧИТАНО       1 КАРТ (0001 ЗОН)
+```
+
+The data stays on the reel: after a new boot, a job with `*TAPE:1234/DEMO,40` (no `W`)
+reads the same line. Zones can be used in any order; the system winds the tape forward or
+back to find each one.
+
+Winding takes time, as on the real machine: about 0.2 seconds of system time per zone
+passed. A job on a long tape needs a larger time limit than the default: a job that wrote
+zone 767 and zone 3 of a 770-zone tape and read them back took 17 minutes of system time
+and needed a `*TIME:24.00` card (the simulator ran it in half a minute). Without the card
+the job stops with `ИСТЕК. ВРЕМЯ` ("time expired").
+
+To run such a job from a deck of punch cards with the tape mounted, put the line
+`attach mg60 tape60.tap` into [card-run.ini](../BUILD/card-run.ini) before `send "01В\r"`.
+
+**Room on the tape.** For `N` zones the formatter writes `N`+4: the first four are kept by
+the system, so zone 1 of a job is the sixth zone on the tape. A tape of 10 (octal) zones
+has room for job zones 0–7; zone 7 is the last one written by the formatter.
 
 ## How it works inside
 
@@ -279,6 +335,10 @@ For the curious; you do not need this to format a tape.
   interrupt of the dispatcher switches to mode 3 after about 30 ms, back to mode 2 after
   0.154 s, and wakes the task ([macro67.dd1:5094](../besmdisp/macro67.dd1#L5094)). See
   [Peripherals.md](Peripherals.md) for the controller.
+- **Reading and writing.** The exchange word gives the memory page and the zone number
+  (bits 26–36, for the dispatcher's own use). A forward move of the tape after an exchange
+  word does that one exchange; every other forward move only reads the service words of the
+  zone it passes. That is how the dispatcher counts zones while it winds the tape.
 - **The simulator.** In mode 3 `besm6` writes the zone given by the pending exchange as one
   tape record. Its delays in the formatting modes follow the clock, since the dispatcher
   times the modes by clock ticks.
