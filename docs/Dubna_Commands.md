@@ -136,7 +136,8 @@ Multitype (tty26), from `BUILD/boot-run-tty26.txt`:
 | `Р` | Start the output task ВЫВОД (task 11), which drives the printers. It starts by itself at boot unless ТР2 bit 42 is set. |
 | `NNР` | Start ВЫВОД with parameter `NN`. |
 | `…nР` | An order for the running spooler, see [Print spooler orders](#print-spooler-orders). |
-| `NМР`, `NИМР` | Start disk formatting (РАЗМЕТКА, task 62) with a parameter. |
+| `МР`, `ИМР`, `NИМР` | Format a magnetic tape (РАЗМЕТКА, task 62), see [Formatting a tape](#formatting-a-tape). |
+| `textLN` | Answer a question of a service task: `L` is the letter the task shows after its шифр, e.g. `Ш23(S)` takes `60SN`. |
 | `NNА` | Buffer the printed output of Ш`NN` (via the output file). |
 | `NNУ` | Print the output of Ш`NN` directly on the printer, unbuffered. |
 | `DF` | Print the DAY-FILE (task 61). |
@@ -156,6 +157,39 @@ Multitype (tty26), from `BUILD/boot-run-tty26.txt`:
 | `NNПЕР`, then `НАNNПЕР` | Move a reel to another drive. First reply `ДЕРЗАЙ` (go ahead), then `O'KEY`. |
 | `NNМddddБ` | Give number `dddd` to the unlabelled tape on drive `NN`. Replies `O'KEY` or `УЖЕ ЕСТЬ 'name'!`. |
 | `ПЛ`, `КПЛ` | Paper tape: start reading / mark end of tape. `НЕТ !` if there is no reader. |
+
+### Formatting a tape
+
+A new reel must be formatted before the system takes it: task 62
+([task47.ts2:10871](../besmtask/task47.ts2#L10871)) erases the start of the tape and writes
+the zones, each with 8 service words that hold the name of the tape, the reel number and the
+zone number. `МР` only formats (a scratch tape without a name), `ИМР` also names the tape,
+`NИМР` gives it standard name `N` (1 `D73INP`, 2 `D73ЗАД`, 3 `D73OUT`, 4 `D68LIB`,
+5 `D73LIB`, 6 `D73STA`, 7 `ЦЫПЦЫП`).
+
+Only the drives of direction 6 (60–67) can format. Switch register ТР3 must hold the drive
+number in bits 48–43, otherwise the reply is `РАЗМЕТКА ЗАПРЕЩЕНА !`.
+
+```
+НЕ ОПОЗН.МЛ-60                      a blank reel is on drive 60
+ИМР
+Ш23(S)-Б6 РАЗМЕТКА                  S is the letter for the answers
+МФ !
+60SN                                the drive
+ЧИСЛО ЗОН !
+10SN                                the number of zones, octal
+ИМЯ !
+DEMOSN                              the name, up to 6 characters
+N БОБ!
+1234SN                              the reel number
+DЕМО  /1234 (0010) МФ-60-ТАК ?
+SN                                  yes; any text before SN starts over
+РАЗМЕЧЕНО 0010 ЗОН.
+```
+
+The task waits about 15 seconds before it starts, then writes two blocks per zone and 8
+more, about 0.3 s each. [tape-format.sh](../BUILD/tape-format.sh) does all this in SIMH;
+[Formatting_Tapes.md](Formatting_Tapes.md) is the full manual.
 
 ### Consoles and terminals
 

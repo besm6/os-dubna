@@ -1,0 +1,288 @@
+# Formatting Magnetic Tapes under OS Dubna
+
+> Written for this repository. It describes how to prepare a new magnetic tape for OS Dubna
+> on the SIMH `besm6` simulator, as of November 2026. Everything shown here was run with
+> [tape-format.sh](../BUILD/tape-format.sh), except where a note says "from the source".
+
+## Why a tape must be formatted
+
+A BESM-6 tape is not a plain stream of bytes. It is cut into numbered **zones** of 1024
+words, and the tape drive finds a zone by the marks written in front of it. A new reel has
+no marks, so the system can neither read it nor write to it. Formatting (*разметка*)
+writes the marks for every zone, and, if you ask, the name of the tape.
+
+OS Dubna checks the name each time a reel is put on a drive. A reel it cannot identify
+gets the console message
+
+```
+НЕ ОПОЗН.МЛ-60
+```
+
+("tape on drive 60 not recognised"). A blank reel always gets it. That is normal, and it is
+the starting point for formatting.
+
+## What you need
+
+- The system built by `./bootstrap.sh` in [BUILD/](../BUILD), or the ready images in
+  `BUILD/data/base`. See [Boot_Process.md](Boot_Process.md).
+- SIMH `besm6` from branch `master` of [simh-besm6](https://github.com/besm6/simh),
+  November 2026 or later. Older simulators write garbage in place of the zones.
+
+## The short way
+
+```sh
+cd BUILD
+./tape-format.sh            # makes tape60.tap
+./tape-format.sh my.tap     # or any other file name
+```
+
+The script boots the system, puts a blank reel on drive 60 and plays the operator. It
+takes about a minute and ends after the line
+
+```
+РАЗМЕЧЕНО 0010 ЗОН.
+```
+
+("formatted 10 zones"; the number is octal, so 8 zones). The file now holds a tape named
+`DEMO`, reel number 1234. The rest of this article explains what the script does, so you
+can do it by hand or change it.
+
+## Words used below
+
+| Word | Meaning |
+| --- | --- |
+| Drive (МФ, магнитофон) | A tape unit. Drives have octal numbers 30–67. Drive 60 is SIMH unit `mg60`, drive 61 is `mg61`, and so on. |
+| Reel (бобина) | One tape. In SIMH it is a file. |
+| Zone (зона) | A piece of tape holding 1024 words. Jobs read and write whole zones. |
+| Order (приказ) | A line the operator types on the console. |
+| Task 62 | The system program that formats tapes. Its name is РАЗМЕТКА. |
+| ТР3 | Switch register 3, a row of 48 switches on the panel of the machine. In SIMH it is memory word 3. |
+
+All numbers in the dialogue are **octal**: `10` zones means eight.
+
+## Step by step
+
+### 1. Make a blank reel
+
+A blank reel is an empty file:
+
+```sh
+: > tape60.tap
+```
+
+Create the file before you attach it. If the file does not exist, SIMH makes it and
+formats it in its own way, for another operating system (Диспак). OS Dubna would not take
+that tape for its own. For the same reason do not use `attach -n`.
+
+### 2. Start the system
+
+Boot as usual and answer the first questions: Enter, the date `040489D`, the time `T`,
+and `A1P` when the system asks for paper. This is described in
+[OS_Dubna_Tutorial.md](OS_Dubna_Tutorial.md). Wait for the word `ПЛАНИРОВЩИК`.
+
+### 3. Put the reel on a drive
+
+```
+sim> attach mg60 tape60.tap
+```
+
+Only drives 60–67 can format. On the real machine the formatting electronics was wired to
+one tape controller, and the simulator follows it.
+
+The system notices the new reel, tries to read its name, and prints:
+
+```
+НЕ ОПОЗН.МЛ-60
+```
+
+### 4. Allow formatting
+
+Formatting destroys everything on the tape, so the system wants a second proof that you
+mean this drive. The operator had to set the drive number on the switches of ТР3, in the
+top six positions (bits 48–43). In SIMH:
+
+```
+sim> d 3 6077 7777 0000 0000
+```
+
+The first two digits, `60`, are the drive number. The other digits are what the boot
+scripts keep in ТР3 (privileges for jobs); leave them as they are.
+
+Without this step the answer is `РАЗМЕТКА ЗАПРЕЩЕНА !` ("formatting forbidden").
+
+### 5. Give the order
+
+Type on the console:
+
+```
+ИМР
+```
+
+The system starts task 62, which answers:
+
+```
+Ш23(S)-Б6 РАЗМЕТКА
+МФ !
+```
+
+Look at the letter in brackets, here `S`. The console is shared by the whole system, so
+the task must know which lines are meant for it. **Every answer to the task ends with that
+letter and `N`**: to answer `60`, type `60SN`. A line without this ending is taken as an
+ordinary order and usually gets the reply `!!!` or `НЕТ !`.
+
+### 6. Answer the questions
+
+| The task asks | Meaning | Answer | Example |
+| --- | --- | --- | --- |
+| `МФ !` | Which drive? | The drive number | `60SN` |
+| `ЧИСЛО ЗОН !` | How many zones? | Octal, up to four digits | `10SN` |
+| `ИМЯ !` | The name of the tape? | Up to six characters | `DEMOSN` |
+| `N БОБ!` | The reel number? | Up to four digits | `1234SN` |
+
+Then the task shows what it understood and asks for a yes:
+
+```
+DЕМО  /1234 (0010) МФ-60-ТАК ?
+```
+
+This reads: name `DEMO`, reel 1234, 10 zones, drive 60 — "right?". Answer with the ending
+alone:
+
+```
+SN
+```
+
+Any other answer means "no", and the task starts over from the first question (from the
+source).
+
+### 7. Wait
+
+Nothing happens for about 15 seconds: the task rests before it starts. Then it erases the
+beginning of the tape and writes the zones, about three per second. At the end it prints:
+
+```
+РАЗМЕЧЕНО 0010 ЗОН.
+```
+
+The tape is ready. In SIMH, take it off with `detach mg60`.
+
+## The whole dialogue
+
+Lines typed by the operator are marked with `<`.
+
+```
+НЕ ОПОЗН.МЛ-60                       a blank reel is on drive 60
+ИМР                                < format and name
+Ш23(S)-Б6 РАЗМЕТКА                   the task; its letter is S
+МФ !
+60SN                               < drive 60
+ЧИСЛО ЗОН !
+10SN                               < 10 (octal) zones
+ИМЯ !
+DEMOSN                             < the name is DEMO
+N БОБ!
+1234SN                             < reel number 1234
+DЕМО  /1234 (0010) МФ-60-ТАК ?
+SN                                 < yes
+РАЗМЕЧЕНО 0010 ЗОН.                  done
+```
+
+The system prints `DЕМО` with Cyrillic `Е`, `М`, `О`: it does not tell lookalike Latin and
+Cyrillic letters apart. Type `И` of `ИМР` in Cyrillic, and `S`, `N`, `D` in Latin. See
+[Dubna_Commands.md](Dubna_Commands.md).
+
+## Other forms of the order
+
+| Order | What it does |
+| --- | --- |
+| `ИМР` | Format and name the tape, as above. |
+| `МР` | Format only. The task asks for the drive and the number of zones and starts at once, with no confirmation. The tape gets no name: it is a scratch tape. |
+| `1ИМР` … `7ИМР` | Format and give one of the standard system names: 1 `D73INP`, 2 `D73ЗАД`, 3 `D73OUT`, 4 `D68LIB`, 5 `D73LIB`, 6 `D73STA`, 7 `ЦЫПЦЫП`. The task does not ask for the name. From the source. |
+
+A `МР` run looks like this:
+
+```
+МР
+Ш23(S)-Б6 РАЗМЕТКА
+МФ !
+60SN
+ЧИСЛО ЗОН !
+20SN
+РАЗМЕЧЕНО 0020 ЗОН.
+```
+
+## When something goes wrong
+
+| You see | Why | What to do |
+| --- | --- | --- |
+| `ОШ23-ТАSК62` after the order | The task library has an empty stub in place of task 62 (builds before November 2026). | Rebuild with `./bootstrap.sh`. |
+| `РАЗМЕТКА ЗАПРЕЩЕНА !` right after the drive number | ТР3 does not hold the drive number. | Do step 4 and give the order again. |
+| `РАЗМЕТКА ЗАПРЕЩЕНА !` after the number of zones, then `РАЗМЕЧЕНО 1774 ЗОН.` | The first zone could not be written: an old simulator, or the drive is not one of 60–67. | Update `besm6`. |
+| `!!!` or `НЕТ !` after an answer | The line did not end with the task's letter and `N`, so it went to the system and not to the task. | Type the answer again with the ending. The task is still waiting. |
+| Nothing after `SN` at `-ТАК ?` | The first character was lost: the answer was typed while the question was still being printed. | Type `SN` again. A script should pause before this answer (`step 3000000` in `tape-format.ini`). |
+| `СПЕШИШЬ !` | Task 62 is already running, or the drive is an ЕС tape drive. From the source. | Wait for the first run to end. |
+| Nothing for 15 seconds after the last answer | The task rests before it starts. | Wait. |
+
+## How long it takes
+
+The task writes two blocks for every zone and eight more, about 0.3 seconds each. The
+simulator keeps real time here, so a tape of 1000 (octal) zones needs about five minutes.
+For a demo, 10 or 20 zones are enough.
+
+## What is on the tape
+
+The file is a SIMH tape image. Each block is one record: 8 service words, then 1024 data
+words. After formatting the data words are filled with a test pattern, and the service
+words of every block say what the tape is:
+
+| Word | Contents |
+| --- | --- |
+| 0 | `2245 1252 5122 4512`, a fixed code |
+| 1, 2 | The name of the tape and the reel number, twice. A scratch tape has the fixed code of word 0 here. |
+| 3, 6 | `0007 0707`, then the zone number and the block number |
+| 4 | `7163 4760 3471 6347`, a fixed code |
+| 5 | A checksum |
+| 7 | All ones |
+
+So the name is not kept in one place at the start of the tape: every zone carries it. The
+system reads it from whatever zone is under the head.
+
+## What does not work yet
+
+After a new boot the system recognises a formatted tape, and a job can ask for it:
+
+```
+*TAPE:1234/DEMO,40,W
+```
+
+The console confirms with `МЛ-Ш01:60` ("tape for job Ш01 is on drive 60"). But reading and
+writing zones from a job fail for now, with the message `СБ/СИ 60-Ш01/0001/` repeated.
+The dispatcher and the simulator disagree about some bits of the exchange word. This will
+be fixed later.
+
+## How it works inside
+
+For the curious; you do not need this to format a tape.
+
+- **The order.** `МР` and `ИМР` are parsed in the dispatcher
+  ([macro67.dd1:6853](../besmdisp/macro67.dd1#L6853)); they start task 62 of the task
+  library 5/D73LIB. `62/` and `362/` do the same (from the source).
+- **The task.** [task47.ts2:10871](../besmtask/task47.ts2#L10871), written in 1977. It
+  runs partly inside the dispatcher: it takes over the interrupt of the tape controller and
+  a timer entry.
+- **The answers.** A line ending with `N` is the order "pass this text to a task". The
+  character before `N` selects the task: the letter stands for the шифр the task runs on,
+  and the task's banner shows it, `Ш23(S)`.
+- **The drive.** Register `033 0141` of the controller switches the formatting modes: 2
+  erases the tape, 3 writes the marks of a zone (the synchrotrack), 0 is normal work. For
+  each block the task gives a write exchange and starts the tape in mode 2; the timer
+  interrupt of the dispatcher switches to mode 3 after about 30 ms, back to mode 2 after
+  0.154 s, and wakes the task ([macro67.dd1:5094](../besmdisp/macro67.dd1#L5094)). See
+  [Peripherals.md](Peripherals.md) for the controller.
+- **The simulator.** In mode 3 `besm6` writes the zone given by the pending exchange as one
+  tape record. Its delays in the formatting modes follow the clock, since the dispatcher
+  times the modes by clock ticks.
+- **The dispatcher.** A change made for SIMH in 2017 put a fake volume name into service
+  words 3 and 7 after every read, for disks. It did the same to tapes and spoiled the zone
+  number, so no tape was recognised. Now it applies to disks only
+  ([fix-dsk.s](../BUILD/deck-b1/fix-dsk.s)).

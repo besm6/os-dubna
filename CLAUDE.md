@@ -51,9 +51,11 @@ Terminology used everywhere:
     boot sequence, the rebuild jobs, running and pitfalls.
   - `OS_Dubna_Tutorial.md` — for users: start the system, log in to Multitype, type and run
     a job, read the printout.
+  - `Formatting_Tapes.md` — for users: format a blank magnetic tape with task 62 (orders
+    `МР`, `ИМР`), the console dialogue, errors, what is written on the tape.
 
-  The articles, except `Switch_Registers.md`, `Dubna_Commands.md`, `Boot_Process.md` and
-  `OS_Dubna_Tutorial.md` (written here), are copies from other BESM-6
+  The articles, except `Switch_Registers.md`, `Dubna_Commands.md`, `Boot_Process.md`,
+  `OS_Dubna_Tutorial.md` and `Formatting_Tapes.md` (written here), are copies from other BESM-6
   projects (besm6/simh, v7besm, c-compiler); a note under each title names the origin. Their "kernel" and "compiler" are those projects', and
   links to files outside `docs/` are absolute GitHub URLs. Keep it that way when adding more:
   no relative links to files that are not in this repo.
@@ -104,7 +106,8 @@ non-interactively, `./boot-run.py -m zone` a job from 7/M through Multitype; run
 arguments for the options (`-f` restores `data/base`, `-d 25` boots the rebuilt DD, `-q`
 queues a Multitype job with `ПУС` so its listing is printed). `./card-run.sh job.dub` runs a job from a deck of punch
 cards instead: a demo in plain SIMH script (`card-run.ini`, `go until`/`send` on the console,
-console order `01В`). Transcripts: `boot-run-tty25.txt`, `boot-run-tty26.txt`,
+console order `01В`). `./tape-format.sh` is a demo of the same kind for magnetic tapes: it attaches a blank
+reel as `mg60` and has task 62 format and name it (order `ИМР`, see `docs/Dubna_Commands.md`). Transcripts: `boot-run-tty25.txt`, `boot-run-tty26.txt`,
 printer: `output.txt`. `runtests.ini` runs the hardware tests from the drum images.
 
 Each job's listing lands in `BUILD/*.list`; errors are found by reading these, not from
@@ -144,7 +147,7 @@ their thousands digit (1400 → 400).
   compiled by the patch deck (`deck-b1/mk-deck-b1.sh`). Change the system there, not in the
   archived sources.
 - Simulator requirements found so far: `set cpu mem=128`, `set cpu ext32`, the card
-  reader fixes (all on branch `master` of simh-besm6). Simulator changes go to that branch; OS changes to `deck-b1/`.
+  reader fixes, tape formatting on `mg6` (all on branch `master` of simh-besm6). Simulator changes go to that branch; OS changes to `deck-b1/`.
 
 ## Cosy tools
 

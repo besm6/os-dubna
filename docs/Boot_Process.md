@@ -172,6 +172,16 @@ whole step takes about a minute and a half.
   character at a time). After `-КШ01-` it steps the simulator until `fgrep` finds the
   trailer line of stars in `output.txt`; `on step` and `on error` (with `set on`) make the
   loop, since both the end of a step and a failed `!` command are errors. About 35 seconds.
+- `./tape-format.sh [image]`: a demo of magnetic tapes, in the same style
+  (`tape-format.ini`). It makes an empty file, a blank reel, and attaches it as `mg60`
+  when the system is up; the console prints `НЕ ОПОЗН.МЛ-60`. Then it puts the drive
+  number into switch register 3 and gives order `ИМР`: task 62 formats the tape and names
+  it `DEMO`, reel 1234, 10 (octal) zones. The dialogue is described in
+  [Dubna_Commands.md](Dubna_Commands.md#formatting-a-tape). About a minute. The image is a
+  SIMH tape file with one record of 8 service words and 1024 data words per block. It needs
+  a `besm6` whose formatting modes of `mg6` write real zones (November 2026), and the
+  real task 62 in 5/D73LIB: until then job `newbsz` in `tra-libs.dub` put an empty stub
+  in its place.
 
 `./boot-run.py -f -d 25 -q -m 110` checks the whole chain in a little over a minute: hello is compiled, run and printed on `output.txt`.
 

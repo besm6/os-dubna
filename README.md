@@ -77,7 +77,8 @@ This terminal is the operator console; Multitype is on telnet port 4199. Command
 replies are described in [docs/Dubna_Commands.md](docs/Dubna_Commands.md).
 `./boot-run.py` boots and runs a job non-interactively (`./boot-run.py -f -d 25 -q -m 110`
 prints the hello job from Multitype on `output.txt`; `./boot-run.py` alone lists the options); `./card-run.sh hello.dub` runs it from a deck of
-punch cards, with a plain SIMH script (`card-run.ini`). How the pieces fit together is described in
+punch cards, with a plain SIMH script (`card-run.ini`); `./tape-format.sh` mounts a blank magnetic tape
+and formats it. How the pieces fit together is described in
 [docs/Boot_Process.md](docs/Boot_Process.md).
 
 More details are in `BUILD/`:
@@ -102,6 +103,7 @@ Reference articles in [docs/](docs/):
 Written for this repository:
 
 - [OS_Dubna_Tutorial.md](docs/OS_Dubna_Tutorial.md) — start the system and run your own jobs;
+- [Formatting_Tapes.md](docs/Formatting_Tapes.md) — prepare a blank magnetic tape for the system;
 - [Boot_Process.md](docs/Boot_Process.md) — how the bootstrap builds and boots the system;
 - [Dubna_Commands.md](docs/Dubna_Commands.md) — operator console and Multitype commands;
 - [Switch_Registers.md](docs/Switch_Registers.md) — the switch registers ТР1–ТР7 in DD.

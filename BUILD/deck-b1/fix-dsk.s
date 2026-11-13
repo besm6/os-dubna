@@ -924,7 +924,14 @@ C      ЦИKЛ YCT.BEPH.CBEPTKИ
  R5,V1M,YCB1.KOHEЦ ЦИKЛA
 Cs +++++++++++++++++++++++++++
 Cs Making a fake DISK VOL name
- ,ita,a
+Cs Disks only (service words at 30B, 40B): a tape keeps its zone number
+ ,ita,j8
+ ,asn,64+3
+ ,aex,=3
+ ,uza,FAKEVOL
+ ,aex,=7
+ ,u1a,CHCTY
+ FAKEVOL:,ita,a
  ,arx,CT000000
  j8,atx,NAMED1
  j8,atx,NAMED2

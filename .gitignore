@@ -21,3 +21,4 @@ BUILD/runtests.log
 BUILD/FSINP.TXT
 BUILD/data/CAMdrum20.bin
 BUILD/card-run.deck
+BUILD/*.tap
