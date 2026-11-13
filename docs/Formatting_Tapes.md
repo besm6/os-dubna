@@ -219,7 +219,7 @@ A `МР` run looks like this:
 | `РАЗМЕТКА ЗАПРЕЩЕНА !` right after the drive number | ТР3 does not hold the drive number. | Do step 4 and give the order again. |
 | `РАЗМЕТКА ЗАПРЕЩЕНА !` after the number of zones, then `РАЗМЕЧЕНО 1774 ЗОН.` | The first zone could not be written: an old simulator, or the drive is not one of 60–67. | Update `besm6`. |
 | `!!!` or `НЕТ !` after an answer | The line did not end with the task's letter and `N`, so it went to the system and not to the task. | Type the answer again with the ending. The task is still waiting. |
-| Nothing after `SN` at `-ТАК ?` | The first character was lost: the answer was typed while the question was still being printed. | Type `SN` again. A script should pause before this answer (`step 3000000` in `tape-format.ini`). |
+| The echo of an answer misses its first character (`0SN` for `60SN`), or nothing happens after `SN` | The character was lost: it was typed while the question was still being printed. | Type the answer again. A script should pause before every answer (`step 3000000` in `tape-format.ini`). |
 | `СПЕШИШЬ !` | Task 62 is already running, or the drive is an ЕС tape drive. From the source. | Wait for the first run to end. |
 | Nothing for 15 seconds after the last answer | The task rests before it starts. | Wait. |
 
@@ -306,8 +306,9 @@ back to find each one.
 Winding takes time, as on the real machine: about 0.2 seconds of system time per zone
 passed. A job on a long tape needs a larger time limit than the default: a job that wrote
 zone 767 and zone 3 of a 770-zone tape and read them back took 17 minutes of system time
-and needed a `*TIME:24.00` card (the simulator ran it in half a minute). Without the card
-the job stops with `ИСТЕК. ВРЕМЯ` ("time expired").
+and needed a `*TIME:24.00` card. The system charges this time by the zones passed, not by the
+clock: the simulator moves its tapes five times faster than the real drive and ran the job in
+three seconds. Without the card the job stops with `ИСТЕК. ВРЕМЯ` ("time expired").
 
 To run such a job from a deck of punch cards with the tape mounted, put the line
 `attach mg60 tape60.tap` into [card-run.ini](../BUILD/card-run.ini) before `send "01В\r"`.
