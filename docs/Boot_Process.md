@@ -207,7 +207,10 @@ whole step takes about a minute and a half.
   backquotes. Python listens on two ports and SIMH dials out to them, so both Consuls are
   driven by send/expect. `./boot-run.py` alone prints all options: `-f` (start from
   `data/base`), `-d 25` (boot the rebuilt DD), `-r ПВ` (send the deck through the input
-  file), `-u` (punch it in the UPDK code instead of UPP), `-v` (trace the reader).
+  file), `-u` (punch it in the UPDK code instead of UPP), `-v` (trace the reader), `-e 0`
+  or `-e 1` (that printer is an ЕС-7032/7033: `set prnN es` and ТР7 bit 34 or 33; with 1,
+  ТР7 bit 46 locks out printer 0 and the spooler is answered `A2P`, so the listing goes to
+  `output1.txt`; it has an 8-column margin and ДКОИ characters, `≠` becomes `#`).
 - `./boot-run.py [options] -m zone`: the job is the deck at 7/M `zone` (110 is hello),
   submitted from Multitype with `СЛА`, or with `-q` queued with `ПУС`, so it is printed;
   `-b`, `-s`, `-n`, `-p`, `-a` add Multitype commands and console orders.

@@ -201,8 +201,12 @@ def options():
     p.add_argument("-d", "--drum", choices=("20", "25"), default="20",
                    help="boot the dispatcher from drum 20 (default) or the one "
                         "rebuilt by newdd on drum 25")
-    p.add_argument("-o", "--order", default="A1P", metavar="ORDER",
-                   help="answer to the spooler's paper request (default %(default)s)")
+    p.add_argument("-e", "--es-printer", choices=("0", "1"), metavar="N",
+                   help="make printer N an ЕС-7032/7033 (ТР7 bit 34 or 33); "
+                        "with 1, printer 0 is locked out so the spooler takes printer 1")
+    p.add_argument("-o", "--order", metavar="ORDER",
+                   help="answer to the spooler's paper request (default A1P, "
+                        "A2P with -e 1)")
     g = p.add_argument_group("card job")
     g.add_argument("-r", "--card-order", default="01В", metavar="ORDER",
                    help="order that starts it (default %(default)s; ПВ puts "
@@ -246,6 +250,8 @@ def options():
     a = p.parse_args()
     if (a.zone is None) == (a.cards is None):
         p.error("give either a deck or -m zone")
+    if a.order is None:
+        a.order = "A2P" if a.es_printer == "1" else "A1P"
     return a
 
 def main():
@@ -261,6 +267,7 @@ def main():
                TTY26=str(l26.getsockname()[1]),
                DRUM=A.drum, CARDS=A.cards or "",
                UPDK="1" if A.updk else "",
+               ESPRN=A.es_printer or "",
                VUDEBUG="1" if A.vu_debug else "")
     out = open("boot-run.out", "w")
     sim = subprocess.Popen(["besm6", A.ini], env=env,

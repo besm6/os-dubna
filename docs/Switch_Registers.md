@@ -219,8 +219,8 @@ wakes the temporarily closed tasks ([PR/TIMER:5011](../dub_besm/dubna.dd#L5011))
 | 39 | `0004 0000 0000 0000` | Compress listings on printer 1. | same |
 | 38 | `0002 0000 0000 0000` | Don't check the array passport in extracode 073. | [NRES73:35013](../dub_besm/dubna.dd#L35013) |
 | 36–34 | `0000 7000 0000 0000` | Machine number (0–7). Goes into statistics, into the task name, and is returned by extracode 114. | [NRESLINE:9606](../dub_besm/dubna.dd#L9606), [EMULATOR:13628](../dub_besm/dubna.dd#L13628), [MULTITYP:46900](../dub_besm/dubna.dd#L46900) |
-| 34 | `0000 1000 0000 0000` | Also: printer 0 is an ЕС printer. | [NRES064:43709](../dub_besm/dubna.dd#L43709) |
-| 33 | `0000 0400 0000 0000` | Printer 1 is an ЕС printer. | same |
+| 34 | `0000 1000 0000 0000` | Also: printer 0 is an ЕС printer (ЕС-7032/7033, driver `PRINTL`). Needs `set prn0 es` in SIMH; `./boot-run.py -e 0` sets both. | [NRES064:43709](../dub_besm/dubna.dd#L43709) |
+| 33 | `0000 0400 0000 0000` | Printer 1 is an ЕС printer. Needs `set prn1 es`; `./boot-run.py -e 1`. | same |
 | 32 | `0000 0200 0000 0000` | Don't write DAYFILE records to the statistics file. | [OPERTERM:4246](../dub_besm/dubna.dd#L4246), [TTANAL:6137](../dub_besm/dubna.dd#L6137), [NRESLINE:8469](../dub_besm/dubna.dd#L8469), [NRES072:31823](../dub_besm/dubna.dd#L31823) |
 | 31 | `0000 0100 0000 0000` | Don't mount LIBRARY tapes. *No reader found.* | — |
 | 30 | `0000 0040 0000 0000` | `*PASS` card is mandatory; user statistics are collected. | [NRESLINE:9965](../dub_besm/dubna.dd#L9965) |

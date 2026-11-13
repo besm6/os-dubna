@@ -110,7 +110,8 @@ Pipeline in `bootstrap.sh`:
 After the bootstrap, run the system with `besm6 dubna.ini` from `BUILD/` (console on the
 terminal, Multitype on telnet port 4199). `./boot-run.py deck` boots and runs a deck of punch cards
 non-interactively, `./boot-run.py -m zone` a job from 7/M through Multitype; run it without
-arguments for the options (`-f` restores `data/base`, `-d 25` boots the rebuilt DD, `-q`
+arguments for the options (`-f` restores `data/base`, `-d 25` boots the rebuilt DD, `-e 0`
+makes printer 0 an ЕС-7032/7033 with ТР7 bit 34, `-q`
 queues a Multitype job with `ПУС` so its listing is printed). `./card-run.sh job.dub` runs a job from a deck of punch
 cards instead: a demo in plain SIMH script (`card-run.ini`, `go until`/`send` on the console,
 console order `01В`). `./tape-format.sh` is a demo of the same kind for magnetic tapes: it attaches a blank
@@ -154,7 +155,8 @@ their thousands digit (1400 → 400).
   compiled by the patch deck (`deck-b1/mk-deck-b1.sh`). Change the system there, not in the
   archived sources.
 - Simulator requirements found so far: `set cpu mem=128`, `set cpu ext32`, the card
-  reader fixes, tape formatting on `mg6` (all on branch `master` of simh-besm6). Simulator changes go to that branch; OS changes to `deck-b1/`.
+  reader fixes, tape formatting on `mg6`, the ЕС printer mode `set prnN es` with
+  ДРП/ДРМ (all on branch `master` of simh-besm6). Simulator changes go to that branch; OS changes to `deck-b1/`.
 
 ## Cosy tools
 
