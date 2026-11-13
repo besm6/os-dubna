@@ -88,7 +88,7 @@ placing catalogs and the roll track ([DISPINIT:61638](../dub_besm/dubna.dd#L6163
 | 43 | `0100 0000 0000 0000` | Obsolete: "отныне нельзя заблокировать TESTTRAK". | [TESTTRAK:14562](../dub_besm/dubna.dd#L14562) |
 | 42 | `0040 0000 0000 0000` | *Start.* Don't search for input/output buffers, don't start the print task, no output buffering. | DISPINIT (`BBLS`, [61769](../dub_besm/dubna.dd#L61769)) |
 | 41 | `0020 0000 0000 0000` | MS drum 21 is modelled by zones 0–37 of disk file 9/MONSYS. | [TESTTRAK:14726](../dub_besm/dubna.dd#L14726), [ПYCKAЧ:18540](../dub_besm/dubna.dd#L18540) |
-| 40 | `0010 0000 0000 0000` | MS drum 22 is modelled by zones 40–77 of 9/MONSYS. | same |
+| 40 | `0010 0000 0000 0000` | MS drum 22 is modelled by zones 40–77 of 9/MONSYS. The tape is described in [Monsys9_Tape.md](Monsys9_Tape.md). | same |
 | 39 | `0004 0000 0000 0000` | Graphics catalog is `CATALO/8` instead of `D73GRF/12`. | [PROC/OUT:45541](../dub_besm/dubna.dd#L45541) |
 | 33–31 | `0000 0700 0000 0000` | *Start.* Number (0–7) of the DD copy to load from disk. Copy N sits in 9/MONSYS from zone 440₈ + 40₈·N ([dubna.dd:332](../dub_besm/dubna.dd#L332)). | loader, not DD |
 | 30 | `0000 0040 0000 0000` | Collect statistics on terminal users. Tested through word `530B`, which holds this mask. | [MDRECOGN:26473](../dub_besm/dubna.dd#L26473), [STAT TT:28189](../dub_besm/dubna.dd#L28189) |

@@ -44,6 +44,9 @@ from zone 40.
 
 ### The Monitor System
 
+The layout of the tape, its catalogs and the rebuild are described in full in
+[Monsys9_Tape.md](Monsys9_Tape.md); this is a summary.
+
 The MS is zones 0–77 of 9/MONSYS (drums 21 and 22): the dynamic loader and tables in
 zones 0–6, the catalog of the dynamic part in 7–10, the dynamic part (166 modules) from
 zone 11, the monitor page in zone 35, and the static part from zone 36 to the end:
@@ -116,7 +119,7 @@ files on these disks. At boot it lists them on the console:
 
 | Model | Disk | Use |
 | --- | --- | --- |
-| `MONSYS/9` | 9 | Monitor System; also models MS drums 21, 22 (ТР2 bits 41, 40). |
+| `MONSYS/9` | 9 | Monitor System; also models MS drums 21, 22 (ТР2 bits 41, 40). See [Monsys9_Tape.md](Monsys9_Tape.md). |
 | `D73LIB/5` | 9 | Task library (STL), built by job `newbsz`. |
 | `M/7` | 9 | Multitype buffer, disk zones 0700–1077: user decks. |
 | `D73INP/1` | 9 | Input file: queued jobs. |

@@ -264,7 +264,7 @@ Messages that appear on their own:
 | --- | --- |
 | `ОИЯИ. ОС ДУБНА ОТ … М1` | Banner at boot. |
 | `name/N WNN` | Tape `name` with number `N` is modelled on logical unit `NN` (printed with ТР1 bit 24). |
-| `Д-2000  МС-…` | Boot is complete: DD and the Monitor System drums (`МС-21,22`, or `МС-Ф10` when modelled on disk). |
+| `Д-2000  МС-…` | Boot is complete: DD and the Monitor System drums (`МС-21,22`, or `МС-Ф10` when modelled on disk: see [Monsys9_Tape.md](Monsys9_Tape.md)). |
 | `ВЫВОД БУФЕРИЗОВАН` | The output task started; output goes through the output file ([sluga.dd4:7216](../besmdisp/sluga.dd4#L7216)). |
 | `МЛ ВЫВОДА!`, `МЛ ВВОДА !`, `МЛ ВВ/ВЫВ!` | The disk files D73OUT and/or D73INP were not found ([sluga.dd4:7210](../besmdisp/sluga.dd4#L7210)). |
 | `ПЛОХ.КАТАЛ.ВЫВОДА` | The output catalogue is damaged. |

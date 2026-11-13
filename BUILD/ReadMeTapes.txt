@@ -74,7 +74,7 @@
 200 - Мониторная Система
 201 - MS: common library written by COLLECT
 202 - MS: working copy of drums 21, 22 written by COMTODRU
-203 - 9/MONSYS with the rebuilt MS (ms-splice.py)
+203 - 9/MONSYS with the rebuilt MS (ms-splice.py), see docs/Monsys9_Tape.md
 221 - libra21 
 223 - libra23
 247 - task11+task47 (compilation in FOREX)

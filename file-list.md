@@ -119,6 +119,6 @@ Note: it is the same as dub_besm/dumba.ms
 
 # monsys/ - image of 9/monsys
 
-	monsys/monsys.9 - the real image of  monsys-9
+	monsys/monsys.9 - the real image of  monsys-9 (layout: docs/Monsys9_Tape.md)
 
 # END

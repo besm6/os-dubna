@@ -105,6 +105,7 @@ Written for this repository:
 - [OS_Dubna_Tutorial.md](docs/OS_Dubna_Tutorial.md) — start the system and run your own jobs;
 - [Formatting_Tapes.md](docs/Formatting_Tapes.md) — prepare a blank magnetic tape for the system;
 - [Boot_Process.md](docs/Boot_Process.md) — how the bootstrap builds and boots the system;
+- [Monsys9_Tape.md](docs/Monsys9_Tape.md) — the system tape 9/MONSYS: its layout, what is rebuilt from sources;
 - [Dubna_Commands.md](docs/Dubna_Commands.md) — operator console and Multitype commands;
 - [Switch_Registers.md](docs/Switch_Registers.md) — the switch registers ТР1–ТР7 in DD.
 
