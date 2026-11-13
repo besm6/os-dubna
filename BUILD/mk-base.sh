@@ -1,5 +1,5 @@
 #! /bin/sh
-# Make the baseline images in data/base, used by "FRESH=1 ./mt-run.py".
+# Make the baseline images in data/base, used by "./mt-run.py -f".
 # Fresh disks and drums from the dubna build, then two jobs run in SIMH:
 # newbsz builds the task library 5/D73LIB (the print spooler is in it),
 # newdd writes the rebuilt dispatcher to drum 25.
@@ -20,15 +20,14 @@ deck() {
     expand | tr a-z A-Z > $DECK
     echo '``````' >> $DECK      # end-of-deck card
 }
-# Boot drum 20, keep the images.
-export DRUM= FRESH=
+# Boot drum 20 and keep the images (no -f, -d).
 
 deck newbsz
-CARDS=$DECK ./mt-run.py >> mk-base.log 2>&1 && grep -q -- "-КШ" mt-run-tty25.txt ||
+./mt-run.py $DECK >> mk-base.log 2>&1 && grep -q -- "-КШ" mt-run-tty25.txt ||
     { echo "newbsz failed, see mk-base.log"; exit 1; }
 
 deck newdd
-CARDS=$DECK ./mt-run.py >> mk-base.log 2>&1 && grep -q "НА 25/" mt-run-tty25.txt ||
+./mt-run.py $DECK >> mk-base.log 2>&1 && grep -q "НА 25/" mt-run-tty25.txt ||
     { echo "newdd failed, see mk-base.log"; exit 1; }
 
 mkdir -p data/base
@@ -36,5 +35,5 @@ cp data/dubdrum1.bin data/dubdrum2.bin data/disk9.bin data/disk11.bin data/base/
 echo "Baseline images are in data/base"
 
 # Check the new dispatcher and Multitype: hello from 7/M.
-FRESH=1 DRUM=25 ./mt-run.py >> mk-base.log 2>&1 ||
+./mt-run.py -f -d 25 -m 110 >> mk-base.log 2>&1 ||
     { echo "Multitype check failed, see mk-base.log"; exit 1; }

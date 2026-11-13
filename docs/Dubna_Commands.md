@@ -448,11 +448,11 @@ These work on a job started with `ОТЛ` or `СЛО`.
 
 | Script | Line | What it sends |
 | --- | --- | --- |
-| `BUILD/mt-run.py` | tty25 | empty line, `040489D`, `T`, `A1P` when the spooler asks (`$ORDER`); after a `ПУС`, orders such as `01БП` (`$CONSUBMIT`) |
-| | tty26 | two spaces, `MJPOP`, `7/M`, `ЛИС zone` and an empty line, `СЛА zone,17` or `ПУС zone,17` (`$SUBMIT`), `КАК` or `СЧЕ` (`$POLL`) until the job ends |
-| `BUILD/mt-run.py` with `CARDS` | tty25 | as above, then `01В` (`$CARDORDER`) with the deck in `vu0` |
+| `BUILD/mt-run.py` | tty25 | empty line, `040489D`, `T`, `A1P` when the spooler asks (`-o`); after a `ПУС`, orders such as `01БП` (`-s`) |
+| | tty26 | two spaces, `MJPOP`, `7/M`, `ЛИС zone` and an empty line, `СЛА zone,17` or `ПУС zone,17` (`-q`), `КАК` or `СЧЕ` (`-p`) until the job ends (`-m zone`) |
+| `BUILD/mt-run.py deck` | tty25 | as above, then `01В` (`-r`) with the deck in `vu0` |
 | `BUILD/card-run.ini` | tty25 | the same orders and `01В` from SIMH `send`, console on the terminal |
-| `BUILD/mk-base.sh` | both | `mt-run.py` with `CARDS` (`01В`) for the decks `newbsz` and `newdd`, then `mt-run.py` for hello |
+| `BUILD/mk-base.sh` | both | `mt-run.py deck` (`01В`) for the decks `newbsz` and `newdd`, then `mt-run.py -m 110` for hello |
 
 The 2017 script `expe.ex` (removed) ran `newbsz` and `newdd` with `СЛА` on tty26, after
 taking it as an operator console with `ОР` and giving it back with `REF`.

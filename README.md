@@ -75,8 +75,8 @@ A step-by-step guide for users is [docs/OS_Dubna_Tutorial.md](docs/OS_Dubna_Tuto
 
 This terminal is the operator console; Multitype is on telnet port 4199. Commands and
 replies are described in [docs/Dubna_Commands.md](docs/Dubna_Commands.md).
-`./mt-run.py` boots and runs a job non-interactively (`FRESH=1 SUBMIT=ПУС ./mt-run.py`
-prints the hello job on `output.txt`); `./card-run.sh hello.dub` runs it from a deck of
+`./mt-run.py` boots and runs a job non-interactively (`./mt-run.py -f -d 25 -q -m 110`
+prints the hello job from Multitype on `output.txt`; `./mt-run.py` alone lists the options); `./card-run.sh hello.dub` runs it from a deck of
 punch cards, with a plain SIMH script (`card-run.ini`). How the pieces fit together is described in
 [docs/Boot_Process.md](docs/Boot_Process.md).
 

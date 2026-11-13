@@ -1,23 +1,17 @@
 #!/usr/bin/env python3
-"""Boot OS Dubna and run a job from 7/M through Multitype.
-
-Usage: mt-run.py [zone]     (zone of 7/M, octal, default 110 = hello.dub)
-
-With CARDS=deck the job comes from card reader vu0 instead, started by the
-operator order CARDORDER (01В by default; ПВ puts the deck into the input
-file); the deck ends with a line of six backquotes.
+"""Boot OS Dubna in SIMH and run one job non-interactively.
 
 Starts besm6 with boot-run.ini. The simulator connects tty25 (operator
 console) and tty26 (Multitype) to sockets opened here; both are driven
-with send/expect. Transcripts: mt-run-tty25.txt, mt-run-tty26.txt.
+with send/expect. Transcripts: mt-run-tty25.txt, mt-run-tty26.txt,
+listings: output.txt.
 """
-import os, re, select, shutil, socket, subprocess, sys, time
+import argparse, os, re, select, shutil, socket, subprocess, sys, time
 
-ZONE = sys.argv[1] if len(sys.argv) > 1 else "110"
+A = None                # parsed options
+SLOW = 1                # timeouts are multiplied by it (for traced runs)
 
 # GOST output turns Latin lookalikes into Cyrillic: compare both as Latin.
-# Timeouts are multiplied by SLOW (for traced runs).
-SLOW = float(os.environ.get("SLOW", "1"))
 
 LOOK = str.maketrans("АВЕКМНОРСТХУ", "ABEKMHOPCTXY")
 
@@ -117,10 +111,9 @@ def by_multitype(con, mt):
     mt.send("  ");          mt.expect(r"PASS:")
     mt.send("MJPOP\r");     mt.expect(r"БУФЕР:")
     mt.send("7/M\r");       mt.expect(r"\n {5}")
-    mt.send("ЛИС %s\r" % ZONE)
+    mt.send("ЛИС %s\r" % A.zone)
     mt.expect(r"\*END FILE\n")
-    # Extra Multitype commands before the submit, separated by "|".
-    for cmd in filter(None, os.environ.get("BEFORE", "").split("|")):
+    for cmd in A.before:
         mt.send(cmd + "\r")
         mt.expect(r"\n {5}\S.*\n")
         mt.read(2)
@@ -128,19 +121,17 @@ def by_multitype(con, mt):
     mt.send("\r")
     mt.read(1)
     # СЛА runs the job from the buffer; ПУС puts it into the input queue.
-    submit = os.environ.get("SUBMIT", "СЛА")
-    mt.send("%s %s,17\r" % (submit, ZONE))
+    submit = "ПУС" if A.queue else "СЛА"
+    mt.send("%s %s,17\r" % (submit, A.zone))
     mt.expect(r"\n {5}\S.*\n")
     entry = ""
     if submit == "ПУС":
         entry = mt.expect(r"ВВОДА: (\d+)").group(1)
 
-    # Operator orders after the submit, separated by "|"; {} is the input
-    # file entry of a ПУС job, e.g. "{}БП" starts it at once. They are
-    # repeated every 15 s until the job starts: too early, they are ignored.
-    orders = [c.replace("{}", entry) for c in
-              filter(None, os.environ.get("CONSUBMIT", "").split("|"))]
-    end = time.time() + int(os.environ.get("JOBWAIT", "600")) * SLOW
+    # Orders after the submit are repeated every 15 s until the job
+    # starts: too early, they are ignored.
+    orders = [c.replace("{}", entry) for c in A.consubmit]
+    end = time.time() + A.jobwait * SLOW
     while True:
         for cmd in orders:
             time.sleep(2)
@@ -152,14 +143,13 @@ def by_multitype(con, mt):
         except Fail:
             if time.time() >= end:
                 raise
-    # Extra operator orders after the job starts, separated by "|".
-    for cmd in filter(None, os.environ.get("CONAFTER", "").split("|")):
+    for cmd in A.conafter:
         time.sleep(2)
         con.send(cmd + "\r")
         con.read(3)
     # The job has started, so "НЕТ ЗАДАЧ" means it has ended. A queued job
     # is not shown by КАК (СЧЕ shows all jobs); its listing ends the wait.
-    poll = os.environ.get("POLL", "KAK")
+    poll = A.poll
     while not listing_done():
         mt.send(poll + "\r")
         m = mt.expect(re.escape(poll) + r"\n(.*\n)")
@@ -168,32 +158,112 @@ def by_multitype(con, mt):
         if time.time() >= end:
             raise Fail("the job did not finish")
         time.sleep(0.3)
-    # Extra Multitype commands, separated by "|".
     # An empty command is an empty line (next page, or end of a listing).
-    after = os.environ.get("AFTER")
-    for cmd in after.split("|") if after else []:
+    for cmd in A.after:
         mt.send(cmd + "\r")
         mt.read(3)
     return submit == "ПУС"         # a listing is printed
 
-def by_cards(con, deck):
+def by_cards(con):
     """Start a job from the deck in card reader vu0 (see boot-run.ini)."""
-    wait = int(os.environ.get("JOBWAIT", "600")) * SLOW
-    con.send(os.environ.get("CARDORDER", "01В") + "\r")
+    wait = A.jobwait * SLOW
+    con.send(A.card_order + "\r")
     con.expect(r"Ш\d\d:", wait)
     # The job ends: NNNN-КШnn-time-name.
     con.expect(r"-КШ\d\d-.*\n", wait)
     return True                     # a listing is printed
 
+USAGE = """%(prog)s [options] deck
+       %(prog)s [options] -m zone"""
+
+DESCRIPTION = """Boot OS Dubna in SIMH (boot-run.ini) and run one job without a user.
+The job is a deck of punch cards in reader vu0, started by an operator
+order, or with -m the deck at a zone of the Multitype buffer 7/M (octal;
+110 is hello.dub, written there by put-job.sh), submitted from Multitype."""
+
+EPILOG = """examples:
+  %(prog)s -f -d 25 deck         a deck of cards; it must end with a line
+                                 of six backquotes (see card-run.sh)
+  %(prog)s -f -d 25 -m 110       hello from 7/M through Multitype
+  %(prog)s -f -d 25 -q -m 110    the same, queued, so the listing is printed
+
+Transcripts: mt-run-tty25.txt, mt-run-tty26.txt; listings: output.txt.
+The run ends when the job ends and its listing is printed; the exit
+status is 0 on success."""
+
+def options():
+    p = argparse.ArgumentParser(usage=USAGE, description=DESCRIPTION, epilog=EPILOG,
+                                formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument("cards", nargs="?", metavar="deck",
+                   help="deck of punch cards, a text file, one card per line")
+    p.add_argument("-f", "--fresh", action="store_true",
+                   help="start from the images in data/base")
+    p.add_argument("-d", "--drum", choices=("20", "25"), default="20",
+                   help="boot the dispatcher from drum 20 (default) or the one "
+                        "rebuilt by newdd on drum 25")
+    p.add_argument("-o", "--order", default="A1P", metavar="ORDER",
+                   help="answer to the spooler's paper request (default %(default)s)")
+    g = p.add_argument_group("card job")
+    g.add_argument("-r", "--card-order", default="01В", metavar="ORDER",
+                   help="order that starts it (default %(default)s; ПВ puts "
+                        "the deck into the input file)")
+    g.add_argument("-u", "--updk", action="store_true",
+                   help="punch the deck in the UPDK code (default UPP)")
+    g.add_argument("-v", "--vu-debug", action="store_true",
+                   help="trace the card reader")
+    g = p.add_argument_group("Multitype job")
+    g.add_argument("-m", "--multitype", dest="zone", metavar="ZONE",
+                   help="run the job at ZONE of 7/M instead, octal")
+    g.add_argument("-q", "--queue", action="store_true",
+                   help="submit with ПУС into the input queue, so the listing "
+                        "is printed (default: СЛА, run from the buffer)")
+    g.add_argument("-b", "--before", action="append", default=[], metavar="CMD",
+                   help="Multitype command before the submit (repeatable)")
+    g.add_argument("-s", "--consubmit", action="append", default=[], metavar="ORDER",
+                   help="console order after the submit, repeated until the job "
+                        "starts; {} is the input file entry of a ПУС job, "
+                        "e.g. {}БП (repeatable)")
+    g.add_argument("-n", "--conafter", action="append", default=[], metavar="ORDER",
+                   help="console order after the job starts (repeatable)")
+    g.add_argument("-p", "--poll", default="KAK", metavar="CMD",
+                   help="Multitype command polled until the job ends "
+                        "(default %(default)s; СЧЕ shows all jobs)")
+    g.add_argument("-a", "--after", action="append", default=[], metavar="CMD",
+                   help="Multitype command after the job; an empty one is an "
+                        "empty line (repeatable)")
+    g = p.add_argument_group("limits and debugging")
+    g.add_argument("--jobwait", type=int, default=600, metavar="SEC",
+                   help="limit for the job to start and end (default %(default)s)")
+    g.add_argument("--prnwait", type=int, default=600, metavar="SEC",
+                   help="limit for the listing to be printed (default %(default)s)")
+    g.add_argument("--slow", type=float, default=1, metavar="N",
+                   help="multiply all timeouts by N, for traced runs")
+    g.add_argument("--ini", default="boot-run.ini", metavar="FILE",
+                   help="SIMH script (default %(default)s)")
+    if len(sys.argv) == 1:
+        p.print_help()
+        sys.exit(2)
+    a = p.parse_args()
+    if (a.zone is None) == (a.cards is None):
+        p.error("give either a deck or -m zone")
+    return a
+
 def main():
-    if os.environ.get("FRESH"):
+    global A, SLOW
+    A = options()
+    SLOW = A.slow
+    if A.fresh:
         fresh()
     l25, l26 = listen(), listen()
+    # boot-run.ini takes its parameters from the environment.
     env = dict(os.environ,
                TTY25=str(l25.getsockname()[1]),
-               TTY26=str(l26.getsockname()[1]))
+               TTY26=str(l26.getsockname()[1]),
+               DRUM=A.drum, CARDS=A.cards or "",
+               UPDK="1" if A.updk else "",
+               VUDEBUG="1" if A.vu_debug else "")
     out = open("boot-run.out", "w")
-    sim = subprocess.Popen(["besm6", os.environ.get("INI", "boot-run.ini")], env=env,
+    sim = subprocess.Popen(["besm6", A.ini], env=env,
                            stdin=subprocess.PIPE, stdout=out, stderr=out)
     try:
         con, mt = Line("tty25", l25), Line("tty26", l26)
@@ -208,15 +278,14 @@ def main():
         m = con.expect(r"([\s\S]*?)ПЛАНИРОВЩИК", 40)
         spooler = norm("ДАЙТЕ ПРИКАЗ") in norm(m.group(1))
         if spooler:
-            con.send(os.environ.get("ORDER", "A1P") + "\r")
+            con.send(A.order + "\r")
 
-        cards = os.environ.get("CARDS")
-        if cards:
-            listing = by_cards(con, cards)
+        if A.cards:
+            listing = by_cards(con)
         else:
             listing = by_multitype(con, mt)
         # Wait for the trailer of the listing, if there is a spooler to print it.
-        end = time.time() + int(os.environ.get("PRNWAIT", "600")) * SLOW
+        end = time.time() + A.prnwait * SLOW
         while listing and spooler and not listing_done():
             if time.time() > end:
                 raise Fail("the listing was not printed to the end")

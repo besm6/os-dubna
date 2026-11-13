@@ -325,11 +325,11 @@ again; give the date, time and `A1P` as before. To return to the clean state:
 `mt-run-tty25.txt` and `mt-run-tty26.txt`:
 
 ```sh
-FRESH=1 DRUM=25 SUBMIT=ПУС ./mt-run.py 110
+./mt-run.py -f -d 25 -q -m 110
 ```
 
 It starts from the clean copy, boots, logs in, runs the deck at zone 110 and waits for the
-printout in `output.txt`. Its options are listed at the top of the script.
+printout in `output.txt`. Run `./mt-run.py` without arguments for its options.
 
 `./card-run.sh hello.dub` does the same with a deck of punch cards: it adds the end-of-deck
 card, puts the deck into the reader and gives the order `01В`. It needs no Python: the
