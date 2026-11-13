@@ -17,7 +17,7 @@ operator console back.
 ## Common rules
 
 - **A line ends with CR.** The Consul input register holds one character, so scripts send one
-  character at a time (`mt-run.py` waits 20 ms between them).
+  character at a time (`boot-run.py` waits 20 ms between them).
 - **Lookalike letters.** BESM-6 text mixes Latin and Cyrillic letters that look the same
   (А В Е К М Н О Р С Т Х У). The system treats them as one letter: `KAK` typed in Latin is
   the command `КАК`. Its echo is usually Cyrillic: `A1P` comes back as `А1Р`, `PASS` as `РАSS`.
@@ -34,7 +34,7 @@ operator console back.
 
 ## A typical session
 
-Operator console (tty25), from `BUILD/mt-run-tty25.txt`. `>` marks what is typed.
+Operator console (tty25), from `BUILD/boot-run-tty25.txt`. `>` marks what is typed.
 
 ```
 ОИЯИ. ОС ДУБНА ОТ 11.11.26 М1        banner: DD version and its build date
@@ -53,7 +53,7 @@ Operator console (tty25), from `BUILD/mt-run-tty25.txt`. `>` marks what is typed
 01Ш05:НЕLLО                          a job from the input file starts on Ш05
 ```
 
-Multitype (tty26), from `BUILD/mt-run-tty26.txt`:
+Multitype (tty26), from `BUILD/boot-run-tty26.txt`:
 
 ```
 >␣␣                                  two spaces bind the line to Multitype
@@ -448,11 +448,11 @@ These work on a job started with `ОТЛ` or `СЛО`.
 
 | Script | Line | What it sends |
 | --- | --- | --- |
-| `BUILD/mt-run.py` | tty25 | empty line, `040489D`, `T`, `A1P` when the spooler asks (`-o`); after a `ПУС`, orders such as `01БП` (`-s`) |
+| `BUILD/boot-run.py` | tty25 | empty line, `040489D`, `T`, `A1P` when the spooler asks (`-o`); after a `ПУС`, orders such as `01БП` (`-s`) |
 | | tty26 | two spaces, `MJPOP`, `7/M`, `ЛИС zone` and an empty line, `СЛА zone,17` or `ПУС zone,17` (`-q`), `КАК` or `СЧЕ` (`-p`) until the job ends (`-m zone`) |
-| `BUILD/mt-run.py deck` | tty25 | as above, then `01В` (`-r`) with the deck in `vu0` |
+| `BUILD/boot-run.py deck` | tty25 | as above, then `01В` (`-r`) with the deck in `vu0` |
 | `BUILD/card-run.ini` | tty25 | the same orders and `01В` from SIMH `send`, console on the terminal |
-| `BUILD/mk-base.sh` | both | `mt-run.py deck` (`01В`) for the decks `newbsz` and `newdd`, then `mt-run.py -m 110` for hello |
+| `BUILD/mk-base.sh` | both | `boot-run.py deck` (`01В`) for the decks `newbsz` and `newdd`, then `boot-run.py -m 110` for hello |
 
 The 2017 script `expe.ex` (removed) ran `newbsz` and `newdd` with `СЛА` on tty26, after
 taking it as an operator console with `ОР` and giving it back with `REF`.

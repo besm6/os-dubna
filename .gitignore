@@ -14,7 +14,7 @@ BUILD/cosy/utf2cosy
 BUILD/cosy/utf2iso
 BUILD/*.out
 BUILD/output1.txt
-BUILD/mt-run-*.txt
+BUILD/boot-run-*.txt
 BUILD/*debug*.txt
 BUILD/data/*.pre-t10
 BUILD/runtests.log

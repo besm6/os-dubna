@@ -3,7 +3,7 @@
 
 Starts besm6 with boot-run.ini. The simulator connects tty25 (operator
 console) and tty26 (Multitype) to sockets opened here; both are driven
-with send/expect. Transcripts: mt-run-tty25.txt, mt-run-tty26.txt,
+with send/expect. Transcripts: boot-run-tty25.txt, boot-run-tty26.txt,
 listings: output.txt.
 """
 import argparse, os, re, select, shutil, socket, subprocess, sys, time
@@ -27,7 +27,7 @@ class Line:
         self.listener = listener
         self.sock = None
         self.text = ""          # unread output
-        self.log = open("mt-run-%s.txt" % name, "w")
+        self.log = open("boot-run-%s.txt" % name, "w")
 
     def connect(self, timeout=10):
         """SIMH probes a Connect= address at attach time and hangs up;
@@ -187,7 +187,7 @@ EPILOG = """examples:
   %(prog)s -f -d 25 -m 110       hello from 7/M through Multitype
   %(prog)s -f -d 25 -q -m 110    the same, queued, so the listing is printed
 
-Transcripts: mt-run-tty25.txt, mt-run-tty26.txt; listings: output.txt.
+Transcripts: boot-run-tty25.txt, boot-run-tty26.txt; listings: output.txt.
 The run ends when the job ends and its listing is printed; the exit
 status is 0 on success."""
 

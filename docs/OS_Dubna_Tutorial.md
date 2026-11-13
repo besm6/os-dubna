@@ -321,15 +321,15 @@ again; give the date, time and `A1P` as before. To return to the clean state:
 
 ## 11. Without typing
 
-`mt-run.py` does all of the above by itself and saves the conversation in
-`mt-run-tty25.txt` and `mt-run-tty26.txt`:
+`boot-run.py` does all of the above by itself and saves the conversation in
+`boot-run-tty25.txt` and `boot-run-tty26.txt`:
 
 ```sh
-./mt-run.py -f -d 25 -q -m 110
+./boot-run.py -f -d 25 -q -m 110
 ```
 
 It starts from the clean copy, boots, logs in, runs the deck at zone 110 and waits for the
-printout in `output.txt`. Run `./mt-run.py` without arguments for its options.
+printout in `output.txt`. Run `./boot-run.py` without arguments for its options.
 
 `./card-run.sh hello.dub` does the same with a deck of punch cards: it adds the end-of-deck
 card, puts the deck into the reader and gives the order `01В`. It needs no Python: the

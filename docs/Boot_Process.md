@@ -131,7 +131,7 @@ exchanges from a privileged job.
 ## 4. The rebuild in SIMH
 
 `mk-base.sh` makes fresh images, runs `tra-libs.dub` (jobs `newdd` and `newbsz` into 7/M zones
-100 and 105) and `put-job.sh hello.dub 110`, then boots drum 20 twice through `mt-run.py deck`,
+100 and 105) and `put-job.sh hello.dub 110`, then boots drum 20 twice through `boot-run.py deck`,
 each time with one of these jobs as a deck of punch cards:
 
 1. **`newbsz`** links the standard tasks (compiled under dubna, perso on 11/LINBUF) with the
@@ -143,7 +143,7 @@ The decks are cut out of `tra-libs.dub` and started with the operator order `01�
 needs neither Multitype nor the planner (queued with `ПУС` the jobs had to be pushed with
 `{}БП`: both ask for 24 minutes, and in debug mode, ТР6 bit 6, the planner starts such jobs
 only on Ш01). The images are then saved in `data/base/`. These images are kept in the
-repository, so a user can run the system with the simulator alone. Last, `mt-run.py` boots
+repository, so a user can run the system with the simulator alone. Last, `boot-run.py` boots
 drum 25 and runs hello from 7/M, as a check of the new dispatcher and of Multitype. The
 whole step takes about a minute and a half.
 
@@ -152,16 +152,16 @@ whole step takes about a minute and a half.
 - `besm6 dubna.ini`: the system from drum 25. The terminal is the operator console;
   Multitype is on telnet port 4199 (two spaces, password `MJPOP`, buffer `7/M`). Listings go
   to `output.txt`. The images are changed in place; `cp data/base/*.bin data/` restores them.
-- `./mt-run.py [options] deck`: boots with `boot-run.ini` and runs a deck of punch cards
+- `./boot-run.py [options] deck`: boots with `boot-run.ini` and runs a deck of punch cards
   from reader `vu0`, started by the console order `01В`; the deck ends with a line of six
   backquotes. Python listens on two ports and SIMH dials out to them, so both Consuls are
-  driven by send/expect. `./mt-run.py` alone prints all options: `-f` (start from
+  driven by send/expect. `./boot-run.py` alone prints all options: `-f` (start from
   `data/base`), `-d 25` (boot the rebuilt DD), `-r ПВ` (send the deck through the input
   file), `-u` (punch it in the UPDK code instead of UPP), `-v` (trace the reader).
-- `./mt-run.py [options] -m zone`: the job is the deck at 7/M `zone` (110 is hello),
+- `./boot-run.py [options] -m zone`: the job is the deck at 7/M `zone` (110 is hello),
   submitted from Multitype with `СЛА`, or with `-q` queued with `ПУС`, so it is printed;
   `-b`, `-s`, `-n`, `-p`, `-a` add Multitype commands and console orders.
-- Transcripts go to `mt-run-tty25.txt` and `mt-run-tty26.txt`. The run ends on an event,
+- Transcripts go to `boot-run-tty25.txt` and `boot-run-tty26.txt`. The run ends on an event,
   not on a timer: `НЕТ ЗАДАЧ` for a terminal job, the trailer of the listing
   (`КОНЕЦ ЗАДАЧИ`) in `output.txt` for a queued or card job. `--jobwait` and `--prnwait`
   (600 s each) only bound a run that has gone wrong.
@@ -173,7 +173,7 @@ whole step takes about a minute and a half.
   trailer line of stars in `output.txt`; `on step` and `on error` (with `set on`) make the
   loop, since both the end of a step and a failed `!` command are errors. About 35 seconds.
 
-`./mt-run.py -f -d 25 -q -m 110` checks the whole chain in a little over a minute: hello is compiled, run and printed on `output.txt`.
+`./boot-run.py -f -d 25 -q -m 110` checks the whole chain in a little over a minute: hello is compiled, run and printed on `output.txt`.
 
 Commands and replies on both lines are in [Dubna_Commands.md](Dubna_Commands.md).
 
@@ -185,9 +185,9 @@ Commands and replies on both lines are in [Dubna_Commands.md](Dubna_Commands.md)
 
 - Stop SIMH with `quit`. Killed, it loses buffered writes to the images.
 - SIMH probes a `Connect=` address at attach time and hangs up; the real connection comes
-  later (`mt-run.py` waits for the banner).
+  later (`boot-run.py` waits for the banner).
 - Jobs started with `СЛА` or `RUN` never print: their printer output is blocked. Use `ПУС`.
 - A Multitype listing that fills a page waits for a key; the first character typed after it
   is lost.
 - An operator order like `NNБП` sent before the job is ready for planning is ignored.
-- Each `mt-run.py` run recreates `output.txt` and the transcripts.
+- Each `boot-run.py` run recreates `output.txt` and the transcripts.
