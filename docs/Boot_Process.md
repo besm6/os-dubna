@@ -80,11 +80,15 @@ sections named on the cards, and the monitor page. `INPUTCAL` comes from library
 needs `DATE` and `DTOI` from library 23. `COMTODRU` makes the drum form: catalog entries
 become physical exchanges, the static part moves to the end of drum 22.
 
-The compilers and `WRITLIB*` cannot be on the cards: they exist only as linked static
-sections in the archived image, without perso or sources. So `ms-splice.py` builds the final
-image: everything from the new drums, the static part and its catalog from the archive
-at the old place, and in it the relinked `INPUTCAL` (the same size; six words differ). The
-result goes to tape 203 and to `data/mons9.bin` for `mkdisk9.sh`.
+The compilers and `WRITLIB*` cannot be on the cards: they have no perso. `ALGOL`,
+`A/PRINTM` and `WRITLIB*` exist only as linked static sections in the archived image; the
+Fortran compiler and `ASEMBLER` have Madlen sources in `fortran/`, `asembler/`, and
+`mk-ms-img.sh` first runs `make` there, which links them with `*CALL OVERLAY`. So
+`ms-splice.py` builds the final image: everything from the new drums, the static part and
+its catalog from the archive at the old place, and in it the relinked `INPUTCAL` (the same
+size; six words differ) and the rebuilt `FORTRAN`, `CBDPR`, `CONTROL`, `ENDPRO`, `GLINK`,
+`ASEMBLER` (the same as the archived ones). The result goes to tape 203 and to
+`data/mons9.bin` for `mkdisk9.sh`.
 
 The date in the banner of a listing, `МОНИТОРНАЯ СИСТЕМА 'Д У Б Н А' - 13/11/26`, is
 the date of this assembly; the archived system shows `20/10/88`.

@@ -216,13 +216,19 @@ otherwise zeros repeat. The piece of TRP, if any, comes after the last group: th
 | Resident `MONITOR*`, monitor page, TRP | 35, zone 1 | **compiled** from `besmmons/` |
 | Dynamic part and its catalog | 7–33 | **compiled** from `besmmons/` |
 | Section `INPUTCAL` | 36–43 | relinked from library 21 (binary perso) and the new dynamic modules |
-| Sections `FORTRAN` … `WRITLIB*` | 43–77 | copied from the archived tape |
+| Sections `FORTRAN`, `CBDPR`, `CONTROL`, `ENDPRO`, `GLINK`, `ASEMBLER` | 43–70 | **rebuilt** from the Madlen sources in `fortran/`, `asembler/` |
+| Sections `ALGOL`, `A/PRINTM`, `WRITLIB*` | 70–77 | copied from the archived tape |
 | Loaders and tables | 0, 2–6 | copied from the running system by `COLLECT` |
 | Everything from zone 100 | 100–437 | the archived tape |
 
-The compilers and `WRITLIB*` cannot be rebuilt: the archive has neither their sources nor
-their perso, only the linked sections. The dynamic loader has a source
-(`besmtask/loader.txt`, compiled to tape 100) but it is not yet put into the image.
+`ALGOL`, `A/PRINTM` and `WRITLIB*` cannot be rebuilt: the archive has neither their sources
+nor their perso, only the linked sections. The Fortran compiler and the assembler were
+taken apart from the linked sections into Madlen sources (`fortran/`, `asembler/`); `make`
+there links them with `*CALL OVERLAY` (`tools/dubovl.pl`) into images identical to the
+archived ones. They have no perso either, so `COLLECT` cannot link them (whatever is in the
+job's temporary library becomes the dynamic part); `ms-splice.py` puts the images in. The
+dynamic loader has a source (`besmtask/loader.txt`, compiled to tape 100) but it is not yet
+put into the image.
 
 ### Step 1: compile — `BUILD/mk-ms-src.sh`
 
@@ -283,7 +289,13 @@ Tape 202 now is a correct MS with one static section. The script makes the final
 3. the static part from the archived tape, at the old place;
 4. each section that `COLLECT` relinked replaces the old one if it takes the same number
    of records (`INPUTCAL`: 181 records, six words differ from the old);
-5. in zone 1 the old static catalog and the old word 1377; the gap in the root entry is
+5. each section given on the command line as `NAME=image` (`mk-ms-img.sh` gives `FORTRAN`,
+   `CBDPR`, `CONTROL`, `ENDPRO`, `GLINK`, `ASEMBLER` from `make` in `../fortran`,
+   `../asembler`) replaces the old one: it keeps the old 8 header words (places on the
+   drums) and the old piece of TRP, is packed as the original packer did (an unchanged
+   image gives the old bytes) and must have the old length and fit into the old records,
+   since the catalog stays the old one;
+6. in zone 1 the old static catalog and the old word 1377; the gap in the root entry is
    computed anew.
 
 It stops if the dynamic part grows past zone 34. The result is written twice: tape 203
@@ -308,8 +320,8 @@ It stops if the dynamic part grows past zone 34. The result is written twice: ta
 - The resident must keep its addresses. If `MONITOR*` changes size, the old sections
   (linked from 1604) and the addresses pinned in `BUILD/deck-b1/fix-aux.s` no longer fit.
 - The room is tight: 64 zones, of which the static part takes 34 and the dynamic part 19.
-- No compiler is rebuilt. The job `hello` uses `*FORTRAN`, the section `FORTRAN` of the
-  static part (banner `Ф О Р Т Р А Н /16.07.73/`); `*FTN` calls Fortran-GDR from zone 100,
-  `*MADLEN` the assembler from library 22. All three are archived binaries. What such jobs
-  exercise in the rebuilt MS is the resident, `STAR*`, `INPUTCAL`, the catalogs, the
-  spliced static part and the runtime library.
+- The job `hello` uses `*FORTRAN`, the section `FORTRAN` of the static part (banner
+  `Ф О Р Т Р А Н /16.07.73/`), rebuilt from `fortran/`; `*FTN` calls Fortran-GDR from zone
+  100, `*MADLEN` the assembler from library 22, both archived binaries. A change in
+  `fortran/` or `asembler/` reaches the image only if the section keeps its length and its
+  records; a longer one needs a new static catalog, which `ms-splice.py` does not make.

@@ -26,14 +26,14 @@ Terminology used everywhere:
   (DD, MS, Madlen/loader/system tasks, library 21, library 23). Large files are split into sections.
 - `dub_besm/` — the same DD and MS texts as single files, for reference only.
 - `monsys/`, `lib12/`, `lib37/` — original binary tape images (9/MONSYS, 12/LIBRAR, 37/LIBRAR).
-  The libraries and the compilers inside 9/MONSYS are used as binaries; the rest of MS is
-  rebuilt from `besmmons/`.
+  The libraries and the compilers inside 9/MONSYS are used as binaries (except FORTRAN and
+  ASEMBLER, below); the rest of MS is rebuilt from `besmmons/`.
 - `fortran/`, `asembler/`, `tools/` — the Fortran compiler of 9/MONSYS (overlays `FORTRAN`, `CBDPR`,
   `CONTROL`, `ENDPRO`, `GLINK`) as Madlen sources, rebuilt identical to the tape by `make` in
   `fortran/` (dubna, `tools/dubovl.pl`); `asembler/` the same for the overlay `ASEMBLER`, which
   shares modules with `GLINK`; `tools/` the helpers, `ovsplit.py` among them (`make asm`
-  regenerates the modules made from the disassembly). Not part of the bootstrap: the compilers
-  stay binary there.
+  regenerates the modules made from the disassembly). `BUILD/mk-ms-img.sh` runs `make` in both
+  and puts the sections into the rebuilt 9/MONSYS.
 - `drums/` — drum images with hardware tests; `d_besm6/` — miscellaneous old files, not used by the build.
 - `tapes/1200`, `jobs/monsys.b6` — MS sources as a tape image and the job that compiles them.
 - `BUILD/` — everything needed for the bootstrap (see below).
@@ -81,9 +81,9 @@ cd BUILD && ./bootstrap.sh
 ```
 
 Requirements: `dubna` and `besmtool` on PATH, SIMH `besm6` on PATH built from branch
-`master` of simh-besm6 (`set cpu mem=128`, `set cpu ext32`), Python 3. `dubna` must be recent
-enough to grow tape images on write, tag the words it writes and do sector exchanges with
-disks (November 2026).
+`master` of simh-besm6 (`set cpu mem=128`, `set cpu ext32`), Python 3, perl and a C compiler
+(for `fortran/`, `asembler/`). `dubna` must be recent enough to grow tape images on write,
+tag the words it writes and do sector exchanges with disks (November 2026).
 
 The scripts read and write tape images in `BUILD/tapes/` (ignored by git), named by tape
 number. `BUILD/env.sh`, sourced by every script, sets `TAPES` and exports `BESM6_PATH` so
@@ -100,8 +100,9 @@ Pipeline in `bootstrap.sh`:
    `mk-ms-img.sh` then assembles the MS: `COLLECT` and `COMTODRU` (library 21) link the
    perso of tape 200 into a copy of drums 21, 22, and `ms-splice.py` puts it into a copy of
    9/MONSYS (tape 203, `data/mons9.bin`), keeping the old static sections of the compilers,
-   which have no perso. `ms-check.sh` compares tape 200 with the archived library: only
-   `CHKBEG*` and `EDIT***` differ in size.
+   which have no perso, except FORTRAN (with its phases) and ASEMBLER, rebuilt by `make` in
+   `fortran/` and `asembler/` (`ms-ftn.list`, `ms-asm.list`). `ms-check.sh` compares tape 200
+   with the archived library: only `CHKBEG*` and `EDIT***` differ in size.
 3. `data/mkdisk9.sh`, `data/mkdisk11.sh`, `data/mkbridges.sh` — concatenate catalog + contents
    + padding into SIMH disk images and symlink them into `BUILD/tapes` as bridge tapes.
 4. `deck-b1/mk-deck-b1.sh` — emit the patch deck job (config + fixes for SIMH), then run

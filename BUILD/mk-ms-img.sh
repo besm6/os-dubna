@@ -3,7 +3,9 @@
 # COLLECT links the resident, the dynamic part and the static section
 # INPUTCAL onto tape 201; COMTODRU turns that into a working copy of
 # drums 21, 22 on tape 202.  The compilers have no perso: ms-splice.py
-# takes their static sections from the archived 9/MONSYS.
+# takes their static sections from the archived 9/MONSYS, except FORTRAN
+# (with CBDPR, CONTROL, ENDPRO, GLINK) and ASEMBLER, which are rebuilt
+# from their Madlen sources by make in ../fortran and ../asembler.
 # Result: tape 203, a 9/MONSYS with the rebuilt MS; tape 922, the same
 # from zone 40 (drum 22); data/mons9.bin for the disk image.
 . ./env.sh
@@ -32,6 +34,14 @@ if ! grep -q 'MOHИTOP HA' ms-img.list || grep -q 'OTCYTCTBYET\|MAЛO MЛ' ms-im
     echo "MS image failed, see ms-img.list"
     exit 1
 fi
-./ms-splice.py $TAPES/202 $TAPES/9 $TAPES/9 $TAPES/203 &&
-./ms-splice.py $TAPES/202 $TAPES/9 data/mons9.d9 data/mons9.bin || exit 1
+if ! make -C ../fortran > ms-ftn.list 2>&1 || ! make -C ../asembler > ms-asm.list 2>&1; then
+    echo "FORTRAN or ASEMBLER failed, see ms-ftn.list, ms-asm.list"
+    exit 1
+fi
+F=../fortran A=../asembler
+SECTIONS="FORTRAN=$F/fortran.silver.bin CBDPR=$F/cbdpr.silver.bin
+    CONTROL=$F/control.silver.bin ENDPRO=$F/endpro.silver.bin
+    GLINK=$F/glink.silver.bin ASEMBLER=$A/asembler.silver.bin"
+./ms-splice.py $TAPES/202 $TAPES/9 $TAPES/9 $TAPES/203 $SECTIONS &&
+./ms-splice.py $TAPES/202 $TAPES/9 data/mons9.d9 data/mons9.bin $SECTIONS || exit 1
 { head -c $((8256*4)) $TAPES/203; dd if=$TAPES/203 bs=8256 skip=36 status=none; } > $TAPES/922
