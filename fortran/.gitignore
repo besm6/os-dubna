@@ -1,0 +1,11 @@
+# the images (from the tape and from the build) and the products of the build
+*.bin
+*.ovl
+*.dis
+*.be
+*.errnum
+*.out
+build.lst
+lib.lst
+dubovl.dub
+__pycache__/

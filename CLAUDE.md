@@ -28,6 +28,12 @@ Terminology used everywhere:
 - `monsys/`, `lib12/`, `lib37/` — original binary tape images (9/MONSYS, 12/LIBRAR, 37/LIBRAR).
   The libraries and the compilers inside 9/MONSYS are used as binaries; the rest of MS is
   rebuilt from `besmmons/`.
+- `fortran/`, `asembler/`, `tools/` — the Fortran compiler of 9/MONSYS (overlays `FORTRAN`, `CBDPR`,
+  `CONTROL`, `ENDPRO`, `GLINK`) as Madlen sources, rebuilt identical to the tape by `make` in
+  `fortran/` (dubna, `tools/dubovl.pl`); `asembler/` the same for the overlay `ASEMBLER`, which
+  shares modules with `GLINK`; `tools/` the helpers, `ovsplit.py` among them (`make asm`
+  regenerates the modules made from the disassembly). Not part of the bootstrap: the compilers
+  stay binary there.
 - `drums/` — drum images with hardware tests; `d_besm6/` — miscellaneous old files, not used by the build.
 - `tapes/1200`, `jobs/monsys.b6` — MS sources as a tape image and the job that compiles them.
 - `BUILD/` — everything needed for the bootstrap (see below).

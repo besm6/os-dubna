@@ -121,4 +121,18 @@ Note: it is the same as dub_besm/dumba.ms
 
 	monsys/monsys.9 - the real image of  monsys-9 (layout: docs/Monsys9_Tape.md)
 
+# fortran/, asembler/, tools/ - the Fortran compiler and the assembler of 9/MONSYS as Madlen sources
+
+	fortran/Makefile      - make: rebuild FORTRAN, CBDPR, CONTROL, ENDPRO, GLINK, compare with the tape
+	fortran/*.asm         - the modules of the compiler
+	fortran/*.layout.py   - the layout of each overlay (for tools/ovsplit.py)
+	asembler/Makefile     - make: rebuild ASEMBLER, compare with the tape
+	asembler/*.asm        - the modules of the assembler (some shared with GLINK)
+	asembler/*.layout.py  - its layout
+	tools/dubovl.pl       - link Madlen files into static overlays in the dubna emulator
+	tools/ovl2bin.c       - expand an overlay of the catalog into an image
+	tools/ovsplit.py      - cut an overlay into modules by its layout (make asm)
+	tools/debemsh.sh      - assemble a module with BEMSH and list it with DTRAN (dispak)
+	tools/degak.py, cosy2txt.cpp - helpers of debemsh.sh
+
 # END

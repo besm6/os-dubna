@@ -1,0 +1,4 @@
+ovl2bin
+cosy2txt
+*.o
+__pycache__/
