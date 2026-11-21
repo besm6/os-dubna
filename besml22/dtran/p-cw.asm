@@ -1,0 +1,7 @@
+ P/CW:,NAME,DTRAN  /01.06.84/
+ P/PF:,SUBP,
+ ,NTR,3
+ 12,WTC,
+ ,ATX,
+ ,UJ,P/PF
+ ,END,

@@ -1,0 +1,113 @@
+ FORIN:,NAME,DTRAN  /01.06.84/
+ *ASP2*:,LC,429
+C     *ASP2*:LC,BLOCK,GAK/1(0)
+ GAK/2:,EQU,*ASP2*+0
+C     ,CONT,GAK/2(424)
+ GAK/3:,EQU,*ASP2*+424
+C     ,CONT,GAK/3
+ GAK/4:,EQU,*ASP2*+425
+C     ,CONT,GAK/4(4)
+ *ASP6*:,LC,5
+C     *ASP6*:LC,BLOCK,GAK/5
+ GAK/6:,EQU,*ASP6*+1
+C     ,CONT,GAK/6(4)
+ GAL/1:,EQU,GAK/6-1
+ *0000B:8,VTM,*0000B
+ 8,XTA,55B
+ ,ATI,9
+ 8,XTA,56B
+ ,ATI,10
+ 9,UTM,-1
+ ,UTC,GAK/2.*ASP2*+0
+ ,XTA,
+ 8,AAX,62B
+ 10,ASN,64
+ 8,ATX,61B
+ 10,UTM,10B
+ 9,UTC,
+ 8,XTA,46B
+ ,UTC,GAK/3.*ASP2*+424
+ ,AAX,
+ 8,AOX,61B
+ ,UTC,GAK/3.*ASP2*+424
+ ,ATX,
+ :,ITA,9
+ 8,ATX,55B
+ ,ITA,10
+ 8,ATX,56B
+ 13,UJ,
+C===========================================
+ FORNUM:,ENTRY,
+C===========================================
+ 8,VTM,*0000B
+ ,RTE,77B
+ 8,ATX,61B
+ ,NTR,3
+ ,UTC,GAK/2.*ASP2*+0
+ ,XTA,
+ 8,AAX,63B
+ 8,ATX,61B
+ ,UTC,GAK/4.*ASP2*+425
+ ,XTA,
+ 8,A*X,64B
+ ,YTA,100B
+ 8,A+X,61B
+ ,UTC,GAK/4.*ASP2*+425
+ ,ATX,
+ 8,XTR,61B
+ 13,UJ,
+C===========================================
+ FORBEG:,ENTRY,
+C===========================================
+ 8,VTM,*0000B
+ 8,XTA,65B
+ 8,ATX,55B
+ 8,XTA,66B
+ 8,ATX,56B
+ 8,XTA,54B
+ ,UTC,GAK/3.*ASP2*+424
+ ,ATX,
+ 13,UJ,
+C===========================================
+ OCTDEC:,ENTRY,
+C===========================================
+ 8,VTM,*0000B
+ ,RTE,77B
+ 8,ATX,61B
+ ,NTR,3
+ 11,VTM,3
+ ,UTC,GAK/4.*ASP2*+425
+ ,XTA,
+ *0037B:8,A*X,67B
+ ,UTC,GAK/4.*ASP2*+425
+ ,ATX,
+ ,YTA,100B
+ 8,A*X,64B
+ 8,AOX,70B
+ ,UTC,GAL/1.GAK/6-1
+ 11,ATX,
+ 11,UTM,-1
+ ,UTC,GAK/4.*ASP2*+425
+ ,XTA,
+ 11,V1M,*0037B
+ ,OCT,4027 0061 67
+ ,OCT,7777 7777 7777 74
+ ,LOG,7777 7777 7760 0377
+ ,LOG,7777 7777 0017 7777
+ ,LOG,7777 7400 7777 7777
+ ,LOG,7760 0377 7777 7777
+ ,LOG,17 7777 7777 7777
+ ,OCT,2004 0100 2004 01
+ ,LOG,6
+ ,OCT,7777 7777 7777 773
+ ,LOG,
+ ,LOG,
+ ,LOG,
+ ,LOG,377
+ ,LOG,7760 0000 0000 0017
+ ,LOG,4000 0000 0000 0012
+ ,LOG,6
+ ,OCT,7777 7777 7777 773
+ ,LOG,4001 4631 4631 4632
+ ,LOG,120
+ ,END,

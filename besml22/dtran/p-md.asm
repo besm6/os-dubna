@@ -1,0 +1,16 @@
+ P/MD:,NAME,DTRAN  /01.06.84/
+ ,NTR,
+ ,AVX,
+ 15,STX,1
+ ,AVX,
+ 15,ATX,1
+ 15,A/X,2
+ ,NTR,3
+ 1,A+X,11B
+ ,NTR,
+ 15,A*X,2
+ 15,X-A,1
+ ,NTR,3
+ 1,A+X,11B
+ 13,UJ,
+ ,END,

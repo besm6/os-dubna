@@ -1,0 +1,4 @@
+ P/EO:,NAME,DTRAN  /01.06.84/
+ 12,XTA,2
+ 13,UJ,
+ ,END,

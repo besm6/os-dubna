@@ -1,0 +1,5 @@
+ BЬIN:,NAME,DTRAN  /01.06.84/
+ ЬINЬ:,SUBP,
+ 14,VTM,
+ ,UJ,ЬINЬ
+ ,END,

@@ -1,0 +1,12 @@
+ BЬNT:,NAME,DTRAN  /01.06.84/
+ ЬCRЬ:,SUBP,
+ ЬЗПЬ:,SUBP,
+ GAK/4:,EQU,ЬЗПЬ+1
+ 14,VTM,1
+ 8,VJM,ЬCRЬ
+ 8,AEX,2
+ ,UJ,ЬЗПЬ
+ 8,AEX,2
+ ,UJ,GAK/4.ЬЗПЬ+1
+ ,LOG,7777 7777 7777 7777
+ ,END,

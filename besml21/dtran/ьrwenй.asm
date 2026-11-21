@@ -1,0 +1,4 @@
+ ЬRWENЙ:,NAME,DTRAN  /01.06.84/
+ SRWEND*:,SUBP,
+ ,UJ,SRWEND*
+ ,END,

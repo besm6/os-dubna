@@ -1,0 +1,7 @@
+ P/TR:,NAME,DTRAN  /01.06.84/
+ ,NTR,3
+ 15,ATX,
+ 1,AMX,11B
+ 15,AVX,
+ 13,UJ,
+ ,END,

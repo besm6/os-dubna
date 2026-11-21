@@ -1,0 +1,32 @@
+ ЬPRINЙ:,NAME,DTRAN  /01.06.84/
+ *ЬIOCBЙ*:,LC,34
+ GAK/2:,EQU,*ЬIOCBЙ*+8
+ GAK/3:,EQU,*ЬIOCBЙ*+32
+ ЬEXECЙ:,SUBP,
+ ЬINOFЙ:,SUBP,
+ PRINT8:,SUBP,
+ GAL/0:,EQU,ЬEXECЙ+2
+ *0000B:8,VTM,*0000B
+ 8,XTA,11B
+ ,UTC,GAK/2
+ ,ATX,
+ 10,VTM,*0005B
+ ,ITA,10
+ ,UTC,GAL/0
+ ,ATX,
+ 8,XTS,12B
+ ,UJ,ЬINOFЙ
+C===========================================
+ ЬPRЙ:,ENTRY,
+C===========================================
+ *0005B:,UTC,GAK/3
+ ,WTC,
+ 9,VTM,
+ ,ITS,9
+ 9,UTM,27B
+ ,ITS,9
+ ,XTS,
+ ,UJ,PRINT8
+ ,OCT,2405 1111 2345 204
+ ,INT,-3
+ ,END,

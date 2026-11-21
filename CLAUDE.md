@@ -24,10 +24,13 @@ Terminology used everywhere:
 
 - `besmdisp/`, `besmmons/`, `besmtask/`, `besml21/`, `besml23/` — the source texts fed to the build
   (DD, MS, Madlen/loader/system tasks, library 21, library 23). Large files are split into sections.
+  `besml21/dtran/`, `besml22/dtran/`, `besml23/dtran/` hold the library modules that have no
+  source, disassembled by DTRAN (`BUILD/dtran.py`, not part of the build; `NAME.dtr` lists its
+  `OCT:` directives; in file names `*` is `%`, `/` is `-`).
 - `dub_besm/` — the same DD and MS texts as single files, for reference only.
 - `monsys/`, `lib12/`, `lib37/` — original binary tape images (9/MONSYS, 12/LIBRAR, 37/LIBRAR).
-  The libraries and the compilers inside 9/MONSYS are used as binaries (except FORTRAN,
-  ASEMBLER and WRITLIB*, below); the rest of MS is rebuilt from `besmmons/`.
+  12/LIBRAR, 37/LIBRAR and the compilers inside 9/MONSYS are used as binaries (except FORTRAN,
+  ASEMBLER and WRITLIB*, below); the rest of MS and libraries 21, 22, 23 are rebuilt.
 - `fortran/`, `asembler/`, `tools/` — the Fortran compiler of 9/MONSYS (overlays `FORTRAN`, `CBDPR`,
   `CONTROL`, `ENDPRO`, `GLINK`) as Madlen sources, rebuilt identical to the tape by `make` in
   `fortran/` (dubna, `tools/dubovl.pl`); `asembler/` the same for the overlay `ASEMBLER`, which
@@ -80,7 +83,7 @@ Terminology used everywhere:
 
 The top-level `Makefile` wraps it: `make run` (copy `BUILD/data/base` into `BUILD/data`
 where newer, `besm6 dubna.ini`), `make rebuild` (`bootstrap.sh`), `make check`
-(`fortran/`, `asembler/` GOOD, `BUILD/ld-check.py`, `ms-check.sh`, a Multitype hello
+(`fortran/`, `asembler/` GOOD, `BUILD/ld-check.py`, `ms-check.sh`, `lib-check.sh`, a Multitype hello
 with `boot-run.py -f -d 25 -m 110`), `make clean`.
 
 Run from `BUILD/`; scripts use relative paths and must be started in their own directory:
@@ -104,8 +107,12 @@ Pipeline in `bootstrap.sh`:
 2. `mk-dd-src.sh`, `mk-ms-src.sh`, `mk-stl-src.sh`, `mk-ld-src.sh` — each one runs a dubna
    job through `run_src_job` (`env.sh`): the sources, concatenated, are mounted as a local
    file on unit 50, copied by the editor to the target tape from zone 100 and compiled to
-   zones 0-77. `mk-lib21-src.sh`, `mk-lib23-src.sh`, `mk-exfor-src.sh` follow the same
-   pattern but are not called by the bootstrap.
+   zones 0-77. `mk-exfor-src.sh` follows the same pattern but is not called by the bootstrap.
+   `mk-lib21-src.sh`, `mk-lib22-src.sh`, `mk-lib23-src.sh` compile libraries 21, 22, 23 the
+   same way (tapes 221-223; `unitcut.py` drops units that are not in them, as `*EXCLUDE`
+   would drop the module EXCLUDE too), and `mk-libs.sh` packs them with `CRELIB` into tapes
+   251-253 and compares them with the archived ones (`lib-check.sh`, `libcat.py cmp`: all
+   modules and entries, only `*DRIVER*` and `W1LOOK` of other length).
    `mk-ld-img.sh` makes the memory image of the dynamic loader on tape 101, as
    `besmtask/loadload.txt` did (identical to the archived one, see `docs/Dynamic_Loader.md`).
    `mk-ms-img.sh` then assembles the MS: `COLLECT` and `COMTODRU` (library 21) link the
@@ -113,7 +120,8 @@ Pipeline in `bootstrap.sh`:
    ASEMBLER and WRITLIB*, whose modules four jobs put into perso on tapes 241-244 (cards
    `FORTRAN:41,42`, `ASEMBLER:43`, `WRITLIB*:44`), and `ms-splice.py` puts it into a copy
    of 9/MONSYS (tape 203, `data/mons9.bin`) with the loader of tape 101, keeping the old
-   static sections of the other compilers.
+   static sections of the other compilers; `lib-splice.py` puts in the libraries of tapes
+   251-253. The build itself keeps using the archived libraries of tape 9.
    `ms-check.sh` compares tape 200 with the archived library:
    only `CHKBEG*` and `EDIT***` differ in size.
 3. `data/mkdisk9.sh`, `data/mkdisk11.sh`, `data/mkbridges.sh` — concatenate catalog + contents
@@ -156,9 +164,9 @@ their thousands digit (1400 → 400).
 | --- | --- |
 | 9, 12, 37 | original images: monsys, librar-12, librar-37 |
 | 100-199 | compilers (100 loader, 101 loader image) |
-| 200-399 | MS and libraries (200 MS, 201 COLLECT output, 202 MS drums, 203 9/MONSYS with the rebuilt MS, 221 lib21, 223 lib23, 241-244 perso of the Fortran compiler, ASEMBLER and the root of WRITLIB*, 247 tasks, 301 exfor) |
+| 200-399 | MS and libraries (200 MS, 201 COLLECT output, 202 MS drums, 203 9/MONSYS with the rebuilt MS, 221-223 perso of libraries 21-23, 241-244 perso of the Fortran compiler, ASEMBLER and the root of WRITLIB*, 247 tasks, 251-253 packed libraries 21-23, 301 exfor) |
 | 400-899 | DD (400) |
-| 900-999 | scratch (922 tape 203 from zone 40: MS drum 22, 990 DD perso, 999 linked DD with the system) |
+| 900-999 | scratch (922 tape 203 from zone 40: MS drum 22, 951-953, 960, 961 `dtran.py`, 990 DD perso, 999 linked DD with the system) |
 | 209, 211, 224 | bridge tapes dubna/SIMH: symlinks to disks 9, 11, 24 |
 
 ## Job files and sources

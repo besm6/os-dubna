@@ -1,0 +1,10 @@
+ P/DI:,NAME,DTRAN  /01.06.84/
+ ,NTR,
+ ,AVX,
+ 15,STX,1
+ ,AVX,
+ 15,A/X,2
+ ,NTR,3
+ 1,A+X,11B
+ 13,UJ,
+ ,END,

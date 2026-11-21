@@ -1,0 +1,43 @@
+ P/MF:,NAME,DTRAN  /01.06.84/
+ P/STACK:,LC,1
+ 1,ATX,3
+ ,ITA,15
+ ,XTS,17B
+ ,UTC,*0023B.=:7777 7777 777
+ ,AAX,
+ 15,AOX,
+ ,ATX,17B
+ 9,VTM,P/STACK
+ 1,XTA,1
+ 9,WTC,
+ ,ATX,13B
+ 9,WTC,
+ ,WTC,
+ 15,VTM,
+ 9,XTA,
+ ,UTC,*0022B.=7777 7777 7767 7777
+ ,AAX,
+ 9,ATX,
+ 1,XTA,3
+ 13,UJ,
+C===========================================
+ P/FM:,ENTRY,
+C===========================================
+ 1,ATX,3
+ ,WTC,17B
+ 15,VTM,
+ 9,VTM,P/STACK
+ 9,XTA,
+ ,UTC,*0021B.=10 0000
+ ,AOX,
+ 9,ATX,
+ ,WTC,P/STACK
+ ,XTA,13B
+ 1,ATX,1
+ 1,XTA,3
+ ,NTR,3
+ 13,UJ,
+ *0021B:,LOG,10 0000
+ *0022B:,LOG,7777 7777 7767 7777
+ *0023B:,OCT,7777 7777 777
+ ,END,

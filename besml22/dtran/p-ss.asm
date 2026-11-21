@@ -1,0 +1,6 @@
+ P/SS:,NAME,DTRAN  /01.06.84/
+ ,ATI,14
+ 1,XTA,25B
+ 14,ASN,64
+ 13,UJ,
+ ,END,

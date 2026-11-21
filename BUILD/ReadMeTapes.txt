@@ -76,13 +76,15 @@
 201 - MS: common library written by COLLECT
 202 - MS: working copy of drums 21, 22 written by COMTODRU
 203 - 9/MONSYS with the rebuilt MS (ms-splice.py), see docs/Monsys9_Tape.md
-221 - libra21 
-223 - libra23
+221 - library 21: perso of besml21/ and besml21/dtran/ (mk-lib21-src.sh)
+222 - library 22: perso of besmtask/madlen.txt and besml22/dtran/ (mk-lib22-src.sh)
+223 - library 23: perso of besml23/ and besml23/dtran/ (mk-lib23-src.sh)
 241 - perso of FORTRAN, CBDPR (mk-ms-img.sh, unit 41 for COLLECT)
 242 - perso of CONTROL, ENDPRO, GLINK (unit 42)
 243 - perso of ASEMBLER (unit 43)
 244 - perso of the root of WRITLIB* (unit 44)
 247 - task11+task47 (compilation in FOREX)
+251-253 - libraries 21, 22, 23 packed by CRELIB (mk-libs.sh), spliced into 203
 301 - exfor - not used (partial source code)
 
 ## 400-899 OS Dubna Dispatcher (DD)
@@ -91,6 +93,8 @@
 
 ## 900-999 Temp/Scratch tapes
 922 - tape 203 from zone 40: MS drum 22 for the link job
+951-953 - plain copies of libraries 21-23 of tape 9 for DTRAN (dtran.py)
+960, 961 - dtran.py: DTRAN text, perso of the assembled text
 990 - DD perso for linking
 999 - DD with the system, cut into drum images
 

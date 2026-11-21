@@ -1,0 +1,7 @@
+ P/LV:,NAME,DTRAN  /01.06.84/
+ P/BX:,SUBP,
+ P/EN:,SUBP,
+ 11,VJM,P/BX
+ 13,VJM,P/EN
+ 14,UJ,
+ ,END,

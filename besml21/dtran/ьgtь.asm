@@ -1,0 +1,10 @@
+ ЬGTЬ:,NAME,DTRAN  /01.06.84/
+ ЬCMЬ:,SUBP,
+ ЬCPABЬ:,SUBP,
+ ЬLTЬ:,SUBP,
+ 8,VTM,ЬCMЬ
+ 14,VJM,ЬCPABЬ
+ ,BSS,2
+ ,ATX,
+ ,Z00,ЬLTЬ
+ ,END,

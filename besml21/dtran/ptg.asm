@@ -1,0 +1,4 @@
+ PTG:,NAME,DTRAN  /01.06.84/
+ PTG/G:,SUBP,
+ ,UJ,PTG/G
+ ,END,

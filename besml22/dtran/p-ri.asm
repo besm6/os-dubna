@@ -1,0 +1,5 @@
+ P/RI:,NAME,DTRAN  /01.06.84/
+ P/GD:,SUBP,
+ ,*62,
+ ,UJ,P/GD
+ ,END,

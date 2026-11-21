@@ -24,6 +24,12 @@ Note:  it the same as dub_besm/dubna.dd
 	besml21/libra211.l21  - library 21 in sections
 	besml21/libra212.l21  - library 21 in sections
 	besml21/libra213.l21  - library 21 in sections
+	besml21/dtran/*.asm   - modules of library 21 without sources, disassembled by DTRAN
+	                        (BUILD/dtran.py; NAME.dtr: its OCT directives)
+
+# besml22/  - library 22 (Madlen is besmtask/madlen.txt)
+
+	besml22/dtran/*.asm   - the other modules of library 22, disassembled by DTRAN
 
 # besml23/  - the sources of library 23
 
@@ -38,6 +44,8 @@ Note:  it the same as dub_besm/dubna.dd
 	besml23/lib23v.l23	 - library 23 
 
 	besml23/microb.mas
+
+	besml23/dtran/*.asm   - LASCII, MAK*TRT, PRINTER, SERVER, disassembled by DTRAN
 
 # besmmons/ - MS Dubna in sections
 

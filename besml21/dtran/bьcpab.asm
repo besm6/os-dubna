@@ -1,0 +1,5 @@
+ BЬCPAB:,NAME,DTRAN  /01.06.84/
+ ЬCPABЬ:,SUBP,
+ 14,VTM,
+ ,UJ,ЬCPABЬ
+ ,END,

@@ -1,0 +1,5 @@
+ CЬNE:,NAME,DTRAN  /01.06.84/
+ CЬCPAB:,SUBP,
+ 12,Z31,CЬCPAB
+ 6,UJ,
+ ,END,

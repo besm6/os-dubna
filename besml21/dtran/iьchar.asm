@@ -1,0 +1,9 @@
+ IЬCHAR:,NAME,DTRAN  /01.06.84/
+ ЬLIBCЬ:,SUBP,
+ ЬЦ0Ь:,SUBP,
+ 13,MTJ,12
+ 13,VJM,ЬLIBCЬ
+ ,ASN,64+40
+ ,UTC,ЬЦ0Ь
+ ,OCT,0012 0000 63
+ ,END,

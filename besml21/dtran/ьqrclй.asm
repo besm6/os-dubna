@@ -1,0 +1,33 @@
+ ЬQRCLЙ:,NAME,DTRAN  /01.06.84/
+ *ЬIOCBЙ*:,LC,34
+C     *ЬIOCBЙ*:LC,BLOCK,GAK/1(28)
+ GAK/2:,EQU,*ЬIOCBЙ*+28
+C     ,CONT,GAK/2(6)
+ *0000B:7,MTJ,8
+ 9,VJM,*0010B
+ ,WTC,GAK/2.*ЬIOCBЙ*+28
+ 6,VTM,
+ 6,XTA,
+ ,ASN,64+26
+ 7,111,1
+ 7,115,2
+ ,WTC,*0016B
+ ,ATX,
+ ,STI,
+ ,STI,13
+ ,STI,6
+ ,STI,7
+ ,NTR,6
+ 13,UJ,
+ *0010B:7,VTM,*0000B+10013B
+ 7,101,3
+ ,ITS,8
+ ,ITS,6
+ ,ITS,13
+ ,ITS,
+ 9,UJ,
+ ,ATX,
+ ,LOG,7 7777
+ ,INT,0
+ *0016B:,BSS,1
+ ,END,

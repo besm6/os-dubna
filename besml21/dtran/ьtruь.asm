@@ -1,0 +1,3 @@
+ ЬTRUЬ:,NAME,DTRAN  /01.06.84/
+ ,OCT,002
+ ,END,

@@ -24,3 +24,4 @@ BUILD/data/CAMdrum20.bin
 BUILD/card-run.deck
 BUILD/*.tap
 BUILD/boot-check.log
+BUILD/__pycache__/

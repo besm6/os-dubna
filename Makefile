@@ -22,7 +22,7 @@ rebuild:
 	cd BUILD && ./bootstrap.sh
 
 # FORTRAN, ASEMBLER, WRITLIB* and the loader equal the archived ones, the MS perso
-# differs only where known, the rebuilt system boots and runs hello from
+# and libraries 21, 22, 23 differ only where known, the rebuilt system boots and runs hello from
 # Multitype (this restores BUILD/data from the base).
 check:
 	@test -f BUILD/tapes/203 || { echo 'No rebuilt images: make rebuild first'; exit 1; }
@@ -31,6 +31,7 @@ check:
 	$(MAKE) -C writlib
 	cd BUILD && ./ld-check.py tapes/101 tapes/9 tapes/203
 	cd BUILD && ./ms-check.sh
+	cd BUILD && ./lib-check.sh
 	cd BUILD && ./boot-run.py -f -d 25 -m 110 > boot-check.log 2>&1 || \
 	    { echo 'Multitype check failed, see BUILD/boot-check.log'; exit 1; }
 	@echo 'All checks passed'

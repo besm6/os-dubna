@@ -1,0 +1,3 @@
+ PASBDE:,NAME,DTRAN  /01.06.84/
+ 13,UJ,
+ ,END,

@@ -1,0 +1,28 @@
+ P/7A:,NAME,DTRAN  /01.06.84/
+ P/PF:,SUBP,
+ P/HIDE:,SUBP,
+ P/EDIH:,SUBP,
+ 14,VJM,P/HIDE
+ 11,MTJ,8
+ 10,MTJ,7
+C===========================================
+ P/7AD:,ENTRY,
+C===========================================
+ *0002B:6,VTM,-5
+ 8,XTA,
+ 1,ATX,5
+ *0004B:1,XTA,5
+ ,ASN,64-8
+ 1,ATX,5
+ ,YTA,
+ 12,WTC,
+ ,ATX,
+ 13,VJM,P/PF
+ 7,UTM,-1
+ 7,VZM,*0013B
+ 6,VLM,*0004B
+ 8,UTM,1
+ ,UJ,*0002B
+ *0013B:14,VJM,P/EDIH
+ 13,UJ,
+ ,END,

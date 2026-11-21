@@ -1,0 +1,40 @@
+ P/EF:,NAME,DTRAN  /01.06.84/
+ PASEOLSY:,LC,1
+ PASZERO*:,LC,1
+ PASMINS*:,LC,1
+ SPACE*:,LC,1
+ PASEOFCD:,LC,1
+ PASENDS*:,LC,1
+ 7,XTA,1
+ ,ASN,64+15
+ ,ATI,14
+ 14,UTC,
+ 13,VJM,
+C===========================================
+ P/E:,ENTRY,
+C===========================================
+ ,NTR,3
+ 7,MTJ,15
+ 7,XTA,
+ ,ATI,7
+ 15,WTC,1
+ ,UJ,
+ ,DATA,
+ /0006B:,LOG,60
+ /0007B:,LOG,55
+ /0010B:,LOG,40
+ /0011B:,ISO,6H/*
+ /0012B:,LOG,12
+ 1,SET,/0012B
+ 1,,PASEOLSY
+ 1,SET,/0006B
+ 1,,PASZERO*
+ 1,SET,/0007B
+ 1,,PASMINS*
+ 1,SET,/0010B
+ 1,,SPACE*
+ 1,SET,/0011B
+ 1,,PASEOFCD
+ 1,SET,/0012B
+ 1,,PASENDS*
+ ,END,

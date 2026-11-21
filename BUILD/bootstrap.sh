@@ -28,6 +28,9 @@ echo compile LD
 echo "Making the loader image"
 ./mk-ld-img.sh || exit 1
 
+echo "Compiling libraries 21, 22, 23"
+./mk-lib21-src.sh && ./mk-lib22-src.sh && ./mk-lib23-src.sh && ./mk-libs.sh || exit 1
+
 echo "Assembling the MS image"
 ./mk-ms-img.sh || exit 1
 

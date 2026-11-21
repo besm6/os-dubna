@@ -1,0 +1,75 @@
+ SETCH:,NAME,DTRAN  /01.06.84/
+ *ASP4*:,LC,8048
+ *ASP2*:,LC,1
+ *ASPPAG*:,LC,6
+ IWA:,SUBP,
+ PRINT8:,SUBP,
+ MONCARD*:,LC,0
+ GAK/7:,EQU,*ASPPAG*+4
+ GAL/0:,EQU,*ASP4*+8048
+ GAL/1:,EQU,*ASP4*+48
+ *0000B:,UTC,GAK/7.*ASPPAG*+4
+ ,XTA,
+ 13,U1A,
+ 8,VTM,*0000B
+ 8,XTA,44B
+ 14,VTM,GAL/0.*ASP4*+8048
+ ,ITS,14
+ 15,AEX,
+ ,UZA,*0011B
+ ,UTC,*ASP2*
+ ,XTA,
+ 8,AAX,42B
+ 8,ATX,43B
+ 14,VTM,*0043B
+ ,ITS,14
+ 14,VTM,*0044B
+ ,ITS,14
+ ,UJ,IWA
+ *0011B:13,VTM,*0035B.=6H * * Б
+ ,ITS,13
+ 13,VTM,
+ ,ITS,13
+ 13,VTM,1
+ ,ITS,13
+ 13,VJM,PRINT8
+ 13,VTM,MONCARD*
+ ,ITS,13
+ 13,VTM,
+ ,ITS,13
+ 13,VTM,1
+ ,ITS,13
+ 13,VJM,PRINT8
+ ,SJ,
+C===========================================
+ PROOF:,ENTRY,
+C===========================================
+ 13,UJ,
+C===========================================
+ SLASH:,ENTRY,
+C===========================================
+ 13,UJ,
+C===========================================
+ REWCHR:,ENTRY,
+C===========================================
+ 8,VTM,*0000B
+ 14,VTM,GAL/1.*ASP4*+48
+ ,ITS,14
+ 8,ATX,44B
+ 8,XTA,34B
+ 8,ATX,45B
+ 12,VTM,60301B
+ 11,VTM,GAL/1.*ASP4*+48
+ ,XTA,
+ *0031B:11,ATX,
+ 11,UTM,1
+ 12,VLM,*0031B
+ ,STX,
+ 13,UJ,
+ ,INT,-48
+ *0035B:,ISO,24H * * БYФEP TEKCTA ПEPEПO
+ ,LOG,3304 4105 2202 0012
+ ,LOG,377
+ *0043B:,BSS,1
+ *0044B:,BSS,3
+ ,END,

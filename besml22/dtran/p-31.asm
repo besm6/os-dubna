@@ -1,0 +1,6 @@
+ P/31:,NAME,DTRAN  /01.06.84/
+ 7,MTJ,3
+ 3,XTA,2
+ ,ATI,2
+ 13,UJ,
+ ,END,

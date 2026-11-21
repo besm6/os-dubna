@@ -1,0 +1,16 @@
+ P/A6:,NAME,DTRAN  /01.06.84/
+ P/SP:,SUBP,
+ P/6A:,SUBP,
+ ,ITS,13
+ ,ITS,10
+ 15,ATX,
+ ,NTR,3
+ 1,AEX,11B
+ 15,A-X,-4
+ 13,VJM,P/SP
+ 15,XTA,
+ ,STI,10
+ ,STI,13
+ 15,UTM,-1
+ ,UJ,P/6A
+ ,END,

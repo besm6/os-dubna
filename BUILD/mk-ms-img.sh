@@ -13,7 +13,8 @@
 # different names in all sections (GLINK's editions of the ASEMBLER modules
 # are named GAS...; ../tools/ovltest shows what happens otherwise).
 # ms-splice.py takes the other static sections (ALGOL, A/PRINTM) from the
-# archived 9/MONSYS, and the dynamic loader from tape 101 (mk-ld-img.sh).
+# archived 9/MONSYS, and the dynamic loader from tape 101 (mk-ld-img.sh);
+# lib-splice.py the libraries 21, 22, 23 rebuilt by mk-libs.sh.
 # Result: tape 203, a 9/MONSYS with the rebuilt MS; tape 922, the same
 # from zone 40 (drum 22); data/mons9.bin for the disk image.
 . ./env.sh
@@ -80,5 +81,6 @@ if ! grep -q 'MOHИTOP HA' ms-img.list || grep -q 'OTCYTCTBYET\|MAЛO MЛ' ms-im
     exit 1
 fi
 ./ms-splice.py $TAPES/202 $TAPES/9 $TAPES/9 $TAPES/203 $TAPES/101 &&
-./ms-splice.py $TAPES/202 $TAPES/9 data/mons9.d9 data/mons9.bin $TAPES/101 || exit 1
+./ms-splice.py $TAPES/202 $TAPES/9 data/mons9.d9 data/mons9.bin $TAPES/101 &&
+./lib-splice.py $TAPES/203 data/mons9.bin || exit 1
 { head -c $((8256*4)) $TAPES/203; dd if=$TAPES/203 bs=8256 skip=36 status=none; } > $TAPES/922

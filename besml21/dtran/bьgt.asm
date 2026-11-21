@@ -1,0 +1,5 @@
+ BЬGT:,NAME,DTRAN  /01.06.84/
+ BЬCPAB:,SUBP,
+ 12,Z31,BЬCPAB
+ 4,100,
+ ,END,

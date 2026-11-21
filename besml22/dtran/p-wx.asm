@@ -1,0 +1,43 @@
+ P/WX:,NAME,DTRAN  /01.06.84/
+ PASISOXT:,SUBP,
+ P/SP:,SUBP,
+ P/CW:,SUBP,
+ ,ATI,14
+ ,UTC,*0024B.=:7777 7777 7777 74
+ ,AAX,
+ ,UZA,*0005B
+ ,UTC,*0004B
+ ,XTA,
+ ,UJ,*0007B
+ *0004B:2,UTM,65764B
+ 12,VZM,34112B
+ *0005B:14,UTC,
+ 8,UTC,
+ 11,XTA,
+C===========================================
+ P/WXD:,ENTRY,
+C===========================================
+ *0007B:,ITS,13
+ ,ITS,8
+ 15,ATX,
+ ,UTC,*0023B.=I8
+ ,XTA,
+ ,NTR,3
+ 15,A-X,-4
+ 13,VJM,P/SP
+ 8,VTM,-7
+ *0014B:15,XTA,-3
+ ,ASN,64-6
+ 15,ATX,-3
+ ,YTA,
+ 13,VJM,PASISOXT
+ 13,VJM,P/CW
+ 8,VLM,*0014B
+ 15,XTA,
+ ,STI,8
+ ,ATI,13
+ 15,UTM,-2
+ 13,UJ,
+ *0023B:,INT,8
+ *0024B:,OCT,7777 7777 7777 74
+ ,END,

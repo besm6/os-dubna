@@ -19,9 +19,9 @@ rest are libraries and an area of the dispatcher (DD) that shares the file.
 | --- | --- | --- |
 | 0–77 | The Monitor System: drums 21 and 22 | rebuilt, see section 6 |
 | 100–171 | Additional static part: compilers Fortran-GDR, Forex, Pascal | binary |
-| 172–237 | Library 22 (also called 24): Madlen, Pascal tools and others | binary |
-| 240–317 | Library 21: system utilities | binary |
-| 320–403 | Library 23 | binary |
+| 172–237 | Library 22 (also called 24): Madlen, Pascal tools and others | rebuilt, see section 7 |
+| 240–317 | Library 21: system utilities | rebuilt, see section 7 |
+| 320–377 | Library 23 | rebuilt, see section 7 |
 | 400–437 | Dispatcher area: "special tracks" | binary, changed by the running system |
 
 ## 2. Units and addresses
@@ -197,10 +197,16 @@ otherwise zeros repeat. The piece of TRP, if any, comes after the last group: th
   zone 100: `INITFTN` (by its name, the Fortran-GDR compiler of card `*FTN`) with `BCDAPRT*`, `F/OPT`,
   `ERRDIAG*`; `FOREX*83` with `LO*SYN`, `LO*GEN`; `PASCAL*`. Here bit 48 is set: places
   are counted from zone 100. Card `*TRANS-name` looks here first.
-- **172–403: libraries 22/24, 21, 23.** Ordinary libraries of perso with the same catalog
-  format as in section 4 (two zones of catalog, then modules). Library 21 holds the tools
-  that assemble the system: `COLLECT`, `COMTODRU`, `OVERLAY`, `OCATALOG`, and the modules of
-  `INPUTCAL`. Library 22 holds the Madlen assembler.
+- **172–377: libraries 22/24, 21, 23.** Common libraries (ОБСП) in the packed format of
+  `CRELIB`: the catalog of a perso (section 4), with the length of the full catalog less one
+  in bits 37–25 of word 0; after the end mark the date (ISO, `DDMMYY`), a zero word, a table
+  of references and a list of references. Modules follow from the first free record after
+  the catalog; their places count from zone 01040, the first zone of the library. Library
+  22 (dated 31.08.88) fills 172–237; library 21 (12.10.88) takes 240–314 of 240–317;
+  library 23 (10.04.89) 320–375. Library 21 holds the tools that assemble the system:
+  `COLLECT`, `COMTODRU`, `OVERLAY`, `OCATALOG`, `CRELIB`, and the modules of `INPUTCAL`.
+  Library 22 holds the Madlen assembler, the Pascal runtime and ASPID; library 23 DTRAN
+  and the terminal routines.
 - **400–437: dispatcher area.** DD keeps here what used to live on special drum tracks:
   statistics buffer (400), roll track (401), passwords (402), names (403–404), departments
   (405), tables of extracode 66 (410–417), the "service" (420–427), planner track (430),
@@ -221,7 +227,8 @@ otherwise zeros repeat. The piece of TRP, if any, comes after the last group: th
 | Section `WRITLIB*` | 77 | **linked by `COLLECT`**: the root from `writlib/`, `WRITLIBR` from `besmmons/`, `FORTLIBR` from library 21 |
 | Dynamic loader | 0, zone 1 words 0–377 | **compiled** from `besmtask/loader.txt` by `mk-ld-img.sh`, see [Dynamic_Loader.md](Dynamic_Loader.md) |
 | Other tables | rest of zone 1, 2–6 | copied from the running system by `COLLECT` |
-| Everything from zone 100 | 100–437 | the archived tape |
+| Libraries 22, 21, 23 | 172–375 | **compiled** from `besmtask/madlen.txt`, `besml21/`, `besml23/` and the disassembled modules in `besml2N/dtran/`, packed by `CRELIB` |
+| Additional static part, dispatcher area | 100–171, 400–437 | the archived tape |
 
 `ALGOL` and `A/PRINTM` cannot be rebuilt: the archive has neither their sources
 nor their perso, only the linked sections. The Fortran compiler and the assembler were
@@ -345,9 +352,60 @@ It stops if the dynamic part grows past zone 34. The result is written twice: ta
 (a full 9/MONSYS for the DD link job, which copies zones 0–77 to drums 21 and 22) and
 `data/mons9.bin` (for `mkdisk9.sh`, the disk image). Tape 922 is tape 203 from zone 40.
 
+### Libraries 21, 22, 23
+
+Of the 734 modules of the three libraries, 371 are compiled from sources: 177 in
+`besml21/`, 188 in `besml23/`, the 6 modules of Madlen in `besmtask/madlen.txt`. The other
+363 (the I/O runtime of Fortran-GDR in library 21, the Pascal runtime, ASPID and others in
+library 22, `LASCII`, `MAK*TRT`, `PRINTER` and `SERVER` in library 23) were disassembled
+from the archived libraries by DTRAN into `besml2N/dtran/*.asm` (file names: `*` is `%`,
+`/` is `-`). `BUILD/dtran.py` made them and checks each one; it is not part of the build.
+
+- DTRAN reads only a plain library, so `dtran.py` copies the library from tape 9 with bits
+  37–25 of word 0 cleared, and calls `*CALL DTRAN:320000(NAME)`. The text goes to editor
+  drum 1, then to a tape, then through `tools/cosy2txt`.
+- Each text is assembled and the object compared with the archived one. *Equal*: the same
+  words (168 modules). *Equivalent* (195): DTRAN of the new object gives the same text,
+  after `tools/degak.py` and a few normalisations (names DTRAN makes up, `*NNNNB+d`, the
+  short commands from address 70000, strings split differently). The compilers that made
+  these modules order the table of designations in ways Madlen does not, so the words
+  that refer to it differ.
+- DTRAN's text cannot always be assembled back. A string with control characters loses
+  them in the editor; a word DTRAN takes for BSS inside the code, or a command Madlen
+  writes otherwise (`15,Z00,-1`), would change. Such words are given to DTRAN as `OCT:`
+  directives, listed in `NAME.dtr` (85 modules). An address past the module (`*10157`) is
+  written `*0000B+10157B`; BSS lines whose counts disagree with their labels are mended.
+- The entry `PAIB` of `LIBSUB` lies past the end of the module (067, length 054); Madlen
+  cannot make it, and an older copy of the catalog, left in the free part of library 22,
+  has it too. `mk-libs.sh` adds it to the catalog of the perso (`libcat.py -e`).
+- Entries are in the catalog in the order of the text; some compilers wrote them in
+  another, which does not matter to the loader.
+
+The build:
+
+- `mk-lib21-src.sh`, `mk-lib22-src.sh`, `mk-lib23-src.sh` compile the sources and the
+  disassembled modules into perso on tapes 221–223. The sources of libraries 21 and 23
+  begin with Fortran (`*FTN`) and switch to Madlen by a card of their own. Units that are
+  not in the libraries are cut out by `unitcut.py` (`*EXCLUDE` would also remove the module
+  `EXCLUDE` of library 21). `SERVER` is taken from DTRAN: its source compiles neither with
+  `*FTN`, `*FOREX` nor `*FORTRAN`.
+- `mk-libs.sh` packs each perso with `*CALL CRELIB:TAPE,670000` into tapes 251–253 and runs
+  `lib-check.sh -p`; `lib-splice.py`, called by `mk-ms-img.sh`, puts them into tape 203 and
+  `data/mons9.bin` at the old zones, so the table of libraries in zone 6 stays.
+- `lib-check.sh` (`libcat.py cmp`) requires every module and entry of the archived library,
+  with the same length in memory. Two modules differ, as their sources are older than the
+  archived editions: `*DRIVER*` of library 21 (761 words against 786) and `W1LOOK` of
+  library 23 (616 against 677). Of the modules built from sources, some differ from the
+  archive in words only: equivalent (compiled with other options), based differently by
+  this Madlen (`12,UTC,111B` for `,UTC,*0111B`), or edited after the sources were saved
+  (`GIVETIME`, `BTLOOK`, `LFSYST`, `PRINT80`, `TEXOUT`, `CTLOOK`).
+- The build itself keeps using the archived libraries of tape 9 (`*LIBRARY:21`): the
+  rebuilt ones reach only the system booted in SIMH.
+
 ### What to check after a change
 
 - `./ms-check.sh` prints only the two modules above.
+- `./lib-check.sh` prints only `*DRIVER*` and `W1LOOK`, marked allowed.
 - `ms-base-src.list`: every Madlen module ends with `ЧИCЛO OШИБ. OПEPATOPOB  00`.
 - `./bootstrap.sh` runs through; it boots the new MS three times in SIMH.
 - `./boot-run.py -f -d 25 -q -m 110`: the listing in `output.txt` has the banner
@@ -373,6 +431,6 @@ It stops if the dynamic part grows past zone 34. The result is written twice: ta
 - The room is tight: 64 zones, of which the static part takes 34 and the dynamic part 19.
 - The job `hello` uses `*FORTRAN`, the section `FORTRAN` of the static part (banner
   `Ф О Р Т Р А Н /16.07.73/`), linked from `fortran/`; `*FTN` calls Fortran-GDR from zone
-  100, `*MADLEN` the assembler from library 22, both archived binaries. A change in
+  100, an archived binary, `*MADLEN` the assembler from library 22. A change in
   `fortran/` or `asembler/` reaches the image only if the section keeps its records; a
   longer one needs a new static catalog, which `ms-splice.py` does not make (it stops).

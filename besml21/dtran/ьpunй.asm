@@ -1,0 +1,4 @@
+ ЬPUNЙ:,NAME,DTRAN  /01.06.84/
+ BCDPUN*:,SUBP,
+ ,UJ,BCDPUN*
+ ,END,

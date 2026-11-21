@@ -1,0 +1,5 @@
+ CЬMV:,NAME,DTRAN  /01.06.84/
+ ЬMV8Ь:,SUBP,
+ 14,VTM,1
+ ,UJ,ЬMV8Ь
+ ,END,

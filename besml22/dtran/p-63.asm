@@ -1,0 +1,8 @@
+ P/63:,NAME,DTRAN  /01.06.84/
+ 7,MTJ,6
+ 6,XTA,2
+ ,ATI,5
+ 5,XTA,2
+ ,ATI,4
+ 13,UJ,
+ ,END,

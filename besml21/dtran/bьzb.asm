@@ -1,0 +1,8 @@
+ BЬZB:,NAME,DTRAN  /01.06.84/
+ ЬZZЬ:,SUBP,
+ ЬMVЬ:,SUBP,
+ 14,VTM,ЬZZЬ
+ ,ITS,14
+ 14,VTM,
+ ,UJ,ЬMVЬ
+ ,END,

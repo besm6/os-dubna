@@ -1,0 +1,7 @@
+ P/6A:,NAME,DTRAN  /01.06.84/
+ P/7A:,SUBP,
+ 1,ATX,5
+ 1,UTC,5
+ 11,VTM,
+ ,UJ,P/7A
+ ,END,

@@ -1,0 +1,17 @@
+ ЬQNRЙ:,NAME,DTRAN  /01.06.84/
+ *0000B:7,MTJ,8
+ 9,VJM,*0004B
+ ,STI,
+ ,STI,13
+ ,STI,7
+ ,NTR,6
+ 13,UJ,
+ ,ATX,
+ *0004B:7,VTM,*0000B+10006B
+ 7,101,1
+ ,ITS,8
+ ,ITS,13
+ ,ITS,
+ 9,UJ,
+ ,BSS,1
+ ,END,

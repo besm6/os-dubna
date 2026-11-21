@@ -1,0 +1,10 @@
+ P/6:,NAME,DTRAN  /01.06.84/
+ ,NTR,3
+ ,ITA,7
+ 15,MTJ,7
+ 15,MTJ,6
+ ,ITS,13
+ ,ITS,5
+ 7,ATX,2
+ 14,UJ,
+ ,END,

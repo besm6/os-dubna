@@ -1,0 +1,22 @@
+ P/STAR:,NAME,DTRAN  /01.06.84/
+ ,NTR,3
+ 1,AOX,11B
+ 15,ATX,1
+ 11,A*X,
+ ,ATI,10
+ 10,J+M,14
+ 11,A*X,1
+ ,YTA,100B
+ 15,X-A,1
+ ,ATI,10
+ 15,XTA,-1
+ 11,WTC,3
+ 10,ASX,
+ 15,ATX,-1
+ 14,AEX,
+ 11,WTC,4
+ 10,AAX,
+ 15,AEX,
+ 14,ATX,
+ 13,UJ,
+ ,END,

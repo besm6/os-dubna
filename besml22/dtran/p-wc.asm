@@ -1,0 +1,13 @@
+ P/WC:,NAME,DTRAN  /01.06.84/
+ P/SP:,SUBP,
+ P/CW:,SUBP,
+ ,ITS,13
+ 1,XTS,21B
+ ,NTR,3
+ 15,A-X,-3
+ 13,VJM,P/SP
+ 15,XTA,
+ ,STI,13
+ 15,UTM,-1
+ ,UJ,P/CW
+ ,END,
