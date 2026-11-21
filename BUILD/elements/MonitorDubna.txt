@@ -1307,17 +1307,20 @@ C----------------
     *tape:245/lib45,45          perso изменённого COLLECT
     *tape:221/lib21,61          perso библиотеки 21
     *tape:223/lib23,63          perso библиотеки 23
+    *tape:246/cmp46,46          perso ALGOL, A/PRINTM
     *library:21
     *library:23
     *perso:66000
     *perso:45000,cont
     *call collect:670000
-    MONITOR*(INPUTCAL,FORTRAN,ASEMBLER,WRITLIB*)
+    MONITOR*(INPUTCAL,FORTRAN,ASEMBLER,ALGOL,WRITLIB*)
     FORTRAN(CBDPR,CONTROL,ENDPRO,GLINK)
+    ALGOL(A/PRINTM)
     INPUTCAL:61,63
     FORTRAN:41,42,61
     ASEMBLER:43,61
     WRITLIB*:44,61
+    ALGOL:46,61
     *end record
     *call comtodru:670000,650000
 
@@ -1333,11 +1336,13 @@ COLLECT сам вызывает NEW//MON (перезагрузка резиде�
 временную библиотеку, где он находится раньше библиотеки 21. Из временной
 библиотеки COLLECT себя удаляет, в разделы он не входит. Править LIBRARY/
 (там NEWLIBR/) нельзя: INPUTCAL включает LIBRARY/ и получил бы правленую копию.
-Разделы ALGOL и A/PRINTM в архиве есть только в собранном виде, в
-статической части 9/MONSYS, поэтому на картах их нет: BUILD/ms-splice.py
-переносит их из старого образа, укладывает статическую часть к концу зоны 77,
-как COMTODRU, и заново делает каталог статических разделов и слово 1377 зоны 1
-(где страница монитора). WRITLIB* - это модуль WRITLIBR (с общим
+Теперь COLLECT собирает все статические разделы. Алгол (ALGOL-ГДР 7.01.82:
+ALGOL и его раздел A/PRINTM, листинг кода по *FULL) тоже восстановлен в виде
+текстов на Мадлене (algol/; perso на ленте 246, карта ALGOL:46,61); его имена
+начинаются с A, ASMPRINT у него тот же, что у ASEMBLER. BUILD/ms-splice.py
+укладывает статическую часть к концу зоны 77, как COMTODRU, и заново делает
+каталог статических разделов и слово 1377 зоны 1 (где страница монитора).
+WRITLIB* - это модуль WRITLIBR (с общим
 блоком CATALOG) из besmmons/system2.txt, вызываемый через FORTLIBR библиотеки
 21; текста не было только у его корня из 14 слов, модуля WRITLIB*, он
 восстановлен по образу (writlib/writlib.asm) и лежит в perso на ленте 244

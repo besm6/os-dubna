@@ -1,20 +1,22 @@
 #! /bin/sh
 # Assemble the Monitor System from the perso on tape 200.
 # COLLECT links the resident, the dynamic part and the static sections
-# INPUTCAL, FORTRAN (with CBDPR, CONTROL, ENDPRO, GLINK), ASEMBLER and
-# WRITLIB* onto tape 201; COMTODRU turns that into a working copy of drums
-# 21, 22 on tape 202.  The modules of the Fortran compiler (../fortran), of
-# ASEMBLER (../asembler) and the root of WRITLIB* (../writlib) are put into
-# perso on tapes 241-244 first; the cards FORTRAN:41,42, ASEMBLER:43 and
-# WRITLIB*:44 make COLLECT take them from there (as units 41-44), so they
-# stay out of the temporary library, which becomes the dynamic part.  A
+# INPUTCAL, FORTRAN (with CBDPR, CONTROL, ENDPRO, GLINK), ASEMBLER, ALGOL
+# (with A/PRINTM) and WRITLIB* onto tape 201; COMTODRU turns that into a
+# working copy of drums 21, 22 on tape 202.  The modules of the Fortran
+# compiler (../fortran), of ASEMBLER (../asembler), of the Algol compiler
+# (../algol) and the root of WRITLIB* (../writlib) are put into perso on
+# tapes 241-244, 246 first; the cards FORTRAN:41,42, ASEMBLER:43, WRITLIB*:44
+# and ALGOL:46 make COLLECT take them from there (as units 41-44, 46), so they stay
+# out of the temporary library, which becomes the dynamic part.  A
 # module taken from a library stays in the temporary library for the rest
 # of the run and is found there first, so modules that differ must have
 # different names in all sections (GLINK's editions of the ASEMBLER modules
-# are named GAS...; ../tools/ovltest shows what happens otherwise).
-# ms-splice.py takes the other static sections (ALGOL, A/PRINTM) from the
-# archived 9/MONSYS, and the dynamic loader from tape 101 (mk-ld-img.sh);
-# lib-splice.py the libraries 21, 22, 23 rebuilt by mk-libs.sh.
+# are named GAS..., those of ALGOL A...; ../tools/ovltest shows what happens
+# otherwise; ALGOL gets the ASMPRINT of ASEMBLER, as it should).  All the
+# static sections are linked here; ms-splice.py takes the dynamic loader
+# from tape 101 (mk-ld-img.sh); lib-splice.py the libraries 21, 22, 23
+# rebuilt by mk-libs.sh.
 # Result: tape 203, a 9/MONSYS with the rebuilt MS; tape 922, the same
 # from zone 40 (drum 22); data/mons9.bin for the disk image.
 . ./env.sh
@@ -52,6 +54,7 @@ perso 241 41 ms-ftn41.list ../fortran FORTRAN CBDPR
 perso 242 42 ms-ftn42.list ../fortran CONTROL ENDPRO GLINK
 perso 243 43 ms-asm43.list ../asembler ASEMBLER
 perso 244 44 ms-wl44.list ../writlib WRITLIB
+perso 246 46 ms-alg46.list ../algol ALGOL APRINTM
 
 # A card NAME:n1,n2 gives the libraries 21,n1,n2 (NEWLIBR/ puts library 21
 # first), so a module of library 21 would come from the archived one.  The
@@ -87,17 +90,20 @@ cat > $J <<'EOF'
 *tape:245/lib45,45
 *tape:221/lib21,61
 *tape:223/lib23,63
+*tape:246/cmp46,46
 *library:21
 *library:23
 *perso:66000
 *perso:45000,cont
 *call collect:670000
-MONITOR*(INPUTCAL,FORTRAN,ASEMBLER,WRITLIB*)
+MONITOR*(INPUTCAL,FORTRAN,ASEMBLER,ALGOL,WRITLIB*)
 FORTRAN(CBDPR,CONTROL,ENDPRO,GLINK)
+ALGOL(A/PRINTM)
 INPUTCAL:61,63
 FORTRAN:41,42,61
 ASEMBLER:43,61
 WRITLIB*:44,61
+ALGOL:46,61
 *end record
 *call comtodru:670000,650000
 *end file

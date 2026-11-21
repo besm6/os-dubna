@@ -223,18 +223,21 @@ otherwise zeros repeat. The piece of TRP, if any, comes after the last group: th
 | Dynamic part and its catalog | 7–33 | **compiled** from `besmmons/` |
 | Section `INPUTCAL` | 36–43 | **linked by `COLLECT`** from the perso of library 21 (tape 221), with `DATE`, `DTOI` of library 23 (tape 223) |
 | Sections `FORTRAN`, `CBDPR`, `CONTROL`, `ENDPRO`, `GLINK`, `ASEMBLER` | 43–70 | **linked by `COLLECT`** from the Madlen sources in `fortran/` and `asembler/` |
-| Sections `ALGOL`, `A/PRINTM` | 70–77 | copied from the archived tape |
+| Sections `ALGOL`, `A/PRINTM` | 70–77 | **linked by `COLLECT`** from the Madlen sources in `algol/` |
 | Section `WRITLIB*` | 77 | **linked by `COLLECT`**: the root from `writlib/`, `WRITLIBR` from `besmmons/`, `FORTLIBR` from the perso of library 21 |
 | Dynamic loader | 0, zone 1 words 0–377 | **compiled** from `besmtask/loader.txt` by `mk-ld-img.sh`, see [Dynamic_Loader.md](Dynamic_Loader.md) |
 | Other tables | rest of zone 1, 2–6 | copied from the running system by `COLLECT` |
 | Libraries 22, 21, 23 | 172–375 | **compiled** from `besmtask/madlen.txt`, `besml21/`, `besml23/` and the disassembled modules in `besml2N/dtran/`, packed by `CRELIB` |
 | Additional static part, dispatcher area | 100–171, 400–437 | the archived tape |
 
-`ALGOL` and `A/PRINTM` cannot be rebuilt: the archive has neither their sources
-nor their perso, only the linked sections. The Fortran compiler and the assembler were
-taken apart from the linked sections into Madlen sources (`fortran/`, `asembler/`); `make`
+The archive has neither sources nor perso of the compilers in the static part, only the
+linked sections. The Fortran compiler, the assembler and the Algol compiler (ALGOL-ГДР
+7.01.82: `ALGOL` and its `A/PRINTM`, the code listing of `*FULL`) were taken apart from
+the linked sections into Madlen sources (`fortran/`, `asembler/`, `algol/`); `make`
 there links them with `*CALL OVERLAY` (`tools/dubovl.pl`) into images identical to the
-archived ones. `WRITLIB*` (it writes the modules made by a compiler into the temporary
+archived ones. The code of `ALGOL` was found by running test programs under `dubna` with
+a trace (`make trace`, `tools/ovltrace.py`) and by `tools/codesym.py`; `ALGOL` holds the
+`ASMPRINT` of `ASEMBLER`, and its names begin with `A` (layout `PREFIX`). `WRITLIB*` (it writes the modules made by a compiler into the temporary
 library) is the module `WRITLIBR` of `besmmons/system2.txt` with its common `CATALOG`,
 called through `FORTLIBR` of library 21; only its root of 14 words, the module
 `WRITLIB*`, had no source and was written from the image (`writlib/writlib.asm`, `make`
@@ -295,27 +298,30 @@ The original tools run under `dubna`:
 *tape:245/lib45,45          perso of COLLECT, changed (below)
 *tape:221/lib21,61          perso of library 21
 *tape:223/lib23,63          perso of library 23
+*tape:246/cmp46,46          perso of ALGOL, A/PRINTM
 *library:21
 *library:23
 *perso:66000
 *perso:45000,cont
 *call collect:670000
-MONITOR*(INPUTCAL,FORTRAN,ASEMBLER,WRITLIB*)
+MONITOR*(INPUTCAL,FORTRAN,ASEMBLER,ALGOL,WRITLIB*)
 FORTRAN(CBDPR,CONTROL,ENDPRO,GLINK)
+ALGOL(A/PRINTM)
 INPUTCAL:61,63
 FORTRAN:41,42,61
 ASEMBLER:43,61
 WRITLIB*:44,61
+ALGOL:46,61
 *end record
 *call comtodru:670000,650000
 ```
 
-- Four jobs before it compile the Madlen files of the Fortran compiler, of the
-  assembler and of the root of `WRITLIB*` (the lists are in `fortran/Makefile`,
-  `asembler/Makefile` and `writlib/Makefile`, `make print-FORTRAN`) and write them with
-  `*TO PERSO:410000` … `*TO PERSO:440000` to tapes 241–244 (`ms-ftn41.list`,
-  `ms-ftn42.list`, `ms-asm43.list`, `ms-wl44.list`): the input of a job is at most two
-  drums.
+- Five jobs before it compile the Madlen files of the Fortran compiler, of the
+  assembler, of the root of `WRITLIB*` and of the Algol compiler (the lists are in
+  `fortran/Makefile`, `asembler/Makefile`, `writlib/Makefile`, `algol/Makefile`, `make
+  print-FORTRAN`) and write them with `*TO PERSO:410000` … `*TO PERSO:440000`, `*TO PERSO:460000`
+  to tapes 241–244, 246 (`ms-ftn41.list`, `ms-ftn42.list`, `ms-asm43.list`,
+  `ms-wl44.list`, `ms-alg46.list`): the input of a job is at most two drums.
 - `*PERSO:66000` copies the perso of tape 200 into the temporary library of the job.
   Whatever is in the temporary library becomes the dynamic part. `*PERSO:45000,CONT` adds
   to it the perso of tape 245: the module `COLLECT` of library 21 with one change. A card
@@ -337,9 +343,11 @@ WRITLIB*:44,61
   The cards give the tree, as in section 5, up to `*END RECORD`; `FORTRAN:41,42` makes it
   take the modules of `FORTRAN` and its sections from tapes 241, 242, `ASEMBLER:43` those
   of `ASEMBLER` from tape 243, `WRITLIB*:44` the root of `WRITLIB*` from tape 244 (the
-  rest of it comes from the temporary library). The library modules of all sections come
-  from the perso of library 21 (unit 61, tape 221); `INPUTCAL` needs `DATE` and `DTOI`
-  of library 23 (unit 63, tape 223). The listing shows where each came from: `*LIBRA:61 = ...`.
+  rest of it comes from the temporary library), `ALGOL:46` the modules of `ALGOL` and
+  `A/PRINTM` from tape 246 (`ASMPRINT` is already in the temporary library, taken for
+  `ASEMBLER`). The library modules of all sections come from the perso of library 21
+  (unit 61, tape 221); `INPUTCAL` needs `DATE` and `DTOI` of library 23 (unit 63, tape
+  223). The listing shows where each came from: `*LIBRA:61 = ...`.
 - **`COMTODRU`** turns that tape into the drum form: catalog entries become physical
   exchanges, the static part moves to the end of zone 77, the monitor page goes to the
   zone before it, and word 1377 of zone 1 is set. It prints where the page is:
@@ -351,12 +359,12 @@ than 64 zones), `CИCTEMA BEЛИKA`.
 ### Step 3: splice — `BUILD/ms-splice.py`
 
 Tape 202 now is a correct MS with the static sections `INPUTCAL`, `FORTRAN` with its four,
-`ASEMBLER` and `WRITLIB*`. The script makes the final 64 zones:
+`ASEMBLER`, `ALGOL` with `A/PRINTM` and `WRITLIB*`: all of the static part. The script
+makes the final 64 zones:
 
 1. everything up to the end of the dynamic part from tape 202;
-2. the static part: the sections of the archived catalog in its order, those that
-   `COLLECT` linked from tape 202, `ALGOL` and `A/PRINTM` from the archived tape, packed
-   to end with zone 77, as `COMTODRU` does;
+2. the static part: the sections of the archived catalog in its order, all linked by
+   `COLLECT`, from tape 202, packed to end with zone 77, as `COMTODRU` does;
 3. the monitor page from tape 202, put into the zone before the static part;
 4. in zone 1 the static catalog, made anew: the root with the gap between the two parts,
    each section with its new place (its other bits, length and load address, as in its
@@ -368,7 +376,7 @@ sizes everything stays at the archived places (static part from 36.12, page in z
 and the catalog equals the archived one but for the gap. Against the archive,
 `INPUTCAL` differs in five words (three after the end of zone 37 and two of `LFSYST`,
 edited in the archived library after its source was saved), the sections of the Fortran
-compiler and `ASEMBLER` only in words of the header (see below), `WRITLIB*` not at all
+compiler, `ASEMBLER`, `ALGOL` and `A/PRINTM` only in words of the header (see below), `WRITLIB*` not at all
 (but three words of junk after its end in zone 77 are zeros now).
 
 It stops if the dynamic part reaches the zone of the page. The result is written twice: tape 203
@@ -441,22 +449,19 @@ The build:
 
 - `dubna` itself always runs the monitor built into it, not the files in `BUILD/tapes`. A
   broken tape 203 cannot break the build, only the system booted in SIMH.
-- Old static sections contain old copies of library modules. A change in, say, `PRINT8`
-  reaches user programs and the relinked sections, but not `ALGOL` or `A/PRINTM`.
 - Words 5 and 6 of a section header are the registers 16B and 17B of the loader after it
   has linked the section (and words 1, 2 of a section under it, the same of its parent):
   16B the pointers AC, AS, AU, of which AS gives out the S arrays (`,LS,`) in the low
   memory from 0100; 17B the length of the load list and the first free address. The
   layouts declare the S arrays of `FORTRAN` (0100–0213) and `CBDPR` (0214–0421), so 16B
   is that of the archive; the length of the load list is not (FORTRAN 310 against 550 in
-  the archive, ASEMBLER 236 against 206): it counts the names of the modules and entries,
+  the archive, ASEMBLER 236 against 206, ALGOL 356 against 260, A/PRINTM 430 against 314): it counts the names of the modules and entries,
   which the archive does not keep.
 - The resident must keep its addresses. If `MONITOR*` changes size, the old sections
   (linked from 1604) and the addresses pinned in `BUILD/deck-b1/fix-aux.s` no longer fit.
 - The room is tight: 64 zones, of which the static part takes 34 and the dynamic part 19.
 - The job `hello` uses `*FORTRAN`, the section `FORTRAN` of the static part (banner
   `Ф О Р Т Р А Н /16.07.73/`), linked from `fortran/`; `*FTN` calls Fortran-GDR from zone
-  100, an archived binary, `*MADLEN` the assembler from library 22. A change in
-  `fortran/` or `asembler/` may change the size of a section: `ms-splice.py` moves the
-  sections and the page and makes the catalog anew. Moved so, `ALGOL` and `A/PRINTM` work
-  (an Algol job printed the right result).
+  100, `*MADLEN` the assembler from library 22, both archived binaries. A change in
+  `fortran/`, `asembler/` or `algol/` may change the size of a section: `ms-splice.py`
+  moves the sections and the page and makes the catalog anew.

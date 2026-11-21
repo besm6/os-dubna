@@ -97,6 +97,11 @@ OV.layout.py defines
     ROOT        (sub-overlay only) OV name of the root overlay; addresses in
                 the root that the listing shows as numbers become the names of
                 its modules, entries and common blocks
+    PREFIX      a prefix for the names Gaaaaa, Daaaaa, Eaaaaa that RENAME does
+                not give: in one COLLECT run a name means one module or block
+                for all the sections, so the overlays of another program that
+                load at the same address need names of their own (a
+                sub-overlay takes that of its ROOT)
 
 Data that more than one module refers to is not left inside a module: it is a
 common block, and its non-zero words are set by a `,DATA,` section
@@ -187,6 +192,7 @@ class Layout:
                 self.RENAME['G%05o' % (a + o)] = x
         r = getattr(m, 'ROOT', None)
         self.root = Layout(r, path) if r else None
+        self.prefix = getattr(m, 'PREFIX', self.root.prefix if self.root else '')
         sh = getattr(m, 'SHARE', None)      # 'dir/ov': the overlay that has the S modules
         self.share = Layout(os.path.basename(sh), os.path.join(path, os.path.dirname(sh))) \
             if sh else None
@@ -257,10 +263,14 @@ class Layout:
         return self.ENDS[self.STARTS.index(s)]
 
     def real(self, n):
-        return self.RENAME.get(n, n)
+        if n in self.RENAME:
+            return self.RENAME[n]
+        if self.prefix and re.match(r'[GDE][0-7]{5}$', n):
+            return self.prefix + n
+        return n
 
     def fname(self, s):
-        return self.real(self.NAME[s]).lower().replace('*', '%')
+        return self.real(self.NAME[s]).lower().replace('*', '%').replace('/', '')
 
     def file(self, s):
         """the Madlen file of module s (that of the other overlay for an S module)"""
@@ -638,8 +648,8 @@ def data_section(lay, c, n):
             o = '%016o' % w[x]
             consts.append(' %s,OCT,%s' % (lab + ':' if x == i else '',
                                           ' '.join(o[y:y + 4] for y in range(0, 16, 4))))
-        sets.append(' %d,SET,%s\n 1,,%s%s' % (j - i, lab, lay.NAME[c], '+%d' % i if i else ''))
-    return consts + sets
+        sets.append(' %d,SET,%s\n 1,,%s%s' % (j - i, lab, lay.real(lay.NAME[c]), '+%d' % i if i else ''))
+    return consts, sets
 
 
 def make_asm(lay, name):
@@ -671,9 +681,12 @@ def make_asm(lay, name):
     for c in own:
         if NAME[c] not in decl:
             decl.append(NAME[c])
-    data = []
+    data, sets = [], []             # Madlen: the constants first, then the SETs
     for n, c in enumerate(own):
-        data += data_section(lay, c, n)
+        x, y = data_section(lay, c, n)
+        data += x
+        sets += y
+    data += sets
     if not rest or rest[-1].strip() != ',END,':
         sys.exit('%s: no END' % name)
     for r, t in lay.rebase.items():
@@ -697,15 +710,22 @@ def make_asm(lay, name):
             if m and m.group(3) not in defined:
                 rest[k] = '%s%s,%s,%oB' % (m.group(1), lay.bases[s], m.group(2),
                                           int(m.group(3), 8) - x)
-    ren = re.compile(r'(?<![\w/*])(%s)(?![\w/*])' % '|'.join(rename or ['\0']))
+    pre = lay.prefix
+
+    def real(n):
+        if n in rename:
+            return rename[n]
+        return pre + n if pre and re.match(r'[GDE][0-7]{5}$', n) else n
+    ren = re.compile(r'(?<![\w/*])(%s)(?![\w/*])' % '|'.join(
+        list(rename) + ([r'[GDE][0-7]{5}'] if pre else []) or ['\0']))
     for l in head:
-        print(ren.sub(lambda m: rename[m.group(1)], l))
+        print(ren.sub(lambda m: real(m.group(1)), l))
     if s == STARTS[0]:
         for a, n in lay.sarrays:
             print(' L%05o:,LS,%d' % (a, n))
     for d in decl:
-        print(' %s:,LC,%d' % (rename.get(d, d), commons[d]) if d in commons
-              else ' %s:,SUBP,' % rename.get(d, d))
+        print(' %s:,LC,%d' % (real(d), commons[d]) if d in commons
+              else ' %s:,SUBP,' % real(d))
     try:
         errs = {int(l.split()[1], 8) for l in open(lay.ov + '.errnum')
                 if l.split()[0] == name.lower()}
@@ -718,7 +738,7 @@ def make_asm(lay, name):
             t = re.sub(r' {3,}\S{1,2}$', '', lay.errmsg[n & 0o7777])   # a stray letter
             for k, t in enumerate(textwrap.wrap(' '.join(t.split()), 60)):
                 print('C %s %s' % (' ' * len('%o:' % n) if k else '%o:' % n, t))
-        print(ren.sub(lambda m: rename[m.group(1)], l))
+        print(ren.sub(lambda m: real(m.group(1)), l))
     if data:
         print(' ,DATA,')
         for l in data:

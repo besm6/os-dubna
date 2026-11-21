@@ -72,17 +72,20 @@ same 166 modules, of the same sizes except `CHKBEG*` and `EDIT***`.
 *tape:245/lib45,45
 *tape:221/lib21,61
 *tape:223/lib23,63
+*tape:246/cmp46,46
 *library:21
 *library:23
 *perso:66000
 *perso:45000,cont
 *call collect:670000
-MONITOR*(INPUTCAL,FORTRAN,ASEMBLER,WRITLIB*)
+MONITOR*(INPUTCAL,FORTRAN,ASEMBLER,ALGOL,WRITLIB*)
 FORTRAN(CBDPR,CONTROL,ENDPRO,GLINK)
+ALGOL(A/PRINTM)
 INPUTCAL:61,63
 FORTRAN:41,42,61
 ASEMBLER:43,61
 WRITLIB*:44,61
+ALGOL:46,61
 *end record
 *call comtodru:670000,650000
 ```
@@ -95,25 +98,24 @@ come from the perso of the rebuilt libraries 21 and 23 (tapes 221, 223, units 61
 `INPUTCAL` and the library modules of the others. A card `NAME:n1,n2` always puts
 library 21 first in the list, so tape 245 has `COLLECT` changed to drop it, and
 `*PERSO:45000,CONT` adds it to the temporary library, where it is found first (see
-`Monsys9_Tape.md`). The modules of the Fortran compiler, of
-`ASEMBLER` and the root of `WRITLIB*` come from perso that four jobs before write to tapes
-241–244 from the Madlen files in `fortran/`, `asembler/` and `writlib/` (`*TO PERSO:410000`
-… `440000`); the cards `FORTRAN:41,42`, `ASEMBLER:43` and `WRITLIB*:44` make `COLLECT`
-take them from there, so they stay out of
+`Monsys9_Tape.md`). The modules of the Fortran compiler, of `ASEMBLER`, of `ALGOL` and
+the root of `WRITLIB*` come from perso that five jobs before write to tapes 241–244 and
+246 from the Madlen files in `fortran/`, `asembler/`, `writlib/` and `algol/` (`*TO
+PERSO:410000` … `440000`, `460000`); the cards `FORTRAN:41,42`, `ASEMBLER:43`,
+`WRITLIB*:44` and `ALGOL:46` make `COLLECT` take them from there, so they stay out of
 the temporary library, which becomes the dynamic part (the archived image was made in the
 same way). In one run a name stands for one module in all sections, so the editions of
-the assembler modules in `GLINK` are named `GAS...` (see `Monsys9_Tape.md`). `COMTODRU`
+the assembler modules in `GLINK` are named `GAS...` and the modules of `ALGOL` `A...`
+(see `Monsys9_Tape.md`). `COMTODRU`
 makes the drum form: catalog entries become physical exchanges, the static part moves to
 the end of drum 22.
 
-`ALGOL` and `A/PRINTM` cannot be on the cards: they exist only as linked
-static sections in the archived image. So `ms-splice.py` builds the final image:
-everything from the new drums, the static part with the sections linked by `COLLECT` and
-`ALGOL`, `A/PRINTM` from the archive, packed to the end of zone 77, the monitor page in
+`ms-splice.py` builds the final image: everything from the new drums, the static part
+with the sections linked by `COLLECT` packed to the end of zone 77, the monitor page in
 the zone before it, a new static catalog and word 1377 in zone 1, and the dynamic loader
 from tape 101 in zones 0 and 1. With the present sizes all lands at the archived places
-(`INPUTCAL` differs in five words, the Fortran compiler and `ASEMBLER` in words of the
-headers, `WRITLIB*` not at all). The result goes to tape 203
+(`INPUTCAL` differs in five words, the compilers in words of the headers, `WRITLIB*` not
+at all). The result goes to tape 203
 and to
 `data/mons9.bin` for `mkdisk9.sh`.
 

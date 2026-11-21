@@ -129,7 +129,7 @@ Note: it is the same as dub_besm/dumba.ms
 
 	monsys/monsys.9 - the real image of  monsys-9 (layout: docs/Monsys9_Tape.md)
 
-# fortran/, asembler/, tools/, writlib/ - the Fortran compiler, the assembler and WRITLIB* of 9/MONSYS as Madlen sources
+# fortran/, asembler/, tools/, writlib/, algol/ - the static sections of 9/MONSYS as Madlen sources
 
 	fortran/Makefile      - make: rebuild FORTRAN, CBDPR, CONTROL, ENDPRO, GLINK, compare with the tape
 	fortran/*.asm         - the modules of the compiler
@@ -146,5 +146,12 @@ Note: it is the same as dub_besm/dumba.ms
 	tools/ovltest/        - test: modules of the same name in sibling overlays (run.sh)
 	writlib/writlib.asm   - the root of the section WRITLIB* (the rest are library modules)
 	writlib/Makefile      - make: link WRITLIB*, compare with the tape
+	algol/Makefile        - make: rebuild ALGOL and A/PRINTM (ALGOL-ГДР), compare with the tape
+	algol/*.asm           - the modules of the Algol compiler (names A...)
+	algol/*.layout.py     - the layout of each overlay
+	algol/*.sym, *.tsym   - code marks for the disassembly (*.tsym: make trace, test*.alg)
+	tools/ovltrace.py     - the code of an overlay that a dubna trace executed
+	tools/codesym.py      - guess the code that a disassembly shows as data
+	tools/findsame.py     - find the same code in two images at different addresses
 
 # END

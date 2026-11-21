@@ -21,7 +21,7 @@ BUILD/data/%.bin: BUILD/data/base/%.bin
 rebuild:
 	cd BUILD && ./bootstrap.sh
 
-# FORTRAN, ASEMBLER, WRITLIB* and the loader equal the archived ones, the MS perso
+# FORTRAN, ASEMBLER, ALGOL, WRITLIB* and the loader equal the archived ones, the MS perso
 # and libraries 21, 22, 23 differ only where known, the rebuilt system boots and runs hello from
 # Multitype (this restores BUILD/data from the base).
 check:
@@ -29,6 +29,7 @@ check:
 	$(MAKE) -C fortran
 	$(MAKE) -C asembler
 	$(MAKE) -C writlib
+	$(MAKE) -C algol
 	cd BUILD && ./ld-check.py tapes/101 tapes/9 tapes/203
 	cd BUILD && ./ms-check.sh
 	cd BUILD && ./lib-check.sh
@@ -40,8 +41,9 @@ clean:
 	$(MAKE) -C fortran clean
 	$(MAKE) -C asembler clean
 	$(MAKE) -C writlib clean
+	$(MAKE) -C algol clean
 	$(MAKE) -C tools clean
-	rm -f fortran/*.gold.bin asembler/*.gold.bin
+	rm -f fortran/*.gold.bin asembler/*.gold.bin algol/*.gold.bin
 	rm -rf tools/ovltest/out BUILD/tapes
 	rm -f BUILD/cosy/cosy2utf BUILD/cosy/utf2cosy BUILD/cosy/utf2iso
 	cd BUILD && rm -f *.list *log*.txt *debug*.txt *.out *.tap mk-base.log boot-check.log \

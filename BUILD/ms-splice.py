@@ -10,12 +10,12 @@ out      - result: template with zones 0-77 replaced
 loader   - tape made by mk-ld-img.sh: the dynamic loader, zone 0 (LOADER)
            and words 0-377 of zone 1 (REDUOL) go to the same places
 
-The static part has the sections of the old catalog in its order: those
-that COLLECT did relink (INPUTCAL, FORTRAN with its phases, ASEMBLER,
-WRITLIB*) from the new image, the others (ALGOL, A/PRINTM) from the old one.
-As COMTODRU does, it ends with zone 77 and the monitor page is in the zone
-before it; the static catalog and word 1377 of zone 1 are made anew.  All
-the rest of zones 0-77 is new.
+The static part has the sections of the old catalog in its order, each
+from the new image if COLLECT did relink it (now all of them: INPUTCAL,
+FORTRAN with its phases, ASEMBLER, ALGOL with A/PRINTM, WRITLIB*), else
+from the old one.  As COMTODRU does, it ends with zone 77 and the monitor
+page is in the zone before it; the static catalog and word 1377 of zone 1
+are made anew.  All the rest of zones 0-77 is new.
 """
 import struct
 import sys
