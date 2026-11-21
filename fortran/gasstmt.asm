@@ -1,17 +1,17 @@
- ASMSTMT:,NAME,DTRAN  /01.06.84/
+ GASSTMT:,NAME,DTRAN  /01.06.84/
  *REGIM//:,LC,1
  FLGEX*:,LC,1
  D10170:,LC,5800
  TABFIND:,SUBP,
  TABHASH:,SUBP,
- ASMGEN:,SUBP,
+ GASGEN:,SUBP,
  G44504:,SUBP,
  D44562:,LC,165
  ,UJ,*0005B
  :13,UJ,
  :13,UJ,
- :,UJ,ASMGEN+16
- :,UJ,ASMGEN
+ :,UJ,GASGEN+16
+ :,UJ,GASGEN
  *0005B:,XTA,
  ,UTC,D44562+159
  ,ATX,
@@ -32,7 +32,7 @@
  6,AAX,117B
  ,UZA,*0020B
  13,VTM,*0011B
- ,UJ,ASMGEN+6
+ ,UJ,GASGEN+6
  *0020B:6,XTA,1
  6,ATX,61B
  6,XTA,2
@@ -143,7 +143,7 @@
  6,ATX,51B
  3,VTM,-9
  *0112B:,XTA,
- 13,VJM,ASMGEN+23
+ 13,VJM,GASGEN+23
  3,VLM,*0112B
  :6,XTA,154B
  6,WTC,223B
@@ -187,7 +187,7 @@
  14,VZM,*0340B
  ,ITA,13
  6,XTS,55B
- 13,VJM,ASMGEN+23
+ 13,VJM,GASGEN+23
  ,UJ,*0175B
  *0143B:6,XTA,67B
  6,AEX,64B
@@ -210,9 +210,9 @@
  ,UZA,*0173B
  7,XTA,
  6,ATX,246B
- 13,VJM,ASMGEN+5
+ 13,VJM,GASGEN+5
  7,XTA,
- 13,VJM,ASMGEN+23
+ 13,VJM,GASGEN+23
  6,XTA,64B
  6,ARX,154B
  6,ATX,64B
@@ -225,10 +225,10 @@
  6,WTC,111B
  ,XTA,
  6,ATX,246B
- 13,VJM,ASMGEN+5
+ 13,VJM,GASGEN+5
  6,WTC,111B
  ,XTA,
- 13,VJM,ASMGEN+23
+ 13,VJM,GASGEN+23
  6,XTA,64B
  6,ARX,154B
  6,ATX,64B
@@ -373,9 +373,9 @@
  *0303B:6,WTC,214B
  ,XTA,
  15,ATX,
- 13,VJM,ASMGEN+21
+ 13,VJM,GASGEN+21
  ,STX,
- 13,VJM,ASMGEN+23
+ 13,VJM,GASGEN+23
  6,WTC,21B
  2,VTM,1
  *0307B:,ITA,2
@@ -383,9 +383,9 @@
  ,UZA,*0314B
  2,XTA,
  15,ATX,
- 13,VJM,ASMGEN+21
+ 13,VJM,GASGEN+21
  ,STX,
- 13,VJM,ASMGEN+23
+ 13,VJM,GASGEN+23
  2,VLM,*0307B
  *0314B:6,WTC,103B
  2,VTM,
@@ -405,14 +405,14 @@
  ,UZA,*0327B
  2,XTA,
  15,ATX,
- 13,VJM,ASMGEN+21
+ 13,VJM,GASGEN+21
  ,STX,
- 13,VJM,ASMGEN+23
+ 13,VJM,GASGEN+23
  *0327B:2,UTM,2
  ,UJ,*0315B
  *0330B:,ATX,
  13,VJM,*1521B
- 13,VJM,ASMGEN+22
+ 13,VJM,GASGEN+22
  *0332B:13,VJM,G44504
  6,XTA,221B
  ,ATI,13
@@ -420,29 +420,29 @@
  *0335B:,XTA,
  ,XTA,
  *0336B:13,VTM,*0343B
- ,UJ,ASMGEN+11
+ ,UJ,GASGEN+11
  *0337B:13,VTM,*0343B
- ,UJ,ASMGEN+12
+ ,UJ,GASGEN+12
  *0340B:13,VTM,*0343B
- ,UJ,ASMGEN+13
+ ,UJ,GASGEN+13
 C===========================================
  G40204:,ENTRY,
 C===========================================
  13,VTM,*0343B
- ,UJ,ASMGEN+14
+ ,UJ,GASGEN+14
  *0342B:13,VTM,*0343B
- ,UJ,ASMGEN+15
+ ,UJ,GASGEN+15
  *0343B:,UTC,*0365B
  ,XTA,
  ,UTC,*1134B
  ,ATX,
- 13,VJM,ASMGEN+24
- ,UTC,ASMGEN+6
+ 13,VJM,GASGEN+24
+ ,UTC,GASGEN+6
  ,XTA,
  6,ATX,111B
  ,UTC,*0366B
  ,XTA,
- ,UTC,ASMGEN+6
+ ,UTC,GASGEN+6
  ,CTX,
  6,XTA,60B
  ,UTC,D44562+118
@@ -453,7 +453,7 @@ C===========================================
  ,UTC,*1134B
  ,ATX,
  6,XTA,111B
- ,UTC,ASMGEN+6
+ ,UTC,GASGEN+6
  ,CTX,
  ,XTA,
  ,UTC,*0037B
@@ -521,7 +521,7 @@ C===========================================
  6,AAX,123B
  13,UZA,
  12,XTA,
- ,UJ,ASMGEN+18
+ ,UJ,GASGEN+18
  *0425B:12,UTM,2
  ,UJ,*0413B
  *0426B:6,XTA,72B
@@ -592,7 +592,7 @@ C===========================================
  ,UJ,*0460B
  *0472B:,ITA,13
  6,XTS,72B
- 13,VJM,ASMGEN+17
+ 13,VJM,GASGEN+17
  ,STX,
  ,ATI,13
  ,XTA,
@@ -678,7 +678,7 @@ C===========================================
  6,AAX,143B
  ,U1A,*0555B
  *0553B:6,XTA,72B
- 13,VJM,ASMGEN+18
+ 13,VJM,GASGEN+18
  12,VTM,
  ,UJ,*0562B
  *0555B:12,XTA,1
@@ -687,7 +687,7 @@ C===========================================
  ,ITA,12
  ,XTS,
  6,XTA,72B
- 13,VJM,ASMGEN+18
+ 13,VJM,GASGEN+18
  ,STX,
  ,ATI,12
  *0562B:,STX,
@@ -766,7 +766,7 @@ C===========================================
  13,UZA,
  ,ITA,13
  6,XTS,156B
- 13,VJM,ASMGEN+4
+ 13,VJM,GASGEN+4
  6,XTA,156B
  13,VJM,*0126B
  ,UJ,*0143B
@@ -780,9 +780,9 @@ C===========================================
  6,AAX,114B
  ,UZA,*0651B
  ,STX,
- *0645B:13,VJM,ASMGEN+20
+ *0645B:13,VJM,GASGEN+20
  13,VJM,*1641B
- 13,VJM,ASMGEN+6
+ 13,VJM,GASGEN+6
  ,UJ,*0007B
  *0651B:13,VJM,*0631B
  13,VJM,*0713B
@@ -1149,7 +1149,7 @@ C===========================================
  ,ATI,7
  6,ARX,46B
  6,ATX,46B
- *1166B:13,VJM,ASMGEN+1
+ *1166B:13,VJM,GASGEN+1
  *1167B:,ITA,7
  ,XTS,
  13,VJM,*0637B
@@ -1160,12 +1160,12 @@ C===========================================
  ,UJ,*0007B
  *1174B:,ATX,
  *1175B:13,VTM,*0007B
- ,UJ,ASMGEN+1
+ ,UJ,GASGEN+1
  *1176B:6,XTA,64B
  6,XTS,64B
  6,ARX,204B
  6,ATX,64B
- 13,VJM,ASMGEN+1
+ 13,VJM,GASGEN+1
  6,XTA,204B
  6,ARX,170B
  6,ATX,46B
@@ -1193,7 +1193,7 @@ C===========================================
  6,XTA,63B
  6,AAX,123B
  ,UZA,*1222B
- 13,VTM,ASMGEN+6
+ 13,VTM,GASGEN+6
  ,UJ,*0007B
  *1222B:6,XTA,137B
  6,AEX,122B
@@ -1223,7 +1223,7 @@ C===========================================
  6,AOX,167B
  6,ATX,51B
  :13,VTM,*0007B
- ,UJ,ASMGEN+6
+ ,UJ,GASGEN+6
  *1242B:6,XTA,51B
  6,AOX,114B
  6,AOX,122B
@@ -1240,7 +1240,7 @@ C===========================================
  6,ATX,76B
  ,UJ,*1264B
  *1253B:13,VTM,*0007B
- ,UJ,ASMGEN+6
+ ,UJ,GASGEN+6
  *1254B:,ATX,
  ,A+X,603B
  ,XTA,
@@ -1275,12 +1275,12 @@ C===========================================
  ,STX,
  ,ATI,13
  13,UJ,
- :13,VJM,ASMGEN+19
+ :13,VJM,GASGEN+19
  ,XTA,
  13,VTM,*1135B
  ,UJ,*0126B
  :13,VJM,*0631B
- 13,VJM,ASMGEN+6
+ 13,VJM,GASGEN+6
  6,XTA,51B
  6,AAX,154B
  ,UZA,*0040B
@@ -1326,7 +1326,7 @@ C===========================================
  13,VJM,*0723B
  ,STX,
  15,ATX,
- 13,VJM,ASMGEN+3
+ 13,VJM,GASGEN+3
  ,STX,
  13,VJM,*0126B
  ,UJ,*0007B
@@ -1378,7 +1378,7 @@ C===========================================
  6,XTS,56B
  13,VJM,*0405B
  13,VTM,*0007B
- ,UJ,ASMGEN+6
+ ,UJ,GASGEN+6
  *1375B:13,VJM,*1647B
  ,UJ,*1372B
  :13,VJM,*1645B
@@ -1446,7 +1446,7 @@ C===========================================
  6,XTS,73B
  13,VJM,*1604B
  *1443B:13,VTM,*0007B
- ,UJ,ASMGEN+6
+ ,UJ,GASGEN+6
  *1444B:6,XTA,61B
  ,U1A,*1447B
  6,XTA,63B
@@ -1528,7 +1528,7 @@ C===========================================
  13,VJM,*0637B
  6,XTA,55B
  13,VTM,*0007B
- ,UJ,ASMGEN+2
+ ,UJ,GASGEN+2
  *1521B:,NTR,3
  6,XTA,76B
  6,ATX,11B
@@ -1704,8 +1704,8 @@ C===========================================
  ,ASN,64-5
  ,ASN,64+5
  6,ATX,63B
- 13,VJM,ASMGEN+20
- *1665B:13,VJM,ASMGEN+6
+ 13,VJM,GASGEN+20
+ *1665B:13,VJM,GASGEN+6
  ,UJ,*0007B
  *1667B:6,XTA,61B
  6,ATX,56B

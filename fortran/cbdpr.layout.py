@@ -38,5 +38,6 @@ RENAME = {
 # the names of the S modules and of their entries, at their addresses here
 RENAME.update({'G36106': 'MKITEM', 'G40531': 'PUTLABEL', 'G40621': 'D41115',
                'G40623': 'LABTEXT'})
+SARRAYS = [(0o214, 0o206)]       # S arrays: D02144 past 037 words and the rest, 0214-0421
 LOW = 'dubna'                   # Dubna resident: MONITOR*, /MONTRAN
 ERRCALLS = [0o36102]            # CBERROR (and those of the root)

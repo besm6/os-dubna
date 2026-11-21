@@ -9,3 +9,5 @@ build.lst
 lib.lst
 dubovl.dub
 __pycache__/
+gasgen.asm
+gas43044.asm

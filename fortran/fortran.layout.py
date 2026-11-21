@@ -68,6 +68,7 @@ RENAME.update({'G04022': 'SYMOUT', 'G04134': 'PUTAWAY', 'G06134': 'WRDECL',
                'G34473': 'DBGSTUB', 'G34477': 'OCTTODEC'})
 # the places here that the S modules call by these names
 ALIASES = {0o6136: 'WRLIST'}
+SARRAYS = [(0o100, 0o114)]       # S arrays: its variables in 0100-0213
 LOW = 'dubna'                   # Dubna resident: MONITOR*, /MONTRAN
 # the error routines: ERRVEC, ERRPRINT, ERRPRIN2, ERRCODE, 05130 (inside PUTAWAY), 03207 (the common error exit of SCANSTMT)
 ERRCALLS = [0o33465, 0o34045, 0o34047, 0o06210, 0o05130, 0o03207]

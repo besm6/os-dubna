@@ -2,7 +2,8 @@
 # installation tape 9/MONSYS (../monsys/monsys.9), rebuilt identical to the
 # original. Linked under /MONTRAN by ../tools/dubovl.pl in the dubna
 # emulator: it loads at 01604. Some of its modules are also linked into
-# GLINK of the Fortran compiler (../fortran).
+# GLINK of the Fortran compiler (../fortran): ASMPRINT and SIMFAIL* as they
+# are, ASMGEN and G43044 as copies with other names (GASGEN, GAS43044).
 #
 # Some modules are made from the disassembly (M items of asembler.layout.py,
 # `make asm`), the Madlen files of the others are kept as they are (S items:
@@ -72,6 +73,10 @@ asm: asembler.gold.dis asembler.gold.bin ../tools/cosy2txt
 # after a BAD build: which module or common block is misplaced or different
 modcmp: asembler.silver.bin
 	-$(OVSPLIT) asembler cmp
+
+# the Madlen files, for ../BUILD/mk-ms-img.sh: make print-ASEMBLER
+print-%:
+	@echo $($*)
 
 .PHONY: all asm modcmp
 .SECONDARY:

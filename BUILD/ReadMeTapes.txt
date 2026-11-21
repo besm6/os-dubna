@@ -77,6 +77,9 @@
 203 - 9/MONSYS with the rebuilt MS (ms-splice.py), see docs/Monsys9_Tape.md
 221 - libra21 
 223 - libra23
+241 - perso of FORTRAN, CBDPR (mk-ms-img.sh, unit 41 for COLLECT)
+242 - perso of CONTROL, ENDPRO, GLINK (unit 42)
+243 - perso of ASEMBLER (unit 43)
 247 - task11+task47 (compilation in FOREX)
 301 - exfor - not used (partial source code)
 

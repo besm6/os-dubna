@@ -1,8 +1,10 @@
 """
 GLINK, the assembler of Fortran inserts, of the Dubna installation tape
-(monsys.9). From ASMSTMT on it is the assembler: ASMSTMT and ASMINIT (the
-editions of GLINK, here), ASMGEN and its second half G43044, ASMPRINT,
-SIMFAIL* (../asembler, shared with ASEMBLER). GLINK keeps a variable of
+(monsys.9). From GASSTMT on it is the assembler: GASSTMT and GASINIT (the
+editions of GLINK of ASMSTMT and ASMINIT, here), GASGEN and its second half
+GAS43044 (ASMGEN and G43044 of ../asembler with these names, made by
+`make sources`), ASMPRINT, SIMFAIL* (../asembler, shared with ASEMBLER).
+The names GAS... keep those of ASEMBLER apart in one COLLECT run. GLINK keeps a variable of
 D02144 that lies in the low memory (see fortran.layout.py). ASMPRINT keeps
 its tables in a common block after its code. The modules made from the
 disassembly are M items, those whose Madlen files are kept as they are S
@@ -21,10 +23,10 @@ LAYOUT = [
     (0o37030, S, 'G37030'),     # TABFIND
     (0o37106, S, 'G37106'),     # LISTLINE
     (0o37313, S, 'G37313'),     # FLDADD
-    (0o37326, M, 'G37326'),     # ASMSTMT
-    (0o41644, S, 'G41644'),     # ASMGEN
-    (0o42527, S, 'G42527'),     # G43044
-    (0o43725, M, 'G43725'),     # ASMINIT
+    (0o37326, M, 'G37326'),     # GASSTMT
+    (0o41644, S, 'G41644'),     # GASGEN
+    (0o42527, S, 'G42527'),     # GAS43044
+    (0o43725, M, 'G43725'),     # GASINIT
     (0o44236, C, 'D44562'),
     (0o44503, M, 'G44503'),     # ASMPRINT
     (0o45026, C, 'D45026'),     # its tables
@@ -40,11 +42,11 @@ LIB = {
     0o50035: ('OCTTDEC', {}),
 }
 # the modules made here (the S modules keep the names in their files)
-RENAME = {'G34600': 'GLINK', 'G37326': 'ASMSTMT', 'G43725': 'ASMINIT',
+RENAME = {'G34600': 'GLINK', 'G37326': 'GASSTMT', 'G43725': 'GASINIT',
           'G44503': 'ASMPRINT', 'G46371': 'SIMFAIL*'}
-# what ASMGEN and G43044 call in ASMINIT, which is shorter here, and FLDADD in
-# ASMSTMT
-ALIASES = {0o43726: 'G44243', 0o44235: 'D44561',
+# what GASGEN and GAS43044 call in GASINIT, which is shorter here, and FLDADD
+# in GASSTMT
+ALIASES = {0o43726: 'GAS44243', 0o44235: 'GAS44561',
            0o37667: 'G40204'}    # FLDADD jumps into ASMSTMT
 OWNER = {0o45026: 0o44503,
          0o47063: 0o34600}      # declared only by GLINK, which has all
@@ -55,8 +57,8 @@ RENAME.update({'G35745': 'G36241', 'G35753': 'E36247', 'G36255': 'G36551',
                'G36434': 'G36730', 'G36502': 'G36776', 'G37030': 'TABFIND',
                'G37031': 'TABHASH', 'G37106': 'LISTLINE',
                'G37213': 'LISTEND', 'G37313': 'FLDADD', 'G37325': 'E37621',
-               'G41644': 'ASMGEN', 'G41677': 'G42214', 'G42052': 'G42367',
-               'G42261': 'G42576', 'G42456': 'G42773', 'G42527': 'G43044'})
+               'G41644': 'GASGEN', 'G41677': 'GAS42214', 'G42052': 'GAS42367',
+               'G42261': 'GAS42576', 'G42456': 'GAS42773', 'G42527': 'GAS43044'})
 # the places here that the S modules call by these names
 ALIASES.update({0o35745: 'G36241', 0o35753: 'E36247'})
 VECTORS = {0o41644: 27}   # ASMGEN: a vector of jumps

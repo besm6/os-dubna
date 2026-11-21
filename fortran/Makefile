@@ -4,6 +4,9 @@
 # originals. Linked under /MONTRAN by ../tools/dubovl.pl in the dubna
 # emulator: the root loads at 01604, the sub-overlays at 34570. GLINK, the
 # assembler of Madlen inserts, shares modules with ASEMBLER (../asembler).
+# Its editions of them have names GAS... (GASSTMT, GASINIT and the copies
+# GASGEN, GAS43044 made here, `make sources`), so that ASEMBLER keeps the
+# names ASM... and both can be linked in one COLLECT run (../BUILD/mk-ms-img.sh).
 #
 # Some modules are made from the disassembly (M items of OV.layout.py,
 # `make asm`), the Madlen files of the others are kept as they are (S items).
@@ -30,7 +33,7 @@ OWN_cbdpr = cbdpr.asm cbproc.asm cbbss.asm cbce.asm cbequ.asm cdimsr.asm cfrch.a
 	cbtrace.asm cberror.asm cbprcz.asm putdat.asm
 OWN_control = control.asm g40152.asm assignst.asm arithexp.asm operand.asm \
 	funcref.asm g45015.asm logexpr.asm g46107.asm prosig.asm g50741.asm
-OWN_glink = glink.asm asmstmt.asm asminit.asm $(A)asmprint.asm $(A)simfail%.asm
+OWN_glink = glink.asm gasstmt.asm gasinit.asm $(A)asmprint.asm $(A)simfail%.asm
 FORTRAN = fortran.asm scanstmt.asm symout.asm putaway.asm \
 	wrdecl.asm wrout.asm errcode.asm banner.asm getcard.asm \
 	addtext.asm listcard.asm errvec.asm putname.asm putsymb.asm \
@@ -44,9 +47,15 @@ CONTROL = control.asm g40152.asm assignst.asm ifstmt.asm arithexp.asm \
 	g50501.asm g50510.asm g50517.asm g50531.asm g50610.asm \
 	g50635.asm g50655.asm g50674.asm g50741.asm
 ENDPRO = endpro.asm idxerr.asm enddump.asm
-GLINK = glink.asm g36551.asm tabfind.asm listline.asm fldadd.asm asmstmt.asm \
-	$(addprefix $(A),asmgen.asm g43044.asm) asminit.asm \
+GLINK = glink.asm g36551.asm tabfind.asm listline.asm fldadd.asm gasstmt.asm \
+	gasgen.asm gas43044.asm gasinit.asm \
 	$(addprefix $(A),asmprint.asm simfail%.asm)
+
+# GASGEN and GAS43044 are ASMGEN and G43044 of ../asembler with the names of
+# the GLINK editions: what differs from ASEMBLER and what they call there
+GEN = gasgen.asm gas43044.asm
+GAS = $(foreach n,ASMSTMT ASMINIT ASMGEN G43044 G42214 G42367 G42576 G42773 \
+	G44243 D44561,-e 's/\b$(n)\b/$(subst ASM,GAS,$(subst G4,GAS4,$(subst D4,GAS4,$(n))))/g')
 
 # the header (8 words) holds the place of the overlay in the catalog
 all: $(addsuffix .silver.bin,$(OVERLAYS)) $(addsuffix .gold.bin,$(OVERLAYS))
@@ -94,6 +103,14 @@ build.lst: $(FORTRAN) $(CBDPR) lib.lst
 %.silver.bin: %.silver.ovl $(OVL2BIN)
 	$(OVL2BIN) < $< > $@
 
+gasgen.asm: $(A)asmgen.asm
+	sed $(GAS) $< > $@
+
+gas43044.asm: $(A)g43044.asm
+	sed $(GAS) $< > $@
+
+sources: $(GEN)
+
 # name, load address, first code address
 dis = disbesm6 -a$(2) -e$(3) $(if $(wildcard $(1).sym),-n$(1).sym)
 
@@ -125,8 +142,12 @@ asm: $(addsuffix .gold.dis,$(OVERLAYS)) $(addsuffix .gold.bin,$(OVERLAYS)) ../to
 modcmp: $(addsuffix .silver.bin,$(OVERLAYS))
 	-for o in $(OVERLAYS); do $(OVSPLIT) $$o cmp; done
 
-.PHONY: all asm modcmp
+# the Madlen files of an overlay, for BUILD/mk-ms-img.sh: make print-FORTRAN
+print-%:
+	@echo $($*)
+
+.PHONY: all asm modcmp sources
 .SECONDARY:
 
 clean:
-	rm -f *.silver.* *.out build.lst lib.lst dubovl.dub ftnlib.bin ftnovl.bin
+	rm -f *.silver.* *.out build.lst lib.lst dubovl.dub ftnlib.bin ftnovl.bin $(GEN)

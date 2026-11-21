@@ -216,7 +216,7 @@ otherwise zeros repeat. The piece of TRP, if any, comes after the last group: th
 | Resident `MONITOR*`, monitor page, TRP | 35, zone 1 | **compiled** from `besmmons/` |
 | Dynamic part and its catalog | 7–33 | **compiled** from `besmmons/` |
 | Section `INPUTCAL` | 36–43 | relinked from library 21 (binary perso) and the new dynamic modules |
-| Sections `FORTRAN`, `CBDPR`, `CONTROL`, `ENDPRO`, `GLINK`, `ASEMBLER` | 43–70 | **rebuilt** from the Madlen sources in `fortran/`, `asembler/` |
+| Sections `FORTRAN`, `CBDPR`, `CONTROL`, `ENDPRO`, `GLINK`, `ASEMBLER` | 43–70 | **linked by `COLLECT`** from the Madlen sources in `fortran/` and `asembler/` |
 | Sections `ALGOL`, `A/PRINTM`, `WRITLIB*` | 70–77 | copied from the archived tape |
 | Loaders and tables | 0, 2–6 | copied from the running system by `COLLECT` |
 | Everything from zone 100 | 100–437 | the archived tape |
@@ -225,10 +225,32 @@ otherwise zeros repeat. The piece of TRP, if any, comes after the last group: th
 nor their perso, only the linked sections. The Fortran compiler and the assembler were
 taken apart from the linked sections into Madlen sources (`fortran/`, `asembler/`); `make`
 there links them with `*CALL OVERLAY` (`tools/dubovl.pl`) into images identical to the
-archived ones. They have no perso either, so `COLLECT` cannot link them (whatever is in the
-job's temporary library becomes the dynamic part); `ms-splice.py` puts the images in. The
-dynamic loader has a source (`besmtask/loader.txt`, compiled to tape 100) but it is not yet
-put into the image.
+archived ones. The dynamic loader has a source (`besmtask/loader.txt`, compiled to tape
+100) but it is not yet put into the image.
+
+All the static sections of the archived tape were written by one run of `COLLECT` (bit 46
+of each catalog word; the date 22/10/88 in words 1776–1777 of the catalog), with the tree of
+section 5. The modules of a compiler were not in the temporary library, which becomes the
+dynamic part, but in a library of their own: a card `NAME:n1,n2` in the tree (up to four
+numbers; a number from 030 up is the unit of a tape with a library from zone 0, an ОБСП or a
+perso) gives the libraries for the section `NAME` of the second level and all the sections
+under it. `COLLECT` takes from them what it does not find in the temporary library. The
+build does the same for the Fortran compiler and the assembler. `*CALL OVERLAY` is an entry
+of `COLLECT` and builds the catalog anew each time: there is no mode that adds to an old one.
+
+A module taken from a library stays in the temporary library to the end of the run, and the
+temporary library is searched first. So in one run a name means one module for all the
+sections: a section linked later gets the module, or the entry, that an earlier one took,
+whatever its own cards say, and no message tells it. Modules that differ must have different
+names. `GLINK` and `ASEMBLER` share modules, but `ASMSTMT` and `ASMINIT` come in two
+editions, and `ASMGEN` and `G43044`, the same text in both, call the entries `D44561` and
+`G44243`, which are in different modules in each. `ASEMBLER` keeps the names `ASM...`;
+the editions of `GLINK` are `GASSTMT`, `GASINIT` (with the entries `GAS44243`, `GAS44561`),
+and `fortran/Makefile` makes the copies `GASGEN`, `GAS43044` from the files in `asembler/`
+(`make sources`). `ASMPRINT` and `SIMFAIL*` are linked into both as they are.
+`tools/ovltest/run.sh` shows the effects on two small overlays. The cards `NAME:n` take
+effect only under the root `MONITOR*` (label `LOAD` in `besml21/libra211.l21`); under
+another root they are ignored.
 
 ### Step 1: compile — `BUILD/mk-ms-src.sh`
 
@@ -253,25 +275,37 @@ The original tools run under `dubna`:
 *tape:200/ms,66             the perso
 *tape:201/msimg,67,w        output of COLLECT
 *tape:202/msdrum,65,w       output of COMTODRU
+*tape:241/cmp41,41          perso of FORTRAN, CBDPR
+*tape:242/cmp42,42          perso of CONTROL, ENDPRO, GLINK
+*tape:243/cmp43,43          perso of ASEMBLER
 *library:21
 *library:23
 *perso:66000
 *call collect:670000
-MONITOR*(INPUTCAL)
+MONITOR*(INPUTCAL,FORTRAN,ASEMBLER)
+FORTRAN(CBDPR,CONTROL,ENDPRO,GLINK)
+FORTRAN:41,42
+ASEMBLER:43
 *end record
 *call comtodru:670000,650000
 ```
 
-- `*PERSO:66000` makes tape 200 the temporary library of the job. Whatever is in the
-  temporary library becomes the dynamic part.
+- Three jobs before it compile the Madlen files of the Fortran compiler and of the
+  assembler (the lists are in `fortran/Makefile` and `asembler/Makefile`, `make
+  print-FORTRAN`) and write them with `*TO PERSO:410000` … `*TO PERSO:430000` to tapes
+  241–243 (`ms-ftn41.list`, `ms-ftn42.list`, `ms-asm43.list`): the input of a job is at
+  most two drums.
+- `*PERSO:66000` copies the perso of tape 200 into the temporary library of the job.
+  Whatever is in the temporary library becomes the dynamic part.
 - **`COLLECT`** first jumps to `NEW//MON`, which loads a fresh resident and saves its page,
   then starts `COLLECT` again. It prints the map of the resident: check that `MONITOR*` is
   at 423 and `INFLOAD*` at 716, as before; DD and the old sections rely on these addresses.
   Then it removes itself and its helpers from the library, writes zones 0–6, the
   dynamic part and the catalogs to unit 67, links the sections named on the cards and
   writes them after the dynamic part, and puts the monitor page into zone 77.
-  The cards give the tree, as in section 5, up to `*END RECORD`. Only `INPUTCAL` can be
-  named: the other sections have no perso. `INPUTCAL` needs `DATE` and `DTOI` from library 23.
+  The cards give the tree, as in section 5, up to `*END RECORD`; `FORTRAN:41,42` makes it
+  take the modules of `FORTRAN` and its sections from tapes 241, 242, `ASEMBLER:43` those
+  of `ASEMBLER` from tape 243. `INPUTCAL` needs `DATE` and `DTOI` from library 23.
 - **`COMTODRU`** turns that tape into the drum form: catalog entries become physical
   exchanges, the static part moves to the end of zone 77, the monitor page goes to the
   zone before it, and word 1377 of zone 1 is set. It prints where the page is:
@@ -282,20 +316,17 @@ than 64 zones), `CИCTEMA BEЛИKA`.
 
 ### Step 3: splice — `BUILD/ms-splice.py`
 
-Tape 202 now is a correct MS with one static section. The script makes the final 64 zones:
+Tape 202 now is a correct MS with the static sections `INPUTCAL`, `FORTRAN` with its four
+and `ASEMBLER`. The script makes the final 64 zones:
 
 1. everything up to the end of the dynamic part from tape 202;
 2. the monitor page from tape 202, put into the old zone (35);
 3. the static part from the archived tape, at the old place;
-4. each section that `COLLECT` relinked replaces the old one if it takes the same number
-   of records (`INPUTCAL`: 181 records, six words differ from the old);
-5. each section given on the command line as `NAME=image` (`mk-ms-img.sh` gives `FORTRAN`,
-   `CBDPR`, `CONTROL`, `ENDPRO`, `GLINK`, `ASEMBLER` from `make` in `../fortran`,
-   `../asembler`) replaces the old one: it keeps the old 8 header words (places on the
-   drums) and the old piece of TRP, is packed as the original packer did (an unchanged
-   image gives the old bytes) and must have the old length and fit into the old records,
-   since the catalog stays the old one;
-6. in zone 1 the old static catalog and the old word 1377; the gap in the root entry is
+4. each section that `COLLECT` linked replaces the old one; it must take the same number
+   of records, since the catalog stays the old one (`INPUTCAL`: 181 records, six words
+   differ from the old; the sections of the Fortran compiler and `ASEMBLER`: only words
+   of the header, see below);
+5. in zone 1 the old static catalog and the old word 1377; the gap in the root entry is
    computed anew.
 
 It stops if the dynamic part grows past zone 34. The result is written twice: tape 203
@@ -316,12 +347,20 @@ It stops if the dynamic part grows past zone 34. The result is written twice: ta
 - `dubna` itself always runs the monitor built into it, not the files in `BUILD/tapes`. A
   broken tape 203 cannot break the build, only the system booted in SIMH.
 - Old static sections contain old copies of library modules. A change in, say, `PRINT8`
-  reaches user programs and `INPUTCAL`, but not the Fortran compiler.
+  reaches user programs and the relinked sections, but not `ALGOL`, `A/PRINTM` or `WRITLIB*`.
+- Words 5 and 6 of a section header are the registers 16B and 17B of the loader after it
+  has linked the section (and words 1, 2 of a section under it, the same of its parent):
+  16B the pointers AC, AS, AU, of which AS gives out the S arrays (`,LS,`) in the low
+  memory from 0100; 17B the length of the load list and the first free address. The
+  layouts declare the S arrays of `FORTRAN` (0100–0213) and `CBDPR` (0214–0421), so 16B
+  is that of the archive; the length of the load list is not (FORTRAN 310 against 550 in
+  the archive, ASEMBLER 236 against 206): it counts the names of the modules and entries,
+  which the archive does not keep.
 - The resident must keep its addresses. If `MONITOR*` changes size, the old sections
   (linked from 1604) and the addresses pinned in `BUILD/deck-b1/fix-aux.s` no longer fit.
 - The room is tight: 64 zones, of which the static part takes 34 and the dynamic part 19.
 - The job `hello` uses `*FORTRAN`, the section `FORTRAN` of the static part (banner
-  `Ф О Р Т Р А Н /16.07.73/`), rebuilt from `fortran/`; `*FTN` calls Fortran-GDR from zone
+  `Ф О Р Т Р А Н /16.07.73/`), linked from `fortran/`; `*FTN` calls Fortran-GDR from zone
   100, `*MADLEN` the assembler from library 22, both archived binaries. A change in
-  `fortran/` or `asembler/` reaches the image only if the section keeps its length and its
-  records; a longer one needs a new static catalog, which `ms-splice.py` does not make.
+  `fortran/` or `asembler/` reaches the image only if the section keeps its records; a
+  longer one needs a new static catalog, which `ms-splice.py` does not make (it stops).

@@ -56,6 +56,10 @@ OV.layout.py defines
     ERRMSG      file of error messages (`code text`, see ftnerr.py): the error
                 numbers found by the ERRCALLS and NUMBERS rules get a comment
                 with the text in the .asm (the low 12 bits are the code)
+    SARRAYS     [(address, length)]: S arrays (`name:,LS,len`) of the overlay,
+                which the loader puts into the low memory from 0100 up (the
+                pointer AS, 16B in the header of the overlay): the first
+                module declares them; the code addresses them by numbers
     OWNER       {common address: module address}: the module whose `,DATA,`
                 section sets the block, when it is not the one before it
     VECTORS     {module address: n} for a module that begins with a vector of
@@ -201,6 +205,7 @@ class Layout:
         self.vectors = dict(getattr(m, 'VECTORS', {}))
         self.offsets = set(getattr(m, 'OFFSETS', ()))
         self.owner = dict(getattr(m, 'OWNER', {}))
+        self.sarrays = list(getattr(m, 'SARRAYS', ()))
         self.errmsg = dict(self.root.errmsg) if self.root else {}
         if getattr(m, 'ERRMSG', None):
             for l in open(os.path.join(path, m.ERRMSG), encoding='utf-8'):
@@ -695,6 +700,9 @@ def make_asm(lay, name):
     ren = re.compile(r'(?<![\w/*])(%s)(?![\w/*])' % '|'.join(rename or ['\0']))
     for l in head:
         print(ren.sub(lambda m: rename[m.group(1)], l))
+    if s == STARTS[0]:
+        for a, n in lay.sarrays:
+            print(' L%05o:,LS,%d' % (a, n))
     for d in decl:
         print(' %s:,LC,%d' % (rename.get(d, d), commons[d]) if d in commons
               else ' %s:,SUBP,' % rename.get(d, d))
