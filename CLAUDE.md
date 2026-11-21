@@ -122,8 +122,9 @@ Pipeline in `bootstrap.sh`:
    `INPUTCAL` among them, come from the perso of libraries 21, 23 (tapes 221, 223, cards
    `INPUTCAL:61,63` ...), as tape 245 adds to the temporary library a `COLLECT` that drops
    library 21 from the head of the list. `ms-splice.py` puts it into a copy
-   of 9/MONSYS (tape 203, `data/mons9.bin`) with the loader of tape 101, keeping the old
-   static sections of the other compilers; `lib-splice.py` puts in the libraries of tapes
+   of 9/MONSYS (tape 203, `data/mons9.bin`) with the loader of tape 101 and the old
+   static sections `ALGOL`, `A/PRINTM`, packing the static part to the end of zone 77 and
+   making the static catalog and word 1377 (the monitor page) anew; `lib-splice.py` puts in the libraries of tapes
    251-253. The jobs of the build keep using the archived libraries of tape 9.
    `ms-check.sh` compares tape 200 with the archived library:
    only `CHKBEG*` and `EDIT***` differ in size.

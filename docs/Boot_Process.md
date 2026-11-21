@@ -108,10 +108,12 @@ the end of drum 22.
 
 `ALGOL` and `A/PRINTM` cannot be on the cards: they exist only as linked
 static sections in the archived image. So `ms-splice.py` builds the final image:
-everything from the new drums, the static part and its catalog from the archive at the
-old place, and in it the sections linked by `COLLECT` (the same size: `INPUTCAL` differs
-in five words, the Fortran compiler and `ASEMBLER` in words of the headers, `WRITLIB*` not
-at all), and the dynamic loader from tape 101 in zones 0 and 1. The result goes to tape 203
+everything from the new drums, the static part with the sections linked by `COLLECT` and
+`ALGOL`, `A/PRINTM` from the archive, packed to the end of zone 77, the monitor page in
+the zone before it, a new static catalog and word 1377 in zone 1, and the dynamic loader
+from tape 101 in zones 0 and 1. With the present sizes all lands at the archived places
+(`INPUTCAL` differs in five words, the Fortran compiler and `ASEMBLER` in words of the
+headers, `WRITLIB*` not at all). The result goes to tape 203
 and to
 `data/mons9.bin` for `mkdisk9.sh`.
 

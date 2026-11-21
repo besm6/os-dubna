@@ -10,11 +10,12 @@ out      - result: template with zones 0-77 replaced
 loader   - tape made by mk-ld-img.sh: the dynamic loader, zone 0 (LOADER)
            and words 0-377 of zone 1 (REDUOL) go to the same places
 
-The result has the old static part at its old place; the sections that
-COLLECT did relink (INPUTCAL, FORTRAN with its phases, ASEMBLER, WRITLIB*)
-replace the old ones and must take the same records (the catalog stays the
-old one).  The others (ALGOL, A/PRINTM) stay as they were.  All the rest of
-zones 0-77 is new.
+The static part has the sections of the old catalog in its order: those
+that COLLECT did relink (INPUTCAL, FORTRAN with its phases, ASEMBLER,
+WRITLIB*) from the new image, the others (ALGOL, A/PRINTM) from the old one.
+As COMTODRU does, it ends with zone 77 and the monitor page is in the zone
+before it; the static catalog and word 1377 of zone 1 are made anew.  All
+the rest of zones 0-77 is new.
 """
 import struct
 import sys
@@ -72,10 +73,25 @@ def main():
     out, skip, _ = load(tmpl_path)
 
     old_cat, _ = catalog(old)
+    new_cat, _ = catalog(new)
     old_sec = sections(old)
     new_sec = sections(new)
-    start = min(p for p, n in old_sec.values())
-    page = old[1024 + MONPAGE] & 0o77
+    for name in new_sec:
+        if name not in old_sec:
+            sys.exit('ms-splice: %s is not in the old catalog' % decode(name))
+
+    # Sections in the old order, each from the new image if COLLECT linked
+    # it: (name, catalog word, image, first record, records).
+    secs = []
+    for name, _ in old_cat[1:]:
+        src, cat, sec = (new, new_cat, new_sec) if name in new_sec else \
+                        (old, old_cat, old_sec)
+        secs.append((name, dict(cat)[name], src) + sec[name])
+
+    # As COMTODRU: the static part ends with zone 77, the monitor page is
+    # in the zone before it.
+    start = NZ * 32 - sum(s[4] for s in secs)
+    page = start // 32 - 1
     new_page = (new[1024 + MONPAGE] & 0o77) + \
         (((new[1024 + MONPAGE] >> 12) & 0o77) - 0o21) * 32
 
@@ -89,23 +105,27 @@ def main():
     for i in range(dyn_end, NZ * 1024):
         img[i] = 0
     img[page * 1024:(page + 1) * 1024] = new[new_page * 1024:(new_page + 1) * 1024]
-    img[start * REC:] = old[start * REC:]
-    for name, (p, n) in old_sec.items():
-        if name in new_sec:
-            q, m = new_sec[name]
-            if m != n:
-                sys.exit('ms-splice: %s is %d records, the old one %d'
-                         % (decode(name), m, n))
-            img[p * REC:(p + n) * REC] = new[q * REC:(q + n) * REC]
 
-    # Zone 1: the old catalog and monitor page; the root keeps the gap
-    # between the dynamic and the static parts, in records.
+    # Zone 1: the catalog.  The root has the gap between the dynamic and
+    # the static parts, a section its place, both in records; a zero name
+    # and the place after zone 77 end it.
+    place = ~(0o77777 << 30)
     i = 1024 + CAT
-    j = i + 2 * len(old_cat) + 2
-    img[i:j] = old[i:j]
     gap = start - (dyn_end + REC - 1) // REC
-    img[i + 1] = (old[i + 1] & ~(0o77777 << 30)) | (gap << 30)
-    img[1024 + MONPAGE] = old[1024 + MONPAGE]
+    img[i] = old[i]
+    img[i + 1] = (old[i + 1] & place) | (gap << 30)
+    p = start
+    for name, w, src, q, n in secs:
+        img[p * REC:(p + n) * REC] = src[q * REC:(q + n) * REC]
+        i += 2
+        img[i] = name
+        img[i + 1] = (w & place) | (((0o21 << 10) + p) << 30)
+        p += n
+    j = i + 2
+    img[j] = old[j]
+    img[j + 1] = (old[j + 1] & place) | (((0o21 << 10) + p) << 30)
+    w = old[1024 + MONPAGE] & ~0o7777
+    img[1024 + MONPAGE] = w | ((0o21 + page // 32) << 12) | (page % 32)
 
     if len(sys.argv) > 5:
         ld = open(sys.argv[5], 'rb').read()

@@ -354,19 +354,24 @@ Tape 202 now is a correct MS with the static sections `INPUTCAL`, `FORTRAN` with
 `ASEMBLER` and `WRITLIB*`. The script makes the final 64 zones:
 
 1. everything up to the end of the dynamic part from tape 202;
-2. the monitor page from tape 202, put into the old zone (35);
-3. the static part from the archived tape, at the old place;
-4. each section that `COLLECT` linked replaces the old one; it must take the same number
-   of records, since the catalog stays the old one (`INPUTCAL`: 181 records, five words
-   differ from the old: three after the end of zone 37 and two of `LFSYST`, edited in
-   the archived library after its source was saved; the sections of the Fortran compiler and `ASEMBLER`: only words
-   of the header, see below; `WRITLIB*`: none, but three words of junk after its end in
-   zone 77 are zeros now);
-5. in zone 1 the old static catalog and the old word 1377; the gap in the root entry is
-   computed anew;
-6. zone 0 and words 0–377 of zone 1, the dynamic loader, from tape 101 (5th argument).
+2. the static part: the sections of the archived catalog in its order, those that
+   `COLLECT` linked from tape 202, `ALGOL` and `A/PRINTM` from the archived tape, packed
+   to end with zone 77, as `COMTODRU` does;
+3. the monitor page from tape 202, put into the zone before the static part;
+4. in zone 1 the static catalog, made anew: the root with the gap between the two parts,
+   each section with its new place (its other bits, length and load address, as in its
+   source), the end mark with the place after zone 77; and word 1377 pointing to the page;
+5. zone 0 and words 0–377 of zone 1, the dynamic loader, from tape 101 (5th argument).
 
-It stops if the dynamic part grows past zone 34. The result is written twice: tape 203
+A section may change its size: the others move, and so may the page. With the present
+sizes everything stays at the archived places (static part from 36.12, page in zone 35)
+and the catalog equals the archived one but for the gap. Against the archive,
+`INPUTCAL` differs in five words (three after the end of zone 37 and two of `LFSYST`,
+edited in the archived library after its source was saved), the sections of the Fortran
+compiler and `ASEMBLER` only in words of the header (see below), `WRITLIB*` not at all
+(but three words of junk after its end in zone 77 are zeros now).
+
+It stops if the dynamic part reaches the zone of the page. The result is written twice: tape 203
 (a full 9/MONSYS for the DD link job, which copies zones 0–77 to drums 21 and 22) and
 `data/mons9.bin` (for `mkdisk9.sh`, the disk image). Tape 922 is tape 203 from zone 40.
 
@@ -452,5 +457,6 @@ The build:
 - The job `hello` uses `*FORTRAN`, the section `FORTRAN` of the static part (banner
   `Ф О Р Т Р А Н /16.07.73/`), linked from `fortran/`; `*FTN` calls Fortran-GDR from zone
   100, an archived binary, `*MADLEN` the assembler from library 22. A change in
-  `fortran/` or `asembler/` reaches the image only if the section keeps its records; a
-  longer one needs a new static catalog, which `ms-splice.py` does not make (it stops).
+  `fortran/` or `asembler/` may change the size of a section: `ms-splice.py` moves the
+  sections and the page and makes the catalog anew. Moved so, `ALGOL` and `A/PRINTM` work
+  (an Algol job printed the right result).
