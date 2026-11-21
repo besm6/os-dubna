@@ -62,11 +62,11 @@ link() {
     for o in A B; do
         set -- `awk -v o=$o '$1 == o && $2 == 60 { print $3, $4 }' case$_c.lst`
         dd bs=192 skip=$((0$1 * 32 + 0$2)) status=none < ovl$_c.bin | ../../ovl2bin |
-        od -An -v -tx1 | tr -s ' \n' '  ' | sed 's/^ //' | awk -v o=$o '{
+        od -An -v -tu1 | tr -s ' \n' '  ' | sed 's/^ //' | awk -v o=$o '{
             s = o ":"
-            for (i = 49; i + 5 <= NF; i += 6) {
-                w = 0; for (j = 0; j < 6; j++) w = w * 256 + strtonum("0x" $(i+j))
-                s = s sprintf(" %016o", w) }
+            for (i = 49; i + 5 <= NF; i += 6)
+                s = s sprintf(" %08o%08o", ($i * 256 + $(i+1)) * 256 + $(i+2),
+                    ($(i+3) * 256 + $(i+4)) * 256 + $(i+5))
             print s }'
     done
 }
