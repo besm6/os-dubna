@@ -83,6 +83,7 @@
 242 - perso of CONTROL, ENDPRO, GLINK (unit 42)
 243 - perso of ASEMBLER (unit 43)
 244 - perso of the root of WRITLIB* (unit 44)
+245 - perso of COLLECT not putting library 21 first (mk-ms-img.sh, *perso:45000,cont)
 247 - task11+task47 (compilation in FOREX)
 251-253 - libraries 21, 22, 23 packed by CRELIB (mk-libs.sh), spliced into 203
 301 - exfor - not used (partial source code)

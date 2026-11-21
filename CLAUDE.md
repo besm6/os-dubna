@@ -118,10 +118,13 @@ Pipeline in `bootstrap.sh`:
    `mk-ms-img.sh` then assembles the MS: `COLLECT` and `COMTODRU` (library 21) link the
    perso of tape 200 into a copy of drums 21, 22, together with the Fortran compiler,
    ASEMBLER and WRITLIB*, whose modules four jobs put into perso on tapes 241-244 (cards
-   `FORTRAN:41,42`, `ASEMBLER:43`, `WRITLIB*:44`), and `ms-splice.py` puts it into a copy
+   `FORTRAN:41,42`, `ASEMBLER:43`, `WRITLIB*:44`); the library modules of the sections,
+   `INPUTCAL` among them, come from the perso of libraries 21, 23 (tapes 221, 223, cards
+   `INPUTCAL:61,63` ...), as tape 245 adds to the temporary library a `COLLECT` that drops
+   library 21 from the head of the list. `ms-splice.py` puts it into a copy
    of 9/MONSYS (tape 203, `data/mons9.bin`) with the loader of tape 101, keeping the old
    static sections of the other compilers; `lib-splice.py` puts in the libraries of tapes
-   251-253. The build itself keeps using the archived libraries of tape 9.
+   251-253. The jobs of the build keep using the archived libraries of tape 9.
    `ms-check.sh` compares tape 200 with the archived library:
    only `CHKBEG*` and `EDIT***` differ in size.
 3. `data/mkdisk9.sh`, `data/mkdisk11.sh`, `data/mkbridges.sh` — concatenate catalog + contents
@@ -164,7 +167,7 @@ their thousands digit (1400 → 400).
 | --- | --- |
 | 9, 12, 37 | original images: monsys, librar-12, librar-37 |
 | 100-199 | compilers (100 loader, 101 loader image) |
-| 200-399 | MS and libraries (200 MS, 201 COLLECT output, 202 MS drums, 203 9/MONSYS with the rebuilt MS, 221-223 perso of libraries 21-23, 241-244 perso of the Fortran compiler, ASEMBLER and the root of WRITLIB*, 247 tasks, 251-253 packed libraries 21-23, 301 exfor) |
+| 200-399 | MS and libraries (200 MS, 201 COLLECT output, 202 MS drums, 203 9/MONSYS with the rebuilt MS, 221-223 perso of libraries 21-23, 241-244 perso of the Fortran compiler, ASEMBLER and the root of WRITLIB*, 245 perso of the changed COLLECT, 247 tasks, 251-253 packed libraries 21-23, 301 exfor) |
 | 400-899 | DD (400) |
 | 900-999 | scratch (922 tape 203 from zone 40: MS drum 22, 951-953, 960, 961 `dtran.py`, 990 DD perso, 999 linked DD with the system) |
 | 209, 211, 224 | bridge tapes dubna/SIMH: symlinks to disks 9, 11, 24 |

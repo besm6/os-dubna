@@ -221,10 +221,10 @@ otherwise zeros repeat. The piece of TRP, if any, comes after the last group: th
 | --- | --- | --- |
 | Resident `MONITOR*`, monitor page, TRP | 35, zone 1 | **compiled** from `besmmons/` |
 | Dynamic part and its catalog | 7–33 | **compiled** from `besmmons/` |
-| Section `INPUTCAL` | 36–43 | relinked from library 21 (binary perso) and the new dynamic modules |
+| Section `INPUTCAL` | 36–43 | **linked by `COLLECT`** from the perso of library 21 (tape 221), with `DATE`, `DTOI` of library 23 (tape 223) |
 | Sections `FORTRAN`, `CBDPR`, `CONTROL`, `ENDPRO`, `GLINK`, `ASEMBLER` | 43–70 | **linked by `COLLECT`** from the Madlen sources in `fortran/` and `asembler/` |
 | Sections `ALGOL`, `A/PRINTM` | 70–77 | copied from the archived tape |
-| Section `WRITLIB*` | 77 | **linked by `COLLECT`**: the root from `writlib/`, `WRITLIBR` from `besmmons/`, `FORTLIBR` from library 21 |
+| Section `WRITLIB*` | 77 | **linked by `COLLECT`**: the root from `writlib/`, `WRITLIBR` from `besmmons/`, `FORTLIBR` from the perso of library 21 |
 | Dynamic loader | 0, zone 1 words 0–377 | **compiled** from `besmtask/loader.txt` by `mk-ld-img.sh`, see [Dynamic_Loader.md](Dynamic_Loader.md) |
 | Other tables | rest of zone 1, 2–6 | copied from the running system by `COLLECT` |
 | Libraries 22, 21, 23 | 172–375 | **compiled** from `besmtask/madlen.txt`, `besml21/`, `besml23/` and the disassembled modules in `besml2N/dtran/`, packed by `CRELIB` |
@@ -292,15 +292,20 @@ The original tools run under `dubna`:
 *tape:242/cmp42,42          perso of CONTROL, ENDPRO, GLINK
 *tape:243/cmp43,43          perso of ASEMBLER
 *tape:244/cmp44,44          perso of the root of WRITLIB*
+*tape:245/lib45,45          perso of COLLECT, changed (below)
+*tape:221/lib21,61          perso of library 21
+*tape:223/lib23,63          perso of library 23
 *library:21
 *library:23
 *perso:66000
+*perso:45000,cont
 *call collect:670000
 MONITOR*(INPUTCAL,FORTRAN,ASEMBLER,WRITLIB*)
 FORTRAN(CBDPR,CONTROL,ENDPRO,GLINK)
-FORTRAN:41,42
-ASEMBLER:43
-WRITLIB*:44
+INPUTCAL:61,63
+FORTRAN:41,42,61
+ASEMBLER:43,61
+WRITLIB*:44,61
 *end record
 *call comtodru:670000,650000
 ```
@@ -312,7 +317,17 @@ WRITLIB*:44
   `ms-ftn42.list`, `ms-asm43.list`, `ms-wl44.list`): the input of a job is at most two
   drums.
 - `*PERSO:66000` copies the perso of tape 200 into the temporary library of the job.
-  Whatever is in the temporary library becomes the dynamic part.
+  Whatever is in the temporary library becomes the dynamic part. `*PERSO:45000,CONT` adds
+  to it the perso of tape 245: the module `COLLECT` of library 21 with one change. A card
+  `NAME:n1,n2` makes the list of libraries with `NEWLIBR/`, which always puts library 21
+  first (`*NEW LIBRARY` does the same), and the libraries are searched in that order, so a
+  module of library 21 would always come from the archived one. After `CALL NEWLIBR/` the
+  changed `COLLECT` shifts library 21 out of the list (`,ASN,64+6` on cell 73B). It is
+  found in the temporary library before library 21, and removes itself from there; no
+  section links it. Patching `LIBRARY/` (where `NEWLIBR/` is) instead would not do:
+  `INPUTCAL` links `LIBRARY/` and would get the patched copy from the temporary library.
+  A `*MADLEN` in this job would not do either: the assembler stays in the temporary
+  library (14 zones).
 - **`COLLECT`** first jumps to `NEW//MON`, which loads a fresh resident and saves its page,
   then starts `COLLECT` again. It prints the map of the resident: check that `MONITOR*` is
   at 423 and `INFLOAD*` at 716, as before; DD and the old sections rely on these addresses.
@@ -322,7 +337,9 @@ WRITLIB*:44
   The cards give the tree, as in section 5, up to `*END RECORD`; `FORTRAN:41,42` makes it
   take the modules of `FORTRAN` and its sections from tapes 241, 242, `ASEMBLER:43` those
   of `ASEMBLER` from tape 243, `WRITLIB*:44` the root of `WRITLIB*` from tape 244 (the
-  rest of it comes from the temporary library and library 21). `INPUTCAL` needs `DATE` and `DTOI` from library 23.
+  rest of it comes from the temporary library). The library modules of all sections come
+  from the perso of library 21 (unit 61, tape 221); `INPUTCAL` needs `DATE` and `DTOI`
+  of library 23 (unit 63, tape 223). The listing shows where each came from: `*LIBRA:61 = ...`.
 - **`COMTODRU`** turns that tape into the drum form: catalog entries become physical
   exchanges, the static part moves to the end of zone 77, the monitor page goes to the
   zone before it, and word 1377 of zone 1 is set. It prints where the page is:
@@ -340,8 +357,9 @@ Tape 202 now is a correct MS with the static sections `INPUTCAL`, `FORTRAN` with
 2. the monitor page from tape 202, put into the old zone (35);
 3. the static part from the archived tape, at the old place;
 4. each section that `COLLECT` linked replaces the old one; it must take the same number
-   of records, since the catalog stays the old one (`INPUTCAL`: 181 records, six words
-   differ from the old; the sections of the Fortran compiler and `ASEMBLER`: only words
+   of records, since the catalog stays the old one (`INPUTCAL`: 181 records, five words
+   differ from the old: three after the end of zone 37 and two of `LFSYST`, edited in
+   the archived library after its source was saved; the sections of the Fortran compiler and `ASEMBLER`: only words
    of the header, see below; `WRITLIB*`: none, but three words of junk after its end in
    zone 77 are zeros now);
 5. in zone 1 the old static catalog and the old word 1377; the gap in the root entry is
@@ -399,8 +417,10 @@ The build:
   archive in words only: equivalent (compiled with other options), based differently by
   this Madlen (`12,UTC,111B` for `,UTC,*0111B`), or edited after the sources were saved
   (`GIVETIME`, `BTLOOK`, `LFSYST`, `PRINT80`, `TEXOUT`, `CTLOOK`).
-- The build itself keeps using the archived libraries of tape 9 (`*LIBRARY:21`): the
-  rebuilt ones reach only the system booted in SIMH.
+- The jobs of the build keep using the archived libraries of tape 9 (`*LIBRARY:21`; dubna
+  has 9/MONSYS built in). The static sections take their library modules from the perso
+  of the rebuilt libraries (tapes 221, 223). The archived `INPUTCAL` was linked with the
+  edition of `GIVETIME` that the source has, not with the later one of library 21.
 
 ### What to check after a change
 

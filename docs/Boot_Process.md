@@ -69,15 +69,20 @@ same 166 modules, of the same sizes except `CHKBEG*` and `EDIT***`.
 *tape:242/cmp42,42
 *tape:243/cmp43,43
 *tape:244/cmp44,44
+*tape:245/lib45,45
+*tape:221/lib21,61
+*tape:223/lib23,63
 *library:21
 *library:23
 *perso:66000
+*perso:45000,cont
 *call collect:670000
 MONITOR*(INPUTCAL,FORTRAN,ASEMBLER,WRITLIB*)
 FORTRAN(CBDPR,CONTROL,ENDPRO,GLINK)
-FORTRAN:41,42
-ASEMBLER:43
-WRITLIB*:44
+INPUTCAL:61,63
+FORTRAN:41,42,61
+ASEMBLER:43,61
+WRITLIB*:44,61
 *end record
 *call comtodru:670000,650000
 ```
@@ -85,8 +90,12 @@ WRITLIB*:44
 `COLLECT` passes control to `NEW//MON`, which loads the resident `MONITOR*` afresh (it
 lands at the same addresses as in the archive) and reloads `COLLECT`. That writes to
 unit 67 zones 0–6 of the running system, the dynamic part with its catalog, the static
-sections named on the cards, and the monitor page. `INPUTCAL` comes from library 21 and
-needs `DATE` and `DTOI` from library 23. The modules of the Fortran compiler, of
+sections named on the cards, and the monitor page. The library modules of the sections
+come from the perso of the rebuilt libraries 21 and 23 (tapes 221, 223, units 61, 63):
+`INPUTCAL` and the library modules of the others. A card `NAME:n1,n2` always puts
+library 21 first in the list, so tape 245 has `COLLECT` changed to drop it, and
+`*PERSO:45000,CONT` adds it to the temporary library, where it is found first (see
+`Monsys9_Tape.md`). The modules of the Fortran compiler, of
 `ASEMBLER` and the root of `WRITLIB*` come from perso that four jobs before write to tapes
 241–244 from the Madlen files in `fortran/`, `asembler/` and `writlib/` (`*TO PERSO:410000`
 … `440000`); the cards `FORTRAN:41,42`, `ASEMBLER:43` and `WRITLIB*:44` make `COLLECT`
@@ -101,7 +110,7 @@ the end of drum 22.
 static sections in the archived image. So `ms-splice.py` builds the final image:
 everything from the new drums, the static part and its catalog from the archive at the
 old place, and in it the sections linked by `COLLECT` (the same size: `INPUTCAL` differs
-in six words, the Fortran compiler and `ASEMBLER` in words of the headers, `WRITLIB*` not
+in five words, the Fortran compiler and `ASEMBLER` in words of the headers, `WRITLIB*` not
 at all), and the dynamic loader from tape 101 in zones 0 and 1. The result goes to tape 203
 and to
 `data/mons9.bin` for `mkdisk9.sh`.

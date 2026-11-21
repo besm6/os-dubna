@@ -53,6 +53,28 @@ perso 242 42 ms-ftn42.list ../fortran CONTROL ENDPRO GLINK
 perso 243 43 ms-asm43.list ../asembler ASEMBLER
 perso 244 44 ms-wl44.list ../writlib WRITLIB
 
+# A card NAME:n1,n2 gives the libraries 21,n1,n2 (NEWLIBR/ puts library 21
+# first), so a module of library 21 would come from the archived one.  The
+# module COLLECT of library 21, with 21 dropped from that list, goes into
+# perso on tape 245; appended to the temporary library, it is found before
+# library 21.  The cards INPUTCAL:61,63 ... then take the library modules
+# from the perso of libraries 21, 23 (tapes 221, 223).  No section links
+# COLLECT, and it removes itself from the temporary library.
+: > $TAPES/245
+{ echo '*name perso45'; echo '*tape:245/lib45,45,w'; echo '*no list'; echo '*madlen'
+  sed -n '/^ COLLECT:,NAME,/,/^ ,END,$/p' ../besml21/libra211.l21 |
+      sed '/^  ,CALL,NEWLIBR\/$/a\
+  ,XTA,LIB\
+  ,ASN,64+6.БEЗ LIBRARY 21\
+  ,ATX,LIB' | grep -v '^[[:space:]]*$'
+  echo '*to perso:450000'; echo '*call plcatalog:450000'; echo '*end file'
+} > $J
+run_job $J ms-lib45.list
+if grep -q 'БЫЛИ OШИБKИ\|Error' ms-lib45.list || ! grep -q '^ *COLLECT ' ms-lib45.list; then
+    echo "perso of COLLECT failed, see ms-lib45.list"
+    exit 1
+fi
+
 cat > $J <<'EOF'
 *name MS-IMG
 *tape:200/ms,66
@@ -62,15 +84,20 @@ cat > $J <<'EOF'
 *tape:242/cmp42,42
 *tape:243/cmp43,43
 *tape:244/cmp44,44
+*tape:245/lib45,45
+*tape:221/lib21,61
+*tape:223/lib23,63
 *library:21
 *library:23
 *perso:66000
+*perso:45000,cont
 *call collect:670000
 MONITOR*(INPUTCAL,FORTRAN,ASEMBLER,WRITLIB*)
 FORTRAN(CBDPR,CONTROL,ENDPRO,GLINK)
-FORTRAN:41,42
-ASEMBLER:43
-WRITLIB*:44
+INPUTCAL:61,63
+FORTRAN:41,42,61
+ASEMBLER:43,61
+WRITLIB*:44,61
 *end record
 *call comtodru:670000,650000
 *end file

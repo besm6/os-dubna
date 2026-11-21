@@ -1304,20 +1304,35 @@ C----------------
     *tape:242/cmp42,42          perso CONTROL, ENDPRO, GLINK
     *tape:243/cmp43,43          perso ASEMBLER
     *tape:244/cmp44,44          perso корня WRITLIB*
+    *tape:245/lib45,45          perso изменённого COLLECT
+    *tape:221/lib21,61          perso библиотеки 21
+    *tape:223/lib23,63          perso библиотеки 23
     *library:21
     *library:23
     *perso:66000
+    *perso:45000,cont
     *call collect:670000
     MONITOR*(INPUTCAL,FORTRAN,ASEMBLER,WRITLIB*)
     FORTRAN(CBDPR,CONTROL,ENDPRO,GLINK)
-    FORTRAN:41,42
-    ASEMBLER:43
-    WRITLIB*:44
+    INPUTCAL:61,63
+    FORTRAN:41,42,61
+    ASEMBLER:43,61
+    WRITLIB*:44,61
     *end record
     *call comtodru:670000,650000
 
 COLLECT сам вызывает NEW//MON (перезагрузка резидента) и после этого
 перезагружается. Временная библиотека задачи становится динамической частью.
+Библиотечные модули разделов (INPUTCAL и другие) берутся из perso
+пересобранных библиотек 21 и 23 (ленты 221, 223, мат. номера 61, 63).
+Список библиотек раздела по карте NAME:n1,n2 делает NEWLIBR/, и библиотека 21
+в нём всегда первая (как и при *NEW LIBRARY); просматриваются они по порядку,
+так что модуль библиотеки 21 брался бы из архивной. Поэтому на ленте 245 -
+модуль COLLECT библиотеки 21, который после CALL NEWLIBR/ сдвигает 21 из
+списка (,ASN,64+6 над ячейкой 73B); *perso:45000,cont добавляет его во
+временную библиотеку, где он находится раньше библиотеки 21. Из временной
+библиотеки COLLECT себя удаляет, в разделы он не входит. Править LIBRARY/
+(там NEWLIBR/) нельзя: INPUTCAL включает LIBRARY/ и получил бы правленую копию.
 Разделы ALGOL и A/PRINTM в архиве есть только в собранном виде, в
 статической части 9/MONSYS, поэтому на картах их нет: BUILD/ms-splice.py
 переносит их из старого образа. WRITLIB* - это модуль WRITLIBR (с общим
