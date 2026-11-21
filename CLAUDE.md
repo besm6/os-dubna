@@ -77,6 +77,11 @@ Terminology used everywhere:
 
 ## Bootstrap
 
+The top-level `Makefile` wraps it: `make run` (copy `BUILD/data/base` into `BUILD/data`
+where newer, `besm6 dubna.ini`), `make rebuild` (`bootstrap.sh`), `make check`
+(`fortran/`, `asembler/` GOOD, `BUILD/ld-check.py`, `ms-check.sh`, a Multitype hello
+with `boot-run.py -f -d 25 -m 110`), `make clean`.
+
 Run from `BUILD/`; scripts use relative paths and must be started in their own directory:
 
 ```sh

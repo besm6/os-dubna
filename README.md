@@ -35,51 +35,41 @@ See [file-list.md](file-list.md) for a per-file list.
 
 ## Building and booting
 
-The sources are compiled by Monitor Dubna batch jobs under the
-[dubna](https://github.com/besm6/dubna) simulator, then disk and drum images are
-assembled and booted in SIMH.
-
-The ready images are in the repository, in `BUILD/data/base/`. To just run the system you
-need only the simulator:
-
 ```sh
-cd BUILD
-cp data/base/*.bin data/
-besm6 dubna.ini
+make            # list the targets
+make run        # run the system
+make rebuild    # rebuild everything from the sources
+make check      # verify the rebuilt system
+make clean      # remove the build artefacts
 ```
 
-To rebuild everything from the sources:
+**Running.** The ready disk and drum images are in the repository, in `BUILD/data/base/`,
+so `make run` needs only SIMH `besm6` on `PATH`, built from branch `master` of
+[simh-besm6](https://github.com/besm6/simh). This terminal is the operator console;
+Multitype is on telnet port 4199. The working copies of the images in `BUILD/data/` keep
+your jobs between runs; remove `BUILD/data/*.bin` to start from the clean system.
+A step-by-step guide is [docs/OS_Dubna_Tutorial.md](docs/OS_Dubna_Tutorial.md), the
+commands and replies are in [docs/Dubna_Commands.md](docs/Dubna_Commands.md).
+
+**Rebuilding.** `make rebuild` compiles the dispatcher, the monitor system and the
+libraries with Monitor Dubna batch jobs under the [dubna](https://github.com/besm6/dubna)
+simulator, assembles the disk and drum images, then boots them in SIMH to build the
+task library and the dispatcher on drum 25. The new images replace those in
+`BUILD/data/base/`. It needs:
 
 - `dubna` (November 2026 or later) and `besmtool` on `PATH`;
-- SIMH `besm6` on `PATH`, built from branch `master` of
-  [simh-besm6](https://github.com/besm6/simh) (it needs `set cpu mem=128` and `set cpu ext32`);
-- Python 3.
+- SIMH `besm6` as above;
+- Python 3, perl and a C compiler.
 
-The scripts keep tape images in `BUILD/tapes/`.
+Commit the new images only when the system has changed: each version adds about 4 MB to
+the history.
 
-```sh
-cd BUILD
-./bootstrap.sh
-```
+**Checking.** `make check` compares the rebuilt Fortran compiler, ASEMBLER and dynamic
+loader with the archived 9/MONSYS, compares the monitor modules, and boots the system to
+run a hello job from Multitype.
 
-The script compiles the dispatcher and libraries under `dubna` and builds the drum and
-disk images. Then `mk-base.sh` boots them in SIMH twice, feeding each job as a deck of
-punch cards (in reader `vu0`): the job `newbsz` builds the task library (the print spooler is in it), and the
-job `newdd` writes a rebuilt dispatcher to drum 25. The resulting images are saved in
-`BUILD/data/base/`. This part takes about a minute and a half. Commit the new images only
-when the system has changed: each version adds about 4 MB to the history.
-
-Run the system from `BUILD/` with `besm6 dubna.ini`.
-
-A step-by-step guide for users is [docs/OS_Dubna_Tutorial.md](docs/OS_Dubna_Tutorial.md).
-
-This terminal is the operator console; Multitype is on telnet port 4199. Commands and
-replies are described in [docs/Dubna_Commands.md](docs/Dubna_Commands.md).
-`./boot-run.py` boots and runs a job non-interactively (`./boot-run.py -f -d 25 -q -m 110`
-prints the hello job from Multitype on `output.txt`; `./boot-run.py` alone lists the options); `./card-run.sh hello.dub` runs it from a deck of
-punch cards, with a plain SIMH script (`card-run.ini`); `./tape-format.sh` mounts a blank magnetic tape
-and formats it. How the pieces fit together is described in
-[docs/Boot_Process.md](docs/Boot_Process.md).
+How the pieces fit together, and the scripts in `BUILD/` behind these targets, are
+described in [docs/Boot_Process.md](docs/Boot_Process.md).
 
 More details are in `BUILD/`:
 

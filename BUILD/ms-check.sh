@@ -1,6 +1,7 @@
 #! /bin/sh
 # Compare the rebuilt MS perso (tape 200) with the permanent library of
-# the archived 9/MONSYS: module names and sizes.
+# the archived 9/MONSYS: module names and sizes.  Fails if modules other
+# than CHKBEG* and EDIT*** differ.
 . ./env.sh
 J=`mktemp` || exit 1
 trap "rm -f -- '$J'" EXIT
@@ -21,7 +22,10 @@ new = dict(pat.findall('\n'.join(lines[:k])))
 old = dict(pat.findall('\n'.join(lines[k:])))
 new.pop('TCATALOG', None)       # loaded by *catalog itself
 print('%d modules in 9/MONSYS, %d on tape 200' % (len(old), len(new)))
+bad = 0
 for n in sorted(set(old) | set(new)):
     if old.get(n) != new.get(n):
         print('%-8s  9/MONSYS %s  tape 200 %s' % (n, old.get(n, '-'), new.get(n, '-')))
+        bad |= n not in ('CHKBEG*', 'EDIT***')
+sys.exit(bad)
 EOF
