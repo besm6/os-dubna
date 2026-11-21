@@ -26,15 +26,16 @@ Terminology used everywhere:
   (DD, MS, Madlen/loader/system tasks, library 21, library 23). Large files are split into sections.
 - `dub_besm/` — the same DD and MS texts as single files, for reference only.
 - `monsys/`, `lib12/`, `lib37/` — original binary tape images (9/MONSYS, 12/LIBRAR, 37/LIBRAR).
-  The libraries and the compilers inside 9/MONSYS are used as binaries (except FORTRAN and
-  ASEMBLER, below); the rest of MS is rebuilt from `besmmons/`.
+  The libraries and the compilers inside 9/MONSYS are used as binaries (except FORTRAN,
+  ASEMBLER and WRITLIB*, below); the rest of MS is rebuilt from `besmmons/`.
 - `fortran/`, `asembler/`, `tools/` — the Fortran compiler of 9/MONSYS (overlays `FORTRAN`, `CBDPR`,
   `CONTROL`, `ENDPRO`, `GLINK`) as Madlen sources, rebuilt identical to the tape by `make` in
   `fortran/` (dubna, `tools/dubovl.pl`); `asembler/` the same for the overlay `ASEMBLER`, which
   shares modules with `GLINK` (GLINK's editions are named `GAS...`); `tools/` the helpers,
   `ovsplit.py` among them (`make asm` regenerates the modules made from the disassembly),
-  `ovltest/` a test of modules of the same name in sibling overlays. `BUILD/mk-ms-img.sh`
-  links both into the rebuilt 9/MONSYS with `COLLECT`.
+  `ovltest/` a test of modules of the same name in sibling overlays; `writlib/` the root of
+  the section `WRITLIB*` (the rest are library modules). `BUILD/mk-ms-img.sh` links them
+  into the rebuilt 9/MONSYS with `COLLECT`.
 - `drums/` — drum images with hardware tests; `d_besm6/` — miscellaneous old files, not used by the build.
 - `tapes/1200`, `jobs/monsys.b6` — MS sources as a tape image and the job that compiles them.
 - `BUILD/` — everything needed for the bootstrap (see below).
@@ -108,11 +109,11 @@ Pipeline in `bootstrap.sh`:
    `mk-ld-img.sh` makes the memory image of the dynamic loader on tape 101, as
    `besmtask/loadload.txt` did (identical to the archived one, see `docs/Dynamic_Loader.md`).
    `mk-ms-img.sh` then assembles the MS: `COLLECT` and `COMTODRU` (library 21) link the
-   perso of tape 200 into a copy of drums 21, 22, together with the Fortran compiler and
-   ASEMBLER, whose modules three jobs put into perso on tapes 241-243 (cards
-   `FORTRAN:41,42`, `ASEMBLER:43`), and `ms-splice.py` puts it into a copy of 9/MONSYS
-   (tape 203, `data/mons9.bin`) with the loader of tape 101, keeping the old static
-   sections of the other compilers.
+   perso of tape 200 into a copy of drums 21, 22, together with the Fortran compiler,
+   ASEMBLER and WRITLIB*, whose modules four jobs put into perso on tapes 241-244 (cards
+   `FORTRAN:41,42`, `ASEMBLER:43`, `WRITLIB*:44`), and `ms-splice.py` puts it into a copy
+   of 9/MONSYS (tape 203, `data/mons9.bin`) with the loader of tape 101, keeping the old
+   static sections of the other compilers.
    `ms-check.sh` compares tape 200 with the archived library:
    only `CHKBEG*` and `EDIT***` differ in size.
 3. `data/mkdisk9.sh`, `data/mkdisk11.sh`, `data/mkbridges.sh` — concatenate catalog + contents
@@ -155,7 +156,7 @@ their thousands digit (1400 → 400).
 | --- | --- |
 | 9, 12, 37 | original images: monsys, librar-12, librar-37 |
 | 100-199 | compilers (100 loader, 101 loader image) |
-| 200-399 | MS and libraries (200 MS, 201 COLLECT output, 202 MS drums, 203 9/MONSYS with the rebuilt MS, 221 lib21, 223 lib23, 241-243 perso of the Fortran compiler and ASEMBLER, 247 tasks, 301 exfor) |
+| 200-399 | MS and libraries (200 MS, 201 COLLECT output, 202 MS drums, 203 9/MONSYS with the rebuilt MS, 221 lib21, 223 lib23, 241-244 perso of the Fortran compiler, ASEMBLER and the root of WRITLIB*, 247 tasks, 301 exfor) |
 | 400-899 | DD (400) |
 | 900-999 | scratch (922 tape 203 from zone 40: MS drum 22, 990 DD perso, 999 linked DD with the system) |
 | 209, 211, 224 | bridge tapes dubna/SIMH: symlinks to disks 9, 11, 24 |

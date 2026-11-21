@@ -217,17 +217,22 @@ otherwise zeros repeat. The piece of TRP, if any, comes after the last group: th
 | Dynamic part and its catalog | 7–33 | **compiled** from `besmmons/` |
 | Section `INPUTCAL` | 36–43 | relinked from library 21 (binary perso) and the new dynamic modules |
 | Sections `FORTRAN`, `CBDPR`, `CONTROL`, `ENDPRO`, `GLINK`, `ASEMBLER` | 43–70 | **linked by `COLLECT`** from the Madlen sources in `fortran/` and `asembler/` |
-| Sections `ALGOL`, `A/PRINTM`, `WRITLIB*` | 70–77 | copied from the archived tape |
+| Sections `ALGOL`, `A/PRINTM` | 70–77 | copied from the archived tape |
+| Section `WRITLIB*` | 77 | **linked by `COLLECT`**: the root from `writlib/`, `WRITLIBR` from `besmmons/`, `FORTLIBR` from library 21 |
 | Dynamic loader | 0, zone 1 words 0–377 | **compiled** from `besmtask/loader.txt` by `mk-ld-img.sh`, see [Dynamic_Loader.md](Dynamic_Loader.md) |
 | Other tables | rest of zone 1, 2–6 | copied from the running system by `COLLECT` |
 | Everything from zone 100 | 100–437 | the archived tape |
 
-`ALGOL`, `A/PRINTM` and `WRITLIB*` cannot be rebuilt: the archive has neither their sources
+`ALGOL` and `A/PRINTM` cannot be rebuilt: the archive has neither their sources
 nor their perso, only the linked sections. The Fortran compiler and the assembler were
 taken apart from the linked sections into Madlen sources (`fortran/`, `asembler/`); `make`
 there links them with `*CALL OVERLAY` (`tools/dubovl.pl`) into images identical to the
-archived ones. The dynamic loader is built from `besmtask/loader.txt` into two pages
-identical to the archived ones, see [Dynamic_Loader.md](Dynamic_Loader.md).
+archived ones. `WRITLIB*` (it writes the modules made by a compiler into the temporary
+library) is the module `WRITLIBR` of `besmmons/system2.txt` with its common `CATALOG`,
+called through `FORTLIBR` of library 21; only its root of 14 words, the module
+`WRITLIB*`, had no source and was written from the image (`writlib/writlib.asm`, `make`
+there checks it the same way). The dynamic loader is built from `besmtask/loader.txt` into
+two pages identical to the archived ones, see [Dynamic_Loader.md](Dynamic_Loader.md).
 
 All the static sections of the archived tape were written by one run of `COLLECT` (bit 46
 of each catalog word; the date 22/10/88 in words 1776–1777 of the catalog), with the tree of
@@ -236,7 +241,7 @@ dynamic part, but in a library of their own: a card `NAME:n1,n2` in the tree (up
 numbers; a number from 030 up is the unit of a tape with a library from zone 0, an ОБСП or a
 perso) gives the libraries for the section `NAME` of the second level and all the sections
 under it. `COLLECT` takes from them what it does not find in the temporary library. The
-build does the same for the Fortran compiler and the assembler. `*CALL OVERLAY` is an entry
+build does the same for the Fortran compiler, the assembler and the root of `WRITLIB*`. `*CALL OVERLAY` is an entry
 of `COLLECT` and builds the catalog anew each time: there is no mode that adds to an old one.
 
 A module taken from a library stays in the temporary library to the end of the run, and the
@@ -279,23 +284,26 @@ The original tools run under `dubna`:
 *tape:241/cmp41,41          perso of FORTRAN, CBDPR
 *tape:242/cmp42,42          perso of CONTROL, ENDPRO, GLINK
 *tape:243/cmp43,43          perso of ASEMBLER
+*tape:244/cmp44,44          perso of the root of WRITLIB*
 *library:21
 *library:23
 *perso:66000
 *call collect:670000
-MONITOR*(INPUTCAL,FORTRAN,ASEMBLER)
+MONITOR*(INPUTCAL,FORTRAN,ASEMBLER,WRITLIB*)
 FORTRAN(CBDPR,CONTROL,ENDPRO,GLINK)
 FORTRAN:41,42
 ASEMBLER:43
+WRITLIB*:44
 *end record
 *call comtodru:670000,650000
 ```
 
-- Three jobs before it compile the Madlen files of the Fortran compiler and of the
-  assembler (the lists are in `fortran/Makefile` and `asembler/Makefile`, `make
-  print-FORTRAN`) and write them with `*TO PERSO:410000` … `*TO PERSO:430000` to tapes
-  241–243 (`ms-ftn41.list`, `ms-ftn42.list`, `ms-asm43.list`): the input of a job is at
-  most two drums.
+- Four jobs before it compile the Madlen files of the Fortran compiler, of the
+  assembler and of the root of `WRITLIB*` (the lists are in `fortran/Makefile`,
+  `asembler/Makefile` and `writlib/Makefile`, `make print-FORTRAN`) and write them with
+  `*TO PERSO:410000` … `*TO PERSO:440000` to tapes 241–244 (`ms-ftn41.list`,
+  `ms-ftn42.list`, `ms-asm43.list`, `ms-wl44.list`): the input of a job is at most two
+  drums.
 - `*PERSO:66000` copies the perso of tape 200 into the temporary library of the job.
   Whatever is in the temporary library becomes the dynamic part.
 - **`COLLECT`** first jumps to `NEW//MON`, which loads a fresh resident and saves its page,
@@ -306,7 +314,8 @@ ASEMBLER:43
   writes them after the dynamic part, and puts the monitor page into zone 77.
   The cards give the tree, as in section 5, up to `*END RECORD`; `FORTRAN:41,42` makes it
   take the modules of `FORTRAN` and its sections from tapes 241, 242, `ASEMBLER:43` those
-  of `ASEMBLER` from tape 243. `INPUTCAL` needs `DATE` and `DTOI` from library 23.
+  of `ASEMBLER` from tape 243, `WRITLIB*:44` the root of `WRITLIB*` from tape 244 (the
+  rest of it comes from the temporary library and library 21). `INPUTCAL` needs `DATE` and `DTOI` from library 23.
 - **`COMTODRU`** turns that tape into the drum form: catalog entries become physical
   exchanges, the static part moves to the end of zone 77, the monitor page goes to the
   zone before it, and word 1377 of zone 1 is set. It prints where the page is:
@@ -317,8 +326,8 @@ than 64 zones), `CИCTEMA BEЛИKA`.
 
 ### Step 3: splice — `BUILD/ms-splice.py`
 
-Tape 202 now is a correct MS with the static sections `INPUTCAL`, `FORTRAN` with its four
-and `ASEMBLER`. The script makes the final 64 zones:
+Tape 202 now is a correct MS with the static sections `INPUTCAL`, `FORTRAN` with its four,
+`ASEMBLER` and `WRITLIB*`. The script makes the final 64 zones:
 
 1. everything up to the end of the dynamic part from tape 202;
 2. the monitor page from tape 202, put into the old zone (35);
@@ -326,7 +335,8 @@ and `ASEMBLER`. The script makes the final 64 zones:
 4. each section that `COLLECT` linked replaces the old one; it must take the same number
    of records, since the catalog stays the old one (`INPUTCAL`: 181 records, six words
    differ from the old; the sections of the Fortran compiler and `ASEMBLER`: only words
-   of the header, see below);
+   of the header, see below; `WRITLIB*`: none, but three words of junk after its end in
+   zone 77 are zeros now);
 5. in zone 1 the old static catalog and the old word 1377; the gap in the root entry is
    computed anew;
 6. zone 0 and words 0–377 of zone 1, the dynamic loader, from tape 101 (5th argument).
@@ -349,7 +359,7 @@ It stops if the dynamic part grows past zone 34. The result is written twice: ta
 - `dubna` itself always runs the monitor built into it, not the files in `BUILD/tapes`. A
   broken tape 203 cannot break the build, only the system booted in SIMH.
 - Old static sections contain old copies of library modules. A change in, say, `PRINT8`
-  reaches user programs and the relinked sections, but not `ALGOL`, `A/PRINTM` or `WRITLIB*`.
+  reaches user programs and the relinked sections, but not `ALGOL` or `A/PRINTM`.
 - Words 5 and 6 of a section header are the registers 16B and 17B of the loader after it
   has linked the section (and words 1, 2 of a section under it, the same of its parent):
   16B the pointers AC, AS, AU, of which AS gives out the S arrays (`,LS,`) in the low

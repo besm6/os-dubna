@@ -68,14 +68,16 @@ same 166 modules, of the same sizes except `CHKBEG*` and `EDIT***`.
 *tape:241/cmp41,41
 *tape:242/cmp42,42
 *tape:243/cmp43,43
+*tape:244/cmp44,44
 *library:21
 *library:23
 *perso:66000
 *call collect:670000
-MONITOR*(INPUTCAL,FORTRAN,ASEMBLER)
+MONITOR*(INPUTCAL,FORTRAN,ASEMBLER,WRITLIB*)
 FORTRAN(CBDPR,CONTROL,ENDPRO,GLINK)
 FORTRAN:41,42
 ASEMBLER:43
+WRITLIB*:44
 *end record
 *call comtodru:670000,650000
 ```
@@ -84,22 +86,24 @@ ASEMBLER:43
 lands at the same addresses as in the archive) and reloads `COLLECT`. That writes to
 unit 67 zones 0–6 of the running system, the dynamic part with its catalog, the static
 sections named on the cards, and the monitor page. `INPUTCAL` comes from library 21 and
-needs `DATE` and `DTOI` from library 23. The modules of the Fortran compiler and of
-`ASEMBLER` come from perso that three jobs before write to tapes 241–243 from the Madlen
-files in `fortran/` and `asembler/` (`*TO PERSO:410000` … `430000`); the cards
-`FORTRAN:41,42` and `ASEMBLER:43` make `COLLECT` take them from there, so they stay out of
+needs `DATE` and `DTOI` from library 23. The modules of the Fortran compiler, of
+`ASEMBLER` and the root of `WRITLIB*` come from perso that four jobs before write to tapes
+241–244 from the Madlen files in `fortran/`, `asembler/` and `writlib/` (`*TO PERSO:410000`
+… `440000`); the cards `FORTRAN:41,42`, `ASEMBLER:43` and `WRITLIB*:44` make `COLLECT`
+take them from there, so they stay out of
 the temporary library, which becomes the dynamic part (the archived image was made in the
 same way). In one run a name stands for one module in all sections, so the editions of
 the assembler modules in `GLINK` are named `GAS...` (see `Monsys9_Tape.md`). `COMTODRU`
 makes the drum form: catalog entries become physical exchanges, the static part moves to
 the end of drum 22.
 
-`ALGOL`, `A/PRINTM` and `WRITLIB*` cannot be on the cards: they exist only as linked
+`ALGOL` and `A/PRINTM` cannot be on the cards: they exist only as linked
 static sections in the archived image. So `ms-splice.py` builds the final image:
 everything from the new drums, the static part and its catalog from the archive at the
 old place, and in it the sections linked by `COLLECT` (the same size: `INPUTCAL` differs
-in six words, the Fortran compiler and `ASEMBLER` in words of the headers), and the
-dynamic loader from tape 101 in zones 0 and 1. The result goes to tape 203 and to
+in six words, the Fortran compiler and `ASEMBLER` in words of the headers, `WRITLIB*` not
+at all), and the dynamic loader from tape 101 in zones 0 and 1. The result goes to tape 203
+and to
 `data/mons9.bin` for `mkdisk9.sh`.
 
 The date in the banner of a listing, `МОНИТОРНАЯ СИСТЕМА 'Д У Б Н А' - 13/11/26`, is

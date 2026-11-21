@@ -121,7 +121,7 @@ Note: it is the same as dub_besm/dumba.ms
 
 	monsys/monsys.9 - the real image of  monsys-9 (layout: docs/Monsys9_Tape.md)
 
-# fortran/, asembler/, tools/ - the Fortran compiler and the assembler of 9/MONSYS as Madlen sources
+# fortran/, asembler/, tools/, writlib/ - the Fortran compiler, the assembler and WRITLIB* of 9/MONSYS as Madlen sources
 
 	fortran/Makefile      - make: rebuild FORTRAN, CBDPR, CONTROL, ENDPRO, GLINK, compare with the tape
 	fortran/*.asm         - the modules of the compiler
@@ -136,5 +136,7 @@ Note: it is the same as dub_besm/dumba.ms
 	tools/debemsh.sh      - assemble a module with BEMSH and list it with DTRAN (dispak)
 	tools/degak.py, cosy2txt.cpp - helpers of debemsh.sh
 	tools/ovltest/        - test: modules of the same name in sibling overlays (run.sh)
+	writlib/writlib.asm   - the root of the section WRITLIB* (the rest are library modules)
+	writlib/Makefile      - make: link WRITLIB*, compare with the tape
 
 # END

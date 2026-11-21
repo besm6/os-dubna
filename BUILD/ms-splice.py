@@ -11,9 +11,9 @@ loader   - tape made by mk-ld-img.sh: the dynamic loader, zone 0 (LOADER)
            and words 0-377 of zone 1 (REDUOL) go to the same places
 
 The result has the old static part at its old place; the sections that
-COLLECT did relink (INPUTCAL, FORTRAN with its phases, ASEMBLER) replace the
-old ones and must take the same records (the catalog stays the old one).
-The others (ALGOL, A/PRINTM, WRITLIB*) stay as they were.  All the rest of
+COLLECT did relink (INPUTCAL, FORTRAN with its phases, ASEMBLER, WRITLIB*)
+replace the old ones and must take the same records (the catalog stays the
+old one).  The others (ALGOL, A/PRINTM) stay as they were.  All the rest of
 zones 0-77 is new.
 """
 import struct

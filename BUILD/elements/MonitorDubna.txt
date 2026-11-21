@@ -1303,22 +1303,28 @@ C----------------
     *tape:241/cmp41,41          perso FORTRAN, CBDPR
     *tape:242/cmp42,42          perso CONTROL, ENDPRO, GLINK
     *tape:243/cmp43,43          perso ASEMBLER
+    *tape:244/cmp44,44          perso корня WRITLIB*
     *library:21
     *library:23
     *perso:66000
     *call collect:670000
-    MONITOR*(INPUTCAL,FORTRAN,ASEMBLER)
+    MONITOR*(INPUTCAL,FORTRAN,ASEMBLER,WRITLIB*)
     FORTRAN(CBDPR,CONTROL,ENDPRO,GLINK)
     FORTRAN:41,42
     ASEMBLER:43
+    WRITLIB*:44
     *end record
     *call comtodru:670000,650000
 
 COLLECT сам вызывает NEW//MON (перезагрузка резидента) и после этого
 перезагружается. Временная библиотека задачи становится динамической частью.
-Разделы ALGOL, A/PRINTM и WRITLIB* в архиве есть только в собранном виде, в
+Разделы ALGOL и A/PRINTM в архиве есть только в собранном виде, в
 статической части 9/MONSYS, поэтому на картах их нет: BUILD/ms-splice.py
-переносит их из старого образа. Фортран (FORTRAN, CBDPR, CONTROL, ENDPRO,
+переносит их из старого образа. WRITLIB* - это модуль WRITLIBR (с общим
+блоком CATALOG) из besmmons/system2.txt, вызываемый через FORTLIBR библиотеки
+21; текста не было только у его корня из 14 слов, модуля WRITLIB*, он
+восстановлен по образу (writlib/writlib.asm) и лежит в perso на ленте 244
+(карта WRITLIB*:44). Фортран (FORTRAN, CBDPR, CONTROL, ENDPRO,
 GLINK) и ASEMBLER восстановлены в виде текстов на Мадлене (fortran/,
 asembler/). Их модули три задания перед COLLECT пишут в perso на лентах
 241-243 (*TO PERSO:410000 ... 430000), а карта FORTRAN:41,42 велит COLLECT
