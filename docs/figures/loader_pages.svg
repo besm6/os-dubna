@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1060" height="480" viewBox="0 0 1060 480">
+<rect width="1060" height="480" fill="white"/>
+<text x="130" y="26" font-family="Helvetica, Arial, sans-serif" font-size="17.85" fill="#333333" text-anchor="middle" font-weight="bold">drum 21 (9/MONSYS)</text>
+<rect x="20" y="40" width="220" height="32" fill="#d5e8d4" stroke="#82b366" stroke-width="1.2" rx="3"/>
+<text x="130" y="61.35" font-family="Helvetica, Arial, sans-serif" font-size="15.3" fill="#333333" text-anchor="middle">zone 1, 0–377: REDUOL</text>
+<rect x="20" y="72" width="220" height="30" fill="#f5f5f5" stroke="#999999" stroke-width="1.2" rx="3"/>
+<text x="130" y="92.36" font-family="Helvetica, Arial, sans-serif" font-size="15.3" fill="#333333" text-anchor="middle">zone 1, 400–1777: tables</text>
+<rect x="20" y="120" width="220" height="70" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.2" rx="3"/>
+<text x="130" y="150.54" font-family="Helvetica, Arial, sans-serif" font-size="17.85" fill="#333333" text-anchor="middle">zone 0</text>
+<text x="130" y="171.96" font-family="Helvetica, Arial, sans-serif" font-size="17.85" fill="#333333" text-anchor="middle">LOADER</text>
+<rect x="20" y="290" width="220" height="60" fill="#fff2cc" stroke="#d6b656" stroke-width="1.2" rx="3"/>
+<text x="130" y="315.54" font-family="Helvetica, Arial, sans-serif" font-size="17.85" fill="#333333" text-anchor="middle">zone 6</text>
+<text x="130" y="336.96" font-family="Helvetica, Arial, sans-serif" font-size="17.85" fill="#333333" text-anchor="middle">library search</text>
+<text x="730" y="26" font-family="Helvetica, Arial, sans-serif" font-size="17.85" fill="#333333" text-anchor="middle" font-weight="bold">memory</text>
+<rect x="600" y="40" width="260" height="32" fill="#d5e8d4" stroke="#82b366" stroke-width="1.2" rx="3"/>
+<text x="730" y="61.65" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="16.15" fill="#333333" text-anchor="middle">76000–76377</text>
+<rect x="600" y="72" width="260" height="118" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.2" rx="3"/>
+<text x="730" y="117.27" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="16.15" fill="#333333" text-anchor="middle">76400–77777</text>
+<text x="730" y="136.65" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="16.15" fill="#333333" text-anchor="middle"></text>
+<text x="730" y="156.03" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="16.15" fill="#333333" text-anchor="middle">page 37</text>
+<rect x="600" y="290" width="260" height="60" fill="#fff2cc" stroke="#d6b656" stroke-width="1.2" rx="3"/>
+<text x="730" y="315.96" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="16.15" fill="#333333" text-anchor="middle">02000–03777</text>
+<text x="730" y="335.34" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="16.15" fill="#333333" text-anchor="middle">page 1</text>
+<line x1="240" y1="155" x2="592.5" y2="155" stroke="#333333" stroke-width="1.2"/>
+<polygon points="598,155 591.55,157.73 591.55,152.27" fill="#333333" stroke="none" stroke-width="1"/>
+<text x="420" y="146" font-family="Helvetica, Arial, sans-serif" font-size="16.15" fill="#333333" text-anchor="middle">1. *70 61B: the whole page</text>
+<line x1="240" y1="56" x2="592.5" y2="56" stroke="#333333" stroke-width="1.2"/>
+<polygon points="598,56 591.55,58.73 591.55,53.27" fill="#333333" stroke="none" stroke-width="1"/>
+<text x="420" y="47" font-family="Helvetica, Arial, sans-serif" font-size="16.15" fill="#333333" text-anchor="middle">3. at the end: the print part</text>
+<line x1="240" y1="320" x2="592.5" y2="320" stroke="#333333" stroke-width="1.2"/>
+<polygon points="598,320 591.55,322.73 591.55,317.27" fill="#333333" stroke="none" stroke-width="1"/>
+<text x="420" y="311" font-family="Helvetica, Arial, sans-serif" font-size="16.15" fill="#333333" text-anchor="middle">4b. *70 74B: library search</text>
+<text x="730" y="220" font-family="Helvetica, Arial, sans-serif" font-size="15.3" fill="#808080" text-anchor="middle">2. LOAD reads tables and</text>
+<text x="730" y="239.12" font-family="Helvetica, Arial, sans-serif" font-size="15.3" fill="#808080" text-anchor="middle">modules into free pages</text>
+<text x="730" y="400" font-family="Helvetica, Arial, sans-serif" font-size="17.85" fill="#333333" text-anchor="middle" font-weight="bold">drum 20</text>
+<rect x="600" y="410" width="120" height="44" fill="#f5f5f5" stroke="#999999" stroke-width="1.2" rx="3"/>
+<text x="660" y="437.95" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#333333" text-anchor="middle">zone 26</text>
+<rect x="740" y="410" width="120" height="44" fill="#f5f5f5" stroke="#999999" stroke-width="1.2" rx="3"/>
+<text x="800" y="437.95" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#333333" text-anchor="middle">zone 4</text>
+<path d="M860,100 L920,100 L920,432" fill="none" stroke="#808080" stroke-width="1.2"/>
+<line x1="920" y1="432" x2="867.5" y2="432" stroke="#808080" stroke-width="1.2"/>
+<polygon points="862,432 868.45,429.27 868.45,434.73" fill="#808080" stroke="none" stroke-width="1"/>
+<text x="930" y="200" font-family="Helvetica, Arial, sans-serif" font-size="15.3" fill="#808080" text-anchor="start">0. *70 46B:</text>
+<text x="930" y="219.12" font-family="Helvetica, Arial, sans-serif" font-size="15.3" fill="#808080" text-anchor="start">the exchange</text>
+<text x="930" y="238.25" font-family="Helvetica, Arial, sans-serif" font-size="15.3" fill="#808080" text-anchor="start">page out first,</text>
+<text x="930" y="257.38" font-family="Helvetica, Arial, sans-serif" font-size="15.3" fill="#808080" text-anchor="start">back at the</text>
+<text x="930" y="276.5" font-family="Helvetica, Arial, sans-serif" font-size="15.3" fill="#808080" text-anchor="start">end (45B)</text>
+<line x1="660" y1="350" x2="660" y2="402.5" stroke="#808080" stroke-width="1.2"/>
+<polygon points="660,408 657.27,401.55 662.73,401.55" fill="#808080" stroke="none" stroke-width="1"/>
+<text x="560" y="375" font-family="Helvetica, Arial, sans-serif" font-size="15.3" fill="#808080" text-anchor="end">4a. page 1 out first,</text>
+<text x="560" y="394.12" font-family="Helvetica, Arial, sans-serif" font-size="15.3" fill="#808080" text-anchor="end">back on RELOAD</text>
+</svg>

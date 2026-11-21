@@ -22,14 +22,17 @@ echo compile DD
 echo compile MS
 ./mk-ms-src.sh
 
+echo compile LD
+./mk-ld-src.sh
+
+echo "Making the loader image"
+./mk-ld-img.sh || exit 1
+
 echo "Assembling the MS image"
 ./mk-ms-img.sh || exit 1
 
 echo compile STL
 ./mk-stl-src.sh
-
-echo compile LD
-./mk-ld-src.sh
 
 echo "Making disk images for SIMH"
 ( cd data; ./mkdisk9.sh; ./mkdisk11.sh; ./mkbridges.sh)

@@ -26,9 +26,10 @@ codes. Tapes live in `BUILD/tapes/`, named by number (`ReadMeTapes.txt`; the map
 | `populate-dsk.sh` | Writes the archived tape images 9/MONSYS, 12 and 37/LIBRAR. |
 | `mk-dd-src.sh` | Puts the DD sources (`besmdisp/`) on tape 400 and compiles them. |
 | `mk-ms-src.sh` | The same for the MS sources (`besmmons/`), tape 200. |
+| `mk-ld-src.sh` | The dynamic loader (`besmtask/loader.txt`), tape 100. |
+| `mk-ld-img.sh` | Its memory image, zones 0 and 1 of tape 101 ([Dynamic_Loader.md](Dynamic_Loader.md)). |
 | `mk-ms-img.sh` | Assembles the MS: tapes 201–203, 922 and `data/mons9.bin` (below). |
 | `mk-stl-src.sh` | The same for the standard tasks (`besmtask/`), tape 247, with Monitor Dubna's `*FOREX`. |
-| `mk-ld-src.sh` | The loader, tape 100. |
 | `data/mkdisk9.sh`, `mkdisk11.sh`, `mkbridges.sh` | Disk images and bridge tapes (below). |
 | `deck-b1/mk-deck-b1.sh` | Writes the patch deck job `deck-b1.dub`. |
 | `debmult.dub` | Runs DEBMULT. It copies the monitor's resident table into the Multitype area. |
@@ -97,8 +98,8 @@ the end of drum 22.
 static sections in the archived image. So `ms-splice.py` builds the final image:
 everything from the new drums, the static part and its catalog from the archive at the
 old place, and in it the sections linked by `COLLECT` (the same size: `INPUTCAL` differs
-in six words, the Fortran compiler and `ASEMBLER` in words of the headers). The result
-goes to tape 203 and to
+in six words, the Fortran compiler and `ASEMBLER` in words of the headers), and the
+dynamic loader from tape 101 in zones 0 and 1. The result goes to tape 203 and to
 `data/mons9.bin` for `mkdisk9.sh`.
 
 The date in the banner of a listing, `МОНИТОРНАЯ СИСТЕМА 'Д У Б Н А' - 13/11/26`, is

@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="470" viewBox="0 0 980 470">
+<rect width="980" height="470" fill="white"/>
+<rect x="20" y="30" width="170" height="64" fill="#f5f5f5" stroke="#999999" stroke-width="1.2" rx="3"/>
+<text x="105" y="57.54" font-family="Helvetica, Arial, sans-serif" font-size="17.85" fill="#333333" text-anchor="middle">loader.txt</text>
+<text x="105" y="78.96" font-family="Helvetica, Arial, sans-serif" font-size="17.85" fill="#333333" text-anchor="middle">2024 lines</text>
+<rect x="260" y="30" width="170" height="64" fill="#fff2cc" stroke="#d6b656" stroke-width="1.2" rx="3"/>
+<text x="345" y="57.54" font-family="Helvetica, Arial, sans-serif" font-size="17.85" fill="#333333" text-anchor="middle">tape 100</text>
+<text x="345" y="78.96" font-family="Helvetica, Arial, sans-serif" font-size="17.85" fill="#333333" text-anchor="middle">from zone 100</text>
+<text x="345" y="118" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="16.15" fill="#808080" text-anchor="middle">mk-ld-src.sh</text>
+<line x1="190" y1="62" x2="252.5" y2="62" stroke="#333333" stroke-width="1.2"/>
+<polygon points="258,62 251.55,64.73 251.55,59.27" fill="#333333" stroke="none" stroke-width="1"/>
+<rect x="500" y="8" width="210" height="50" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.2" rx="3"/>
+<text x="605" y="28.75" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#333333" text-anchor="middle">LOADER</text>
+<text x="605" y="49.15" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#333333" text-anchor="middle">lines 84–376 cut</text>
+<rect x="500" y="68" width="210" height="50" fill="#d5e8d4" stroke="#82b366" stroke-width="1.2" rx="3"/>
+<text x="605" y="88.75" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#333333" text-anchor="middle">REDUOL</text>
+<text x="605" y="109.15" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#333333" text-anchor="middle">lines 377–728 cut</text>
+<line x1="430" y1="55" x2="492.77" y2="34.69" stroke="#333333" stroke-width="1.2"/>
+<polygon points="498,33 492.7,37.58 491.03,32.39" fill="#333333" stroke="none" stroke-width="1"/>
+<line x1="430" y1="69" x2="492.81" y2="91.17" stroke="#333333" stroke-width="1.2"/>
+<polygon points="498,93 491.01,93.42 492.83,88.28" fill="#333333" stroke="none" stroke-width="1"/>
+<text x="465" y="18" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="16.15" fill="#808080" text-anchor="middle">*EDIT</text>
+<rect x="780" y="30" width="180" height="64" fill="#fff2cc" stroke="#d6b656" stroke-width="1.2" rx="3"/>
+<text x="870" y="57.54" font-family="Helvetica, Arial, sans-serif" font-size="17.85" fill="#333333" text-anchor="middle">tape 101</text>
+<text x="870" y="78.96" font-family="Helvetica, Arial, sans-serif" font-size="17.85" fill="#333333" text-anchor="middle">perso, zone 100</text>
+<line x1="710" y1="33" x2="772.77" y2="53.31" stroke="#333333" stroke-width="1.2"/>
+<polygon points="778,55 771.03,55.61 772.7,50.42" fill="#333333" stroke="none" stroke-width="1"/>
+<line x1="710" y1="93" x2="772.81" y2="70.83" stroke="#333333" stroke-width="1.2"/>
+<polygon points="778,69 772.83,73.72 771.01,68.58" fill="#333333" stroke="none" stroke-width="1"/>
+<text x="745" y="18" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="16.15" fill="#808080" text-anchor="middle">*MADLEN</text>
+<text x="870" y="118" font-family="Helvetica, Arial, sans-serif" font-size="16.15" fill="#808080" text-anchor="start">job 1</text>
+<rect x="20" y="200" width="210" height="64" fill="#f5f5f5" stroke="#999999" stroke-width="1.2" rx="3"/>
+<text x="125" y="227.75" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#333333" text-anchor="middle">LDSHIFT</text>
+<text x="125" y="248.15" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#333333" text-anchor="middle">addresses ≥ 60000 +10000</text>
+<rect x="300" y="190" width="230" height="40" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.2" rx="3"/>
+<text x="415" y="215.65" font-family="Helvetica, Arial, sans-serif" font-size="16.15" fill="#333333" text-anchor="middle">NEWLDR: LOADER at 66000</text>
+<rect x="300" y="236" width="230" height="40" fill="#d5e8d4" stroke="#82b366" stroke-width="1.2" rx="3"/>
+<text x="415" y="261.65" font-family="Helvetica, Arial, sans-serif" font-size="16.15" fill="#333333" text-anchor="middle">NEWLDRS: REDUOL at 66000</text>
+<line x1="230" y1="220" x2="292.56" y2="210.8" stroke="#333333" stroke-width="1.2"/>
+<polygon points="298,210 292.02,213.63 291.22,208.24" fill="#333333" stroke="none" stroke-width="1"/>
+<line x1="230" y1="244" x2="292.58" y2="255.04" stroke="#333333" stroke-width="1.2"/>
+<polygon points="298,256 291.18,257.56 292.12,252.2" fill="#333333" stroke="none" stroke-width="1"/>
+<rect x="600" y="190" width="150" height="40" fill="#ffe6cc" stroke="#d79b00" stroke-width="1.2" rx="3"/>
+<text x="675" y="215.65" font-family="Helvetica, Arial, sans-serif" font-size="16.15" fill="#333333" text-anchor="middle">drum 25, zone 35</text>
+<rect x="600" y="236" width="150" height="40" fill="#ffe6cc" stroke="#d79b00" stroke-width="1.2" rx="3"/>
+<text x="675" y="261.65" font-family="Helvetica, Arial, sans-serif" font-size="16.15" fill="#333333" text-anchor="middle">drum 25, zone 36</text>
+<line x1="530" y1="210" x2="592.5" y2="210" stroke="#333333" stroke-width="1.2"/>
+<polygon points="598,210 591.55,212.73 591.55,207.27" fill="#333333" stroke="none" stroke-width="1"/>
+<line x1="530" y1="256" x2="592.5" y2="256" stroke="#333333" stroke-width="1.2"/>
+<polygon points="598,256 591.55,258.73 591.55,253.27" fill="#333333" stroke="none" stroke-width="1"/>
+<text x="565" y="300" font-family="Helvetica, Arial, sans-serif" font-size="16.15" fill="#808080" text-anchor="middle">page 33</text>
+<rect x="820" y="200" width="140" height="64" fill="#fff2cc" stroke="#d6b656" stroke-width="1.2" rx="3"/>
+<text x="890" y="227.54" font-family="Helvetica, Arial, sans-serif" font-size="17.85" fill="#333333" text-anchor="middle">tape 101</text>
+<text x="890" y="248.96" font-family="Helvetica, Arial, sans-serif" font-size="17.85" fill="#333333" text-anchor="middle">zones 0, 1</text>
+<line x1="750" y1="210" x2="812.58" y2="221.04" stroke="#333333" stroke-width="1.2"/>
+<polygon points="818,222 811.18,223.56 812.12,218.2" fill="#333333" stroke="none" stroke-width="1"/>
+<line x1="750" y1="256" x2="812.58" y2="244.96" stroke="#333333" stroke-width="1.2"/>
+<polygon points="818,244 812.12,247.8 811.18,242.44" fill="#333333" stroke="none" stroke-width="1"/>
+<text x="785" y="300" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="16.15" fill="#808080" text-anchor="middle">LDWRITE</text>
+<text x="140" y="300" font-family="Helvetica, Arial, sans-serif" font-size="16.15" fill="#808080" text-anchor="middle">job 2</text>
+<path d="M820,96 C800,160 140,140 125,196" fill="none" stroke="#808080" stroke-width="1.2" stroke-dasharray="4 3"/>
+<polygon points="125,196 124.04,189.07 129.3,190.48" fill="#808080" stroke="none" stroke-width="1"/>
+<rect x="300" y="370" width="230" height="64" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.2" rx="3"/>
+<text x="415" y="397.75" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#333333" text-anchor="middle">ms-splice.py</text>
+<text x="415" y="418.15" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#333333" text-anchor="middle">zone 0, zone 1 words 0–377</text>
+<rect x="620" y="370" width="200" height="64" fill="#d5e8d4" stroke="#82b366" stroke-width="1.2" rx="3"/>
+<text x="720" y="397.54" font-family="Helvetica, Arial, sans-serif" font-size="17.85" fill="#333333" text-anchor="middle">tape 203</text>
+<text x="720" y="418.96" font-family="Helvetica, Arial, sans-serif" font-size="17.85" fill="#333333" text-anchor="middle">data/mons9.bin</text>
+<path d="M890,266 C890,330 600,330 532,392" fill="none" stroke="#333333" stroke-width="1.2"/>
+<polygon points="532,392 534.93,385.64 538.6,389.67" fill="#333333" stroke="none" stroke-width="1"/>
+<line x1="530" y1="402" x2="612.5" y2="402" stroke="#333333" stroke-width="1.2"/>
+<polygon points="618,402 611.55,404.73 611.55,399.27" fill="#333333" stroke="none" stroke-width="1"/>
+<text x="150" y="395" font-family="Helvetica, Arial, sans-serif" font-size="16.15" fill="#808080" text-anchor="middle">mk-ms-img.sh: the rest of</text>
+<text x="150" y="415.19" font-family="Helvetica, Arial, sans-serif" font-size="16.15" fill="#808080" text-anchor="middle">zones 0–77 from COLLECT</text>
+</svg>

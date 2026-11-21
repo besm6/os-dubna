@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """Splice the rebuilt MS into a copy of the archived 9/MONSYS.
 
-    ms-splice.py new old template out
+    ms-splice.py new old template out [loader]
 
 new      - working copy of drums 21/22 made by COLLECT and COMTODRU (tape)
 old      - archived 9/MONSYS (tape)
 template - image to patch: a tape, or the disk file data/mons9.d9
 out      - result: template with zones 0-77 replaced
+loader   - tape made by mk-ld-img.sh: the dynamic loader, zone 0 (LOADER)
+           and words 0-377 of zone 1 (REDUOL) go to the same places
 
 The result has the old static part at its old place; the sections that
 COLLECT did relink (INPUTCAL, FORTRAN with its phases, ASEMBLER) replace the
@@ -104,6 +106,13 @@ def main():
     gap = start - (dyn_end + REC - 1) // REC
     img[i + 1] = (old[i + 1] & ~(0o77777 << 30)) | (gap << 30)
     img[1024 + MONPAGE] = old[1024 + MONPAGE]
+
+    if len(sys.argv) > 5:
+        ld = open(sys.argv[5], 'rb').read()
+        o = 4 * ZONE + 64               # dubna's tape: 4 blocks before zone 0
+        ld = struct.unpack('<2048Q', ld[o:o + 8192] + ld[o + ZONE:o + ZONE + 8192])
+        img[0:1024] = ld[0:1024]
+        img[1024:1024 + 0o400] = ld[1024:1024 + 0o400]
 
     for z in range(NZ):
         o = skip + z * ZONE + 64

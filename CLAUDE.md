@@ -66,9 +66,11 @@ Terminology used everywhere:
   - `Service_Tasks.md` — the service tasks 11–76 of 5/D73LIB: how DD starts them (`NN/`),
     the dialogue, and what each task does. Figures are SVG made by `docs/figures/*.py`
     (`make` there; `svg.py` is the helper).
+  - `Dynamic_Loader.md` — the dynamic loader REDUOL: the address space of a program, how
+    the monitor calls the loader, its two pages, how `mk-ld-img.sh` builds them.
 
   The articles, except `Switch_Registers.md`, `Dubna_Commands.md`, `Boot_Process.md`,
-  `OS_Dubna_Tutorial.md`, `Formatting_Tapes.md`, `Monsys9_Tape.md` and `Service_Tasks.md` (written here), are copies from other BESM-6
+  `OS_Dubna_Tutorial.md`, `Formatting_Tapes.md`, `Monsys9_Tape.md`, `Service_Tasks.md` and `Dynamic_Loader.md` (written here), are copies from other BESM-6
   projects (besm6/simh, v7besm, c-compiler); a note under each title names the origin. Their "kernel" and "compiler" are those projects', and
   links to files outside `docs/` are absolute GitHub URLs. Keep it that way when adding more:
   no relative links to files that are not in this repo.
@@ -98,11 +100,14 @@ Pipeline in `bootstrap.sh`:
    file on unit 50, copied by the editor to the target tape from zone 100 and compiled to
    zones 0-77. `mk-lib21-src.sh`, `mk-lib23-src.sh`, `mk-exfor-src.sh` follow the same
    pattern but are not called by the bootstrap.
+   `mk-ld-img.sh` makes the memory image of the dynamic loader on tape 101, as
+   `besmtask/loadload.txt` did (identical to the archived one, see `docs/Dynamic_Loader.md`).
    `mk-ms-img.sh` then assembles the MS: `COLLECT` and `COMTODRU` (library 21) link the
    perso of tape 200 into a copy of drums 21, 22, together with the Fortran compiler and
    ASEMBLER, whose modules three jobs put into perso on tapes 241-243 (cards
    `FORTRAN:41,42`, `ASEMBLER:43`), and `ms-splice.py` puts it into a copy of 9/MONSYS
-   (tape 203, `data/mons9.bin`), keeping the old static sections of the other compilers.
+   (tape 203, `data/mons9.bin`) with the loader of tape 101, keeping the old static
+   sections of the other compilers.
    `ms-check.sh` compares tape 200 with the archived library:
    only `CHKBEG*` and `EDIT***` differ in size.
 3. `data/mkdisk9.sh`, `data/mkdisk11.sh`, `data/mkbridges.sh` — concatenate catalog + contents
@@ -144,7 +149,7 @@ their thousands digit (1400 → 400).
 | Range | Use |
 | --- | --- |
 | 9, 12, 37 | original images: monsys, librar-12, librar-37 |
-| 100-199 | compilers (100 loader) |
+| 100-199 | compilers (100 loader, 101 loader image) |
 | 200-399 | MS and libraries (200 MS, 201 COLLECT output, 202 MS drums, 203 9/MONSYS with the rebuilt MS, 221 lib21, 223 lib23, 241-243 perso of the Fortran compiler and ASEMBLER, 247 tasks, 301 exfor) |
 | 400-899 | DD (400) |
 | 900-999 | scratch (922 tape 203 from zone 40: MS drum 22, 990 DD perso, 999 linked DD with the system) |

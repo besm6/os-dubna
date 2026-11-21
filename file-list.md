@@ -51,7 +51,7 @@ Note: it is the same as dub_besm/dumba.ms
 	besmtask/exfor.vv
 
 	besmtask/loader.txt	- Силинский REDUOL! большая удача, что есть в текстах  
-	besmtask/loadload.txt	- резидентный загрузчик
+	besmtask/loadload.txt	- резидентный загрузчик: задание, делящее REDUOL на две страницы (образец BUILD/mk-ld-img.sh)
 	besmtask/madlen.txt	- Мадлен 2, V 3.5 
 		(имя Мадлен придумал Волков, aka MAde in Dubna and LENingard) 
 	besmtask/task11.ts1	-  БСЗ 1

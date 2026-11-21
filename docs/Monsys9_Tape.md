@@ -83,7 +83,7 @@ tape as a ready memory picture, the monitor page. A job starts by reading that p
 
 | Words | Content |
 | --- | --- |
-| 0–777 | By M. Popov's notes: loader overlay (0–377), TRP (400–677), a copy of cells 0–77 (700–777). Not checked here. |
+| 0–777 | By M. Popov's notes: loader overlay (0–377, checked: the print part of the loader, see [Dynamic_Loader.md](Dynamic_Loader.md)), TRP (400–677), a copy of cells 0–77 (700–777). |
 | 1000–1376 | TRP of the monitor with the initiator. Read at the start of every job. |
 | 1377 | Where the monitor page is: `0014 0000 0021 0035` = physical drum 21, zone 35 |
 | 1400–1433 | Catalog of the static part |
@@ -218,15 +218,16 @@ otherwise zeros repeat. The piece of TRP, if any, comes after the last group: th
 | Section `INPUTCAL` | 36–43 | relinked from library 21 (binary perso) and the new dynamic modules |
 | Sections `FORTRAN`, `CBDPR`, `CONTROL`, `ENDPRO`, `GLINK`, `ASEMBLER` | 43–70 | **linked by `COLLECT`** from the Madlen sources in `fortran/` and `asembler/` |
 | Sections `ALGOL`, `A/PRINTM`, `WRITLIB*` | 70–77 | copied from the archived tape |
-| Loaders and tables | 0, 2–6 | copied from the running system by `COLLECT` |
+| Dynamic loader | 0, zone 1 words 0–377 | **compiled** from `besmtask/loader.txt` by `mk-ld-img.sh`, see [Dynamic_Loader.md](Dynamic_Loader.md) |
+| Other tables | rest of zone 1, 2–6 | copied from the running system by `COLLECT` |
 | Everything from zone 100 | 100–437 | the archived tape |
 
 `ALGOL`, `A/PRINTM` and `WRITLIB*` cannot be rebuilt: the archive has neither their sources
 nor their perso, only the linked sections. The Fortran compiler and the assembler were
 taken apart from the linked sections into Madlen sources (`fortran/`, `asembler/`); `make`
 there links them with `*CALL OVERLAY` (`tools/dubovl.pl`) into images identical to the
-archived ones. The dynamic loader has a source (`besmtask/loader.txt`, compiled to tape
-100) but it is not yet put into the image.
+archived ones. The dynamic loader is built from `besmtask/loader.txt` into two pages
+identical to the archived ones, see [Dynamic_Loader.md](Dynamic_Loader.md).
 
 All the static sections of the archived tape were written by one run of `COLLECT` (bit 46
 of each catalog word; the date 22/10/88 in words 1776–1777 of the catalog), with the tree of
@@ -327,7 +328,8 @@ and `ASEMBLER`. The script makes the final 64 zones:
    differ from the old; the sections of the Fortran compiler and `ASEMBLER`: only words
    of the header, see below);
 5. in zone 1 the old static catalog and the old word 1377; the gap in the root entry is
-   computed anew.
+   computed anew;
+6. zone 0 and words 0–377 of zone 1, the dynamic loader, from tape 101 (5th argument).
 
 It stops if the dynamic part grows past zone 34. The result is written twice: tape 203
 (a full 9/MONSYS for the DD link job, which copies zones 0–77 to drums 21 and 22) and

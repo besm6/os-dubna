@@ -68,6 +68,7 @@
 ## 100-199 Compilers
 #
 100 - loader
+101 - loader image: zone 0 LOADER, zone 1 REDUOL (mk-ld-img.sh), perso from zone 100
 
 ## 200-399 Monitor System (MS) & libraries
 #
