@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="230" viewBox="0 0 980 230">
+<rect width="980" height="230" fill="white"/>
+<rect x="15" y="80" width="100" height="64" fill="#f5f5f5" stroke="#999999" stroke-width="1.2" rx="3"/>
+<text x="65" y="117.65" font-family="Helvetica, Arial, sans-serif" font-size="16.15" fill="#333333" text-anchor="middle">resident</text>
+<text x="15" y="170" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="14.45" fill="#808080" text-anchor="start">0</text>
+<rect x="115" y="80" width="70" height="64" fill="#f5f5f5" stroke="#999999" stroke-width="1.2" rx="3"/>
+<text x="150" y="117.65" font-family="Helvetica, Arial, sans-serif" font-size="16.15" fill="#333333" text-anchor="middle">head</text>
+<text x="115" y="170" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="14.45" fill="#808080" text-anchor="start">01604</text>
+<rect x="185" y="80" width="80" height="64" fill="#e1d5e7" stroke="#9673a6" stroke-width="1.2" rx="3"/>
+<text x="225" y="117.65" font-family="Helvetica, Arial, sans-serif" font-size="16.15" fill="#333333" text-anchor="middle">root</text>
+<text x="185" y="170" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="14.45" fill="#808080" text-anchor="start">01614</text>
+<rect x="265" y="80" width="120" height="64" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.2" rx="3"/>
+<text x="325" y="117.65" font-family="Helvetica, Arial, sans-serif" font-size="16.15" fill="#333333" text-anchor="middle">FORTLIBR</text>
+<text x="265" y="170" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="14.45" fill="#808080" text-anchor="start">01630</text>
+<rect x="385" y="80" width="140" height="64" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.2" rx="3"/>
+<text x="455" y="117.65" font-family="Helvetica, Arial, sans-serif" font-size="16.15" fill="#333333" text-anchor="middle">BUFFER</text>
+<text x="385" y="170" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="14.45" fill="#808080" text-anchor="start">02000</text>
+<rect x="525" y="80" width="140" height="64" fill="#d5e8d4" stroke="#82b366" stroke-width="1.2" rx="3"/>
+<text x="595" y="117.65" font-family="Helvetica, Arial, sans-serif" font-size="16.15" fill="#333333" text-anchor="middle">WRITLIBR</text>
+<text x="525" y="170" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="14.45" fill="#808080" text-anchor="start">04000</text>
+<rect x="665" y="80" width="300" height="64" fill="#fff2cc" stroke="#d6b656" stroke-width="1.2" rx="3"/>
+<text x="815" y="117.65" font-family="Helvetica, Arial, sans-serif" font-size="16.15" fill="#333333" text-anchor="middle">CATALOG</text>
+<text x="665" y="170" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="14.45" fill="#808080" text-anchor="start">06000</text>
+<text x="965" y="170" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="14.45" fill="#808080" text-anchor="end">26000</text>
+<line x1="115" y1="60" x2="965" y2="60" stroke="#333333" stroke-width="1"/>
+<line x1="115" y1="60" x2="115" y2="72" stroke="#333333" stroke-width="1"/>
+<line x1="965" y1="60" x2="965" y2="72" stroke="#333333" stroke-width="1"/>
+<text x="540" y="46" font-family="Helvetica, Arial, sans-serif" font-size="15.3" fill="#333333" text-anchor="middle">section WRITLIB*: 24174 words, on the tape from zone 77, record 26</text>
+<text x="15" y="215" font-family="Helvetica, Arial, sans-serif" font-size="14.45" fill="#808080" text-anchor="start">BUFFER and CATALOG are zeros: the packed section is little more than the code.</text>
+</svg>

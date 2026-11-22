@@ -74,9 +74,11 @@ Terminology used everywhere:
     (`make` there; `svg.py` is the helper).
   - `Dynamic_Loader.md` — the dynamic loader REDUOL: the address space of a program, how
     the monitor calls the loader, its two pages, how `mk-ld-img.sh` builds them.
+  - `Writlib.md` — the section WRITLIB*: how a compiled module is stored in the temporary
+    library (root, `FORTLIBR`, `WRITLIBR`, the catalog), how it is built.
 
   The articles, except `Switch_Registers.md`, `Dubna_Commands.md`, `Boot_Process.md`,
-  `OS_Dubna_Tutorial.md`, `Formatting_Tapes.md`, `Monsys9_Tape.md`, `Service_Tasks.md` and `Dynamic_Loader.md` (written here), are copies from other BESM-6
+  `OS_Dubna_Tutorial.md`, `Formatting_Tapes.md`, `Monsys9_Tape.md`, `Service_Tasks.md`, `Dynamic_Loader.md` and `Writlib.md` (written here), are copies from other BESM-6
   projects (besm6/simh, v7besm, c-compiler); a note under each title names the origin. Their "kernel" and "compiler" are those projects', and
   links to files outside `docs/` are absolute GitHub URLs. Keep it that way when adding more:
   no relative links to files that are not in this repo.

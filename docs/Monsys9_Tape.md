@@ -241,7 +241,7 @@ a trace (`make trace`, `tools/ovltrace.py`) and by `tools/codesym.py`; `ALGOL` h
 library) is the module `WRITLIBR` of `besmmons/system2.txt` with its common `CATALOG`,
 called through `FORTLIBR` of library 21; only its root of 14 words, the module
 `WRITLIB*`, had no source and was written from the image (`writlib/writlib.asm`, `make`
-there checks it the same way). The dynamic loader is built from `besmtask/loader.txt` into
+there checks it the same way; see [Writlib.md](Writlib.md)). The dynamic loader is built from `besmtask/loader.txt` into
 two pages identical to the archived ones, see [Dynamic_Loader.md](Dynamic_Loader.md).
 
 All the static sections of the archived tape were written by one run of `COLLECT` (bit 46

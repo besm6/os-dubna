@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="380" viewBox="0 0 980 380">
+<rect width="980" height="380" fill="white"/>
+<rect x="20" y="20" width="220" height="64" fill="#f5f5f5" stroke="#999999" stroke-width="1.2" rx="3"/>
+<text x="130" y="48.39" font-family="Helvetica, Arial, sans-serif" font-size="14.45" fill="#333333" text-anchor="middle">writlib/writlib.asm</text>
+<text x="130" y="65.73" font-family="Helvetica, Arial, sans-serif" font-size="14.45" fill="#333333" text-anchor="middle">root WRITLIB*</text>
+<rect x="400" y="20" width="150" height="64" fill="#fff2cc" stroke="#d6b656" stroke-width="1.2" rx="3"/>
+<text x="475" y="47.96" font-family="Helvetica, Arial, sans-serif" font-size="16.15" fill="#333333" text-anchor="middle">tape 244</text>
+<text x="475" y="67.34" font-family="Helvetica, Arial, sans-serif" font-size="16.15" fill="#333333" text-anchor="middle">unit 44</text>
+<line x1="240" y1="52" x2="392.5" y2="52" stroke="#333333" stroke-width="1.2"/>
+<polygon points="398,52 391.55,54.73 391.55,49.27" fill="#333333" stroke="none" stroke-width="1"/>
+<text x="319" y="44" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="13.6" fill="#808080" text-anchor="middle">mk-ms-img.sh</text>
+<line x1="550" y1="52" x2="624.62" y2="147.66" stroke="#333333" stroke-width="1.2"/>
+<polygon points="628,152 621.89,148.59 626.18,145.24" fill="#333333" stroke="none" stroke-width="1"/>
+<rect x="20" y="120" width="220" height="64" fill="#f5f5f5" stroke="#999999" stroke-width="1.2" rx="3"/>
+<text x="130" y="148.39" font-family="Helvetica, Arial, sans-serif" font-size="14.45" fill="#333333" text-anchor="middle">besmmons/system2.txt</text>
+<text x="130" y="165.73" font-family="Helvetica, Arial, sans-serif" font-size="14.45" fill="#333333" text-anchor="middle">WRITLIBR, CATALOG</text>
+<rect x="400" y="120" width="150" height="64" fill="#fff2cc" stroke="#d6b656" stroke-width="1.2" rx="3"/>
+<text x="475" y="147.96" font-family="Helvetica, Arial, sans-serif" font-size="16.15" fill="#333333" text-anchor="middle">tape 200</text>
+<text x="475" y="167.34" font-family="Helvetica, Arial, sans-serif" font-size="16.15" fill="#333333" text-anchor="middle">perso of the MS</text>
+<line x1="240" y1="152" x2="392.5" y2="152" stroke="#333333" stroke-width="1.2"/>
+<polygon points="398,152 391.55,154.73 391.55,149.27" fill="#333333" stroke="none" stroke-width="1"/>
+<text x="319" y="144" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="13.6" fill="#808080" text-anchor="middle">mk-ms-src.sh</text>
+<line x1="550" y1="152" x2="622.5" y2="152" stroke="#333333" stroke-width="1.2"/>
+<polygon points="628,152 621.55,154.73 621.55,149.27" fill="#333333" stroke="none" stroke-width="1"/>
+<rect x="20" y="220" width="220" height="64" fill="#f5f5f5" stroke="#999999" stroke-width="1.2" rx="3"/>
+<text x="130" y="248.39" font-family="Helvetica, Arial, sans-serif" font-size="14.45" fill="#333333" text-anchor="middle">besml21/libra211.l21</text>
+<text x="130" y="265.73" font-family="Helvetica, Arial, sans-serif" font-size="14.45" fill="#333333" text-anchor="middle">FORTLIBR</text>
+<rect x="400" y="220" width="150" height="64" fill="#fff2cc" stroke="#d6b656" stroke-width="1.2" rx="3"/>
+<text x="475" y="247.96" font-family="Helvetica, Arial, sans-serif" font-size="16.15" fill="#333333" text-anchor="middle">tape 221</text>
+<text x="475" y="267.34" font-family="Helvetica, Arial, sans-serif" font-size="16.15" fill="#333333" text-anchor="middle">unit 61</text>
+<line x1="240" y1="252" x2="392.5" y2="252" stroke="#333333" stroke-width="1.2"/>
+<polygon points="398,252 391.55,254.73 391.55,249.27" fill="#333333" stroke="none" stroke-width="1"/>
+<text x="319" y="244" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="13.6" fill="#808080" text-anchor="middle">mk-lib21-src.sh</text>
+<line x1="550" y1="252" x2="624.62" y2="156.34" stroke="#333333" stroke-width="1.2"/>
+<polygon points="628,152 626.18,158.76 621.89,155.41" fill="#333333" stroke="none" stroke-width="1"/>
+<rect x="630" y="120" width="150" height="64" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.2" rx="3"/>
+<text x="705" y="147.96" font-family="Helvetica, Arial, sans-serif" font-size="16.15" fill="#333333" text-anchor="middle">COLLECT</text>
+<text x="705" y="167.34" font-family="Helvetica, Arial, sans-serif" font-size="16.15" fill="#333333" text-anchor="middle">WRITLIB*:44,61</text>
+<rect x="820" y="120" width="145" height="64" fill="#d5e8d4" stroke="#82b366" stroke-width="1.2" rx="3"/>
+<text x="892.5" y="148.17" font-family="Helvetica, Arial, sans-serif" font-size="15.3" fill="#333333" text-anchor="middle">COMTODRU</text>
+<text x="892.5" y="166.53" font-family="Helvetica, Arial, sans-serif" font-size="15.3" fill="#333333" text-anchor="middle">ms-splice.py</text>
+<line x1="780" y1="152" x2="812.5" y2="152" stroke="#333333" stroke-width="1.2"/>
+<polygon points="818,152 811.55,154.73 811.55,149.27" fill="#333333" stroke="none" stroke-width="1"/>
+<rect x="820" y="230" width="145" height="64" fill="#ffe6cc" stroke="#d79b00" stroke-width="1.2" rx="3"/>
+<text x="892.5" y="257.96" font-family="Helvetica, Arial, sans-serif" font-size="16.15" fill="#333333" text-anchor="middle">tape 203</text>
+<text x="892.5" y="277.34" font-family="Helvetica, Arial, sans-serif" font-size="16.15" fill="#333333" text-anchor="middle">zone 77.26</text>
+<line x1="892" y1="184" x2="892" y2="222.5" stroke="#333333" stroke-width="1.2"/>
+<polygon points="892,228 889.27,221.55 894.73,221.55" fill="#333333" stroke="none" stroke-width="1"/>
+<text x="20" y="345" font-family="Helvetica, Arial, sans-serif" font-size="14.45" fill="#808080" text-anchor="start">Check: make in writlib/ links the same section under dubna and compares it</text>
+<text x="20" y="368" font-family="Helvetica, Arial, sans-serif" font-size="14.45" fill="#808080" text-anchor="start">with the archived tape monsys/monsys.9: GOOD.</text>
+</svg>
